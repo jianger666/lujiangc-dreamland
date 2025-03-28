@@ -1,0 +1,126 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 技术栈规范
+• 需精通 TypeScript, Node.js, Next.js App Router, React, Shadcn, Tailwindcss
+
+# 代码风格与结构
+• **代码风格**
+  • 编写简洁的技术型 TypeScript 代码，提供准确示例
+  • 使用函数式编程和声明式编程模式，避免类组件
+  • 优先使用迭代和模块化，避免代码重复
+  • 变量命名需描述性并包含助动词（如 isLoading, hasError）
+  • 包管理器使用PNPM
+  
+• **文件结构**
+  ```tsx
+  // 组件结构顺序：
+  1. 导出组件
+  2. 子组件
+  3. 辅助函数
+  4. 静态内容
+  5. 类型定义
+  ```
+
+# 命名规范
+• **组件路径**
+  • 所有组件放在 `src/components` 目录，命名格式如 `new-component.tsx`
+  • 目录使用小写短横线（如 `components/auth-wizard`）
+  • 优先使用命名导出（named exports）
+
+# TypeScript 规范
+• 全量使用 TypeScript，优先使用 interface 而非 type
+• 避免枚举，改用对象映射
+• 使用带有 TypeScript 接口的函数式组件
+
+# 语法格式
+• 简单条件语句避免冗余大括号
+• 优先使用箭头函数，并且返回值类型优先由 TypeScript 自动推导，无需显式声明。
+
+# UI 与样式
+• 组件库：Shadcn
+• 样式方案：TailwindCSS
+• 响应式设计采用移动优先策略，如果当前没有组件，请自行从shadcn添加
+
+# 性能优化
+• **组件优化**
+  • 请尽量避免使用'use client', 'useEffect' 和 'setState' 的使用
+  • 优先使用 React Server Components (RSC)
+  • 客户端组件需包裹 Suspense 并设置 fallback
+  • 非关键组件动态加载
+  
+• **图片优化**
+  • 使用 WebP 格式
+  • 包含尺寸数据
+  • 实现懒加载
+
+# 核心约定
+• **状态管理**
+  • URL 搜索参数状态使用 'nuqs' 管理
+  
+• **性能指标**
+  • 优化 Web Vitals（LCP, CLS, FID）
+  
+• **组件作用域**
+  • 限制 'use client'：
+    ◦ 优先服务端组件和 Next.js SSR
+    ◦ 仅在需要 Web API 的小组件中使用
+    ◦ 避免用于数据获取或状态管理
+  
+• **项目结构**
+  ```markdown
+  /src
+    /app         # 应用逻辑
+    /components  # 公共组件
+  ```
+  • 优势：
+    ◦ 符合行业标准，便于协作
+    ◦ 逻辑与UI分离，提升可维护性
+    ◦ 模块化架构，易于扩展
+    ◦ 关注点分离原则
+
+# 组件组织规范
+• **目录结构示例**
+  ```markdown
+  /src/components
+    ├── /ui        # 基础组件
+    │   ├── /Button
+    │   ├── /Modal
+    │   └── /Card
+    ├── /forms     # 表单组件
+    │   ├── /TextField
+    │   └── /Select
+    └── /layout    # 布局组件
+        ├── /Navbar
+        └── /Footer
+  ```
+
+• **组件分类**
+  • 私有组件：在 `/app` 子目录创建 `_components` 文件夹
+  • 共享组件：跨页面/功能复用的组件放 `/src/components`
+  • 模块化架构：大型项目可为每个功能模块创建独立目录（包含组件、hooks、工具函数）
+
+• **开发原则**
+  • 遵循 Next.js 官方文档的：
+    ◦ 数据获取规范
+    ◦ 渲染策略
+    ◦ 路由管理规范
+
+# 主题规范
+
+## 主题色彩系统
+
+在Lujiangc系统中使用的是一套精心设计的色彩系统，兼容明暗两种模式。核心颜色定义在`src/app/globals.css`中，通过CSS变量实现。
+
+## 间距、阴影、层级、边框等规范
+在`tailwind.config.ts`中定义了标准化的间距规范，请再编写前自行查看
+
+## UI组件参考
+
+所有UI组件样式及其使用示例可在: `/ui-showcase` 路径查看。
+
+编写新组件或页面时，请遵循此文档中的颜色、间距和阴影等规范，确保整个应用程序的一致性和统一性。使用预定义的Tailwind类，如`text-primary`、`bg-card`、`p-md`、`shadow-lg`等来应用这些样式。
+
+    
