@@ -45,7 +45,7 @@
     --muted-foreground: #bebebe;
     --accent: #2d353e;
     --accent-foreground: #ffffff;
-    --destructive: #7f1d1d;
+    --destructive: #ff5252;
     --destructive-foreground: #ffffff;
     --border: #464646;
     --input: #464646;
@@ -65,5 +65,15 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* 简单的过渡动画效果 */
+@layer components {
+  input, 
+  select, 
+  textarea, 
+  button {
+    @apply transition-colors duration-200;
   }
 }

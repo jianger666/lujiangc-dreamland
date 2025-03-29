@@ -131,12 +131,6 @@ export function RestaurantList({ restaurants, title }: RestaurantListProps) {
                       地址: {restaurant.address}
                     </p>
 
-                    {restaurant.businessHours && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        营业时间: {restaurant.businessHours}
-                      </p>
-                    )}
-
                     <div className="mt-3 flex justify-end">
                       <Button variant="ghost" size="sm" className="text-xs">
                         选择这家

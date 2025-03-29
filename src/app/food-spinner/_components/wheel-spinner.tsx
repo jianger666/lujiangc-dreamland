@@ -1,18 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Restaurant } from './types';
 import { Utensils, Frown, Store } from 'lucide-react';
-
-// 动态导入Wheel组件，禁用SSR以避免"window is not defined"错误
-const Wheel = dynamic(
-  () => import('react-custom-roulette').then((mod) => mod.Wheel),
-  { ssr: false },
-);
+import { Skeleton } from '@/components/ui/skeleton';
+import { Wheel } from 'react-custom-roulette';
 
 // 创建触发confetti效果的函数
 function triggerConfetti() {
@@ -32,6 +27,7 @@ function triggerConfetti() {
 interface WheelSpinnerProps {
   restaurants: Restaurant[];
   hasSearched?: boolean;
+  isLoading?: boolean;
 }
 
 // 生成转盘的分段颜色（循环使用）
@@ -75,6 +71,7 @@ const isValidImageUrl = (url?: string) => {
 export function WheelSpinner({
   restaurants,
   hasSearched = false,
+  isLoading = false,
 }: WheelSpinnerProps) {
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
@@ -82,9 +79,17 @@ export function WheelSpinner({
   const [wheelData, setWheelData] = useState<Array<{ option: string }>>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [error, setError] = useState(false);
+  const [previousRestaurants, setPreviousRestaurants] = useState<Restaurant[]>(
+    [],
+  );
 
   // 根据餐厅列表生成轮盘数据
   useEffect(() => {
+    // 如果正在加载并且用户已经搜索过，保持之前的数据不变
+    if (isLoading && hasSearched && previousRestaurants.length > 0) {
+      return;
+    }
+
     if (restaurants.length > 0) {
       const newColors = generateSegmentColors(restaurants.length);
       const newWheelData = restaurants.map((restaurant) => ({
@@ -94,16 +99,20 @@ export function WheelSpinner({
       setWheelData(newWheelData);
       setColors(newColors);
       setWinner(null);
-    } else {
+
+      // 保存当前数据作为上一次的数据
+      setPreviousRestaurants(restaurants);
+    } else if (!isLoading || !hasSearched) {
+      // 只有在非加载状态或用户未搜索过时才清空转盘
       setWheelData([]);
       setColors([]);
     }
-  }, [restaurants]);
+  }, [restaurants, isLoading, hasSearched]);
 
   const handleSpinClick = () => {
-    if (!mustSpin && restaurants.length > 0) {
+    if (!mustSpin && wheelData.length > 0) {
       // 生成随机结果
-      const newPrizeNumber = Math.floor(Math.random() * restaurants.length);
+      const newPrizeNumber = Math.floor(Math.random() * wheelData.length);
       setPrizeNumber(newPrizeNumber);
       setMustSpin(true);
     }
@@ -126,35 +135,11 @@ export function WheelSpinner({
     console.log('图片加载失败');
   };
 
-  return (
-    <Card className="flex flex-col items-center p-6">
-      <h2 className="mb-4 text-xl font-semibold">美食命运转盘</h2>
-
-      {wheelData.length === 0 ? (
-        <div className="bg-muted/20 flex h-[300px] w-full flex-col items-center justify-center rounded-lg p-6">
-          {!hasSearched ? (
-            <>
-              <Utensils className="mb-4 h-16 w-16 text-muted-foreground" />
-              <p className="mb-2 text-center font-medium text-muted-foreground">
-                请先筛选美食，结果将显示在转盘上
-              </p>
-              <p className="text-muted-foreground/80 text-center text-sm">
-                选择您喜欢的美食分类、价格范围和评分，点击确认筛选按钮开始
-              </p>
-            </>
-          ) : (
-            <>
-              <Frown className="mb-4 h-16 w-16 text-muted-foreground" />
-              <p className="mb-2 text-center font-medium text-muted-foreground">
-                未找到符合条件的美食选项
-              </p>
-              <p className="text-muted-foreground/80 text-center text-sm">
-                请尝试调整筛选条件或减少限制条件
-              </p>
-            </>
-          )}
-        </div>
-      ) : (
+  // 决定显示什么内容
+  const renderContent = () => {
+    // 如果有转盘数据，显示转盘
+    if (wheelData.length > 0) {
+      return (
         <>
           <div className="mb-6 flex w-full max-w-md justify-center">
             <Wheel
@@ -225,17 +210,54 @@ export function WheelSpinner({
                   <p className="mt-2 border-t border-muted pt-2 text-sm text-muted-foreground">
                     地址: {winner.address}
                   </p>
-                  {winner.businessHours && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      营业时间: {winner.businessHours}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
           )}
         </>
-      )}
+      );
+    }
+
+    // 如果没有转盘数据，显示提示信息或骨架屏
+    return (
+      <div className="bg-muted/20 flex h-[300px] w-full flex-col items-center justify-center rounded-lg p-6">
+        {isLoading ? (
+          <div className="w-full max-w-md">
+            <div className="mb-4 flex justify-center">
+              <Skeleton className="h-24 w-24 rounded-full" />
+            </div>
+            <Skeleton className="mx-auto mb-3 h-4 w-3/4" />
+            <Skeleton className="mx-auto h-4 w-1/2" />
+          </div>
+        ) : !hasSearched ? (
+          <>
+            <Utensils className="mb-4 h-16 w-16 text-muted-foreground" />
+            <p className="mb-2 text-center font-medium text-muted-foreground">
+              请先筛选美食，结果将显示在转盘上
+            </p>
+            <p className="text-muted-foreground/80 text-center text-sm">
+              选择您喜欢的美食分类、价格范围和评分，点击确认筛选按钮开始
+            </p>
+          </>
+        ) : (
+          <>
+            <Frown className="mb-4 h-16 w-16 text-muted-foreground" />
+            <p className="mb-2 text-center font-medium text-muted-foreground">
+              未找到符合条件的美食选项
+            </p>
+            <p className="text-muted-foreground/80 text-center text-sm">
+              请尝试调整筛选条件或减少限制条件
+            </p>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <Card className="flex flex-col items-center p-6">
+      <h2 className="mb-4 text-xl font-semibold">美食命运转盘</h2>
+      {renderContent()}
     </Card>
   );
 }

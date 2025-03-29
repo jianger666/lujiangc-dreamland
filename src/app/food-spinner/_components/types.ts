@@ -1,4 +1,4 @@
-// 美食分类
+// 美食分类（保留供将来扩展使用）
 export interface FoodCategory {
   id: string;
   name: string;
@@ -6,9 +6,9 @@ export interface FoodCategory {
   selected: boolean;
 }
 
-// 筛选条件
+// 筛选条件（保留供将来扩展使用）
 export interface FilterOptions {
-  categories: FoodCategory[];
+  category: string; // 单选食物分类
   price: [number, number]; // 价格范围
   distance: number; // 距离，单位：米
   rating: number; // 最低评分
@@ -34,7 +34,6 @@ export interface Restaurant {
   rating: number; // 评分
   price: number; // 人均价格
   category: string; // 分类
-  businessHours?: string; // 营业时间
   coordinates: [number, number]; // 坐标 [经度, 纬度]
   tel?: string; // 电话
   website?: string; // 网站
