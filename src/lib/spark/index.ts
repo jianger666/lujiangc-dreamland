@@ -1,14 +1,13 @@
 import OpenAI from 'openai';
 
-// 配置星火大模型客户端
+// 配置AI Tools客户端
 export const sparkClient = new OpenAI({
-  apiKey: process.env.SPARK_API_PASSWORD || '',
-  baseURL: 'https://spark-api-open.xf-yun.com/v1',
+  apiKey: process.env.AI_TOOLS_API_KEY || '',
+  baseURL: 'https://platform.aitools.cfd/api/v1',
 });
 
-// 星火对话配置
+// AI对话配置
 export const SPARK_CONFIG = {
-  model: 'lite',
-  temperature: 0.7,
+  model: 'deepseek/deepseek-v3-0324',
   stream: true, // 启用流式响应
 };

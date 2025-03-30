@@ -7,13 +7,13 @@ import type {
 } from 'openai/resources';
 
 // 直接在路由中创建客户端避免类型问题
-const sparkClient = new OpenAI({
-  apiKey: process.env.SPARK_API_PASSWORD || '',
-  baseURL: 'https://spark-api-open.xf-yun.com/v1',
+const aiToolsClient = new OpenAI({
+  apiKey: process.env.AI_TOOLS_API_KEY || '',
+  baseURL: 'https://platform.aitools.cfd/api/v1',
 });
 
-// 通用处理星火API调用的函数
-async function handleSparkRequest(
+// 通用处理AI Tools API调用的函数
+async function handleAIToolsRequest(
   messages: Array<{ role: string; content: string }>,
 ) {
   // 构建API请求参数
@@ -24,8 +24,9 @@ async function handleSparkRequest(
   };
 
   try {
-    // 调用星火API获取流式响应
-    const response = await sparkClient.chat.completions.create(requestOptions);
+    // 调用AI Tools API获取流式响应
+    const response =
+      await aiToolsClient.chat.completions.create(requestOptions);
 
     // 处理流式响应
     const encoder = new TextEncoder();
@@ -62,7 +63,7 @@ async function handleSparkRequest(
       },
     });
   } catch (error) {
-    console.error('星火API调用处理错误:', error);
+    console.error('AI Tools API调用处理错误:', error);
     throw error;
   }
 }
@@ -74,9 +75,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { messages } = body;
 
-    return await handleSparkRequest(messages);
+    return await handleAIToolsRequest(messages);
   } catch (error) {
-    console.error('星火API调用出错:', error);
+    console.error('AI Tools API调用出错:', error);
     return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -109,9 +110,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return await handleSparkRequest(messages);
+    return await handleAIToolsRequest(messages);
   } catch (error) {
-    console.error('星火API调用出错:', error);
+    console.error('AI Tools API调用出错:', error);
     return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
