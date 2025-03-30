@@ -134,7 +134,8 @@ export function AIAssistant({
         {
           id: Date.now().toString(),
           role: 'assistant',
-          content: '抱歉，处理您的请求时出现了错误。请稍后再试。',
+          content:
+            '抱歉，我还没有学习到关于这个话题的内容，无法提供相关信息。您可以选择其他问题，我将努力为您解答。',
         },
       ]);
     };
