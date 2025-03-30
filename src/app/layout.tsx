@@ -3,8 +3,9 @@ import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Header } from '@/components/layout/header';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Noto_Sans_SC } from 'next/font/google';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
+import { Suspense } from 'react';
 
 // Noto Sans SC 支持中文和拉丁字符，是一个全面的字体选择
 const notoSansSC = Noto_Sans_SC({
@@ -16,7 +17,11 @@ const notoSansSC = Noto_Sans_SC({
 export const metadata: Metadata = {
   title: '江耳的梦境',
   description: '江耳的梦境 - 一些江耳的奇思妙想的实现以及个人简介和记录',
-  viewport: 'width=device-width, initial-scale=1.0',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1.0,
 };
 
 export default function RootLayout({
@@ -34,7 +39,13 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
+            <Suspense
+              fallback={
+                <div className="h-16 w-full border-b border-border bg-background"></div>
+              }
+            >
+              <Header />
+            </Suspense>
             <main className="min-h-[calc(100vh-4rem)]">{children}</main>
             <AIAssistant isFloating />
           </ThemeProvider>

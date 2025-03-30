@@ -1,4 +1,4 @@
-import { FoodSpinnerContainer } from './_components/food-spinner-container';
+import { FoodSpinnerClientWrapper } from './client-wrapper';
 
 export default function FoodSpinnerPage() {
   return (
@@ -8,7 +8,7 @@ export default function FoodSpinnerPage() {
         再也不用为「今天吃什么」而烦恼！筛选喜欢的美食种类，让转盘来决定你的命运！
       </p>
 
-      <FoodSpinnerContainer />
+      <FoodSpinnerClientWrapper />
     </div>
   );
 }
