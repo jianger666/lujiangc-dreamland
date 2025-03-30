@@ -1,4 +1,3 @@
-import { SPARK_CONFIG } from '@/lib/spark';
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
 import type {
@@ -18,7 +17,7 @@ async function handleAIToolsRequest(
 ) {
   // 构建API请求参数
   const requestOptions = {
-    model: SPARK_CONFIG.model,
+    model: 'deepseek/deepseek-v3-0324',
     messages: messages as ChatCompletionCreateParams['messages'],
     stream: true as const, // 使用const断言确保类型为true
   };

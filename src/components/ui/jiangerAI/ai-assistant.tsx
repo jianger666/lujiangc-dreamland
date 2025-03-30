@@ -88,7 +88,7 @@ export function AIAssistant({
     });
 
     // 创建新的EventSource
-    const eventSource = new EventSource(`/api/spark?${params.toString()}`);
+    const eventSource = new EventSource(`/api/ai?${params.toString()}`);
     eventSourceRef.current = eventSource;
 
     // 处理消息事件
