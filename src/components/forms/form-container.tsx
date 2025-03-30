@@ -299,11 +299,6 @@ export function FormContainer<T extends FieldValues>({
     // 重置表单
     methods.reset(initialValues || ({} as DefaultValues<T>));
 
-    // 清除URL参数（如果启用），直接使用history API而不是router
-    if (syncToUrl && typeof window !== 'undefined') {
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-
     // 调用外部重置回调
     if (onReset) {
       onReset();

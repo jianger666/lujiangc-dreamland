@@ -88,7 +88,7 @@ alwaysApply: true
 • **目录结构示例**
   ```markdown
   /src/components
-    ├── /ui        # 基础组件
+    ├── /ui        # 基础UI组件（如shadcn组件库的原子组件）
     │   ├── /Button
     │   ├── /Modal
     │   └── /Card
@@ -98,6 +98,7 @@ alwaysApply: true
     └── /layout    # 布局组件
         ├── /Navbar
         └── /Footer
+ # 其他通用组件直接存放于components根目录下（如通用工具组件、业务无关的复合组件）
   ```
 
 • **组件分类**
