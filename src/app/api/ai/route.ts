@@ -6,18 +6,15 @@ import type {
 } from 'openai/resources';
 
 // 直接在路由中创建客户端避免类型问题
-const aiToolsClient = new OpenAI({
-  apiKey: process.env.AI_TOOLS_API_KEY || '',
-  baseURL: 'https://platform.aitools.cfd/api/v1',
-});
-
-console.log('AI_TOOLS_API_KEY init', process.env.AI_TOOLS_API_KEY);
 
 // 通用处理AI Tools API调用的函数
 async function handleAIToolsRequest(
   messages: Array<{ role: string; content: string }>,
 ) {
-  console.log('AI_TOOLS_API_KEY', process.env.AI_TOOLS_API_KEY);
+  const aiToolsClient = new OpenAI({
+    apiKey: process.env.AI_TOOLS_API_KEY || '',
+    baseURL: 'https://platform.aitools.cfd/api/v1',
+  });
 
   // 构建API请求参数
   const requestOptions = {
