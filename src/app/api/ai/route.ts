@@ -15,7 +15,7 @@ const aiToolsClient = new OpenAI({
 async function handleAIToolsRequest(
   messages: Array<{ role: string; content: string }>,
 ) {
-  console.log(process.env.AI_TOOLS_API_KEY);
+  console.log('AI_TOOLS_API_KEY', process.env.AI_TOOLS_API_KEY);
 
   // 构建API请求参数
   const requestOptions = {
