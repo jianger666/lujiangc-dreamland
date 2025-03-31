@@ -11,6 +11,8 @@ const aiToolsClient = new OpenAI({
   baseURL: 'https://platform.aitools.cfd/api/v1',
 });
 
+console.log('AI_TOOLS_API_KEY init', process.env.AI_TOOLS_API_KEY);
+
 // 通用处理AI Tools API调用的函数
 async function handleAIToolsRequest(
   messages: Array<{ role: string; content: string }>,
