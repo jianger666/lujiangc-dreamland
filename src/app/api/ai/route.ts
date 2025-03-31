@@ -5,10 +5,17 @@ import type {
   ChatCompletionCreateParams,
 } from 'openai/resources';
 
+// const keyList = [
+//   {
+//     apiKey: 'sk-qY6gdsIUdeBJUKSVWqgZI6t1idJhqzAHmVHQM0LU7FWREJPY',
+//     canUseModel: ['deepseek-ai/DeepSeek-R1', 'DeepSeek-V3-0324'],
+//   },
+// ];
+
 // 直接在路由中创建客户端避免类型问题
 const aiToolsClient = new OpenAI({
-  apiKey: process.env.AI_TOOLS_API_KEY || '',
-  baseURL: 'https://spark-api-open.xf-yun.com/v1/chat',
+  apiKey: 'sk-qY6gdsIUdeBJUKSVWqgZI6t1idJhqzAHmVHQM0LU7FWREJPY',
+  baseURL: 'https://a.henhuoai.com/v1',
 });
 
 // 通用处理AI Tools API调用的函数
@@ -17,7 +24,7 @@ async function handleAIToolsRequest(
 ) {
   // 构建API请求参数
   const requestOptions = {
-    model: 'google/gemini-2.5-pro-exp',
+    model: 'deepseek-ai/DeepSeek-R1',
     messages: messages as ChatCompletionCreateParams['messages'],
     stream: true as const, // 使用const断言确保类型为true
   };
@@ -34,6 +41,8 @@ async function handleAIToolsRequest(
         try {
           // 处理每个流块
           for await (const chunk of response as AsyncIterable<ChatCompletionChunk>) {
+            console.log(chunk.choices[0]?.delta);
+
             // 提取内容
             const content = chunk.choices[0]?.delta?.content || '';
             if (content) {
