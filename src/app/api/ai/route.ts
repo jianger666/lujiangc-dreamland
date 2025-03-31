@@ -17,7 +17,7 @@ async function handleAIToolsRequest(
 ) {
   // 构建API请求参数
   const requestOptions = {
-    model: 'deepseek/deepseek-v3-0324',
+    model: 'google/gemini-2.5-pro-exp',
     messages: messages as ChatCompletionCreateParams['messages'],
     stream: true as const, // 使用const断言确保类型为true
   };
