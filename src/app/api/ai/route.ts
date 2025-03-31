@@ -7,15 +7,25 @@ import type {
 
 // const keyList = [
 //   {
+//     baseURL: 'https://a.henhuoai.com/v1',
 //     apiKey: 'sk-qY6gdsIUdeBJUKSVWqgZI6t1idJhqzAHmVHQM0LU7FWREJPY',
 //     canUseModel: ['deepseek-ai/DeepSeek-R1', 'DeepSeek-V3-0324'],
+//   },
+//   {
+//     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+//     apiKey: 'AIzaSyBwnDATAbg6JZq4xRYyu_BwhwwEktEzdMQ',
+//     canUseModel: [
+//       'gemini-2.5-pro-exp-03-25',
+//       'gemini-2.0-flash',
+//       'gemini-1.5-pro-latest',
+//     ],
 //   },
 // ];
 
 // 直接在路由中创建客户端避免类型问题
 const aiToolsClient = new OpenAI({
-  apiKey: 'sk-qY6gdsIUdeBJUKSVWqgZI6t1idJhqzAHmVHQM0LU7FWREJPY',
-  baseURL: 'https://a.henhuoai.com/v1',
+  apiKey: 'AIzaSyBwnDATAbg6JZq4xRYyu_BwhwwEktEzdMQ',
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
 });
 
 // 通用处理AI Tools API调用的函数
@@ -24,15 +34,17 @@ async function handleAIToolsRequest(
 ) {
   // 构建API请求参数
   const requestOptions = {
-    model: 'deepseek-ai/DeepSeek-R1',
+    model: 'gemini-2.5-pro-exp-03-25',
     messages: messages as ChatCompletionCreateParams['messages'],
-    stream: true as const, // 使用const断言确保类型为true
+    stream: true,
   };
 
   try {
     // 调用AI Tools API获取流式响应
     const response =
       await aiToolsClient.chat.completions.create(requestOptions);
+    const list = await aiToolsClient.models.list();
+    console.log('list', list);
 
     // 处理流式响应
     const encoder = new TextEncoder();
@@ -41,7 +53,7 @@ async function handleAIToolsRequest(
         try {
           // 处理每个流块
           for await (const chunk of response as AsyncIterable<ChatCompletionChunk>) {
-            console.log(chunk.choices[0]?.delta);
+            console.log('chunk.choices[0]?.delta', chunk.choices[0]?.delta);
 
             // 提取内容
             const content = chunk.choices[0]?.delta?.content || '';
