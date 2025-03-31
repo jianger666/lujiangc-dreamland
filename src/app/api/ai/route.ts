@@ -6,19 +6,18 @@ import type {
 } from 'openai/resources';
 
 // 直接在路由中创建客户端避免类型问题
+const aiToolsClient = new OpenAI({
+  apiKey: 'DBQhmUoAgpjUVtvEnjcQ:EtAkKGuKdIbPdZbnhAJj',
+  baseURL: 'https://spark-api-open.xf-yun.com/v1',
+});
 
 // 通用处理AI Tools API调用的函数
 async function handleAIToolsRequest(
   messages: Array<{ role: string; content: string }>,
 ) {
-  const aiToolsClient = new OpenAI({
-    apiKey: process.env.AI_TOOLS_API_KEY || '',
-    baseURL: 'https://platform.aitools.cfd/api/v1',
-  });
-
   // 构建API请求参数
   const requestOptions = {
-    model: 'deepseek/deepseek-v3-0324',
+    model: 'lite',
     messages: messages as ChatCompletionCreateParams['messages'],
     stream: true as const, // 使用const断言确保类型为true
   };
