@@ -67,23 +67,6 @@ async function handleAIToolsRequest(
   }
 }
 
-// 处理POST请求 - 用于fetch API
-export async function POST(req: NextRequest) {
-  try {
-    // 解析请求体
-    const body = await req.json();
-    const { messages } = body;
-
-    return await handleAIToolsRequest(messages);
-  } catch (error) {
-    console.error('AI Tools API调用出错:', error);
-    return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-}
-
 // 处理GET请求 - 用于EventSource
 export async function GET(req: NextRequest) {
   try {
