@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Conversation } from './types';
+import { Conversation } from '../types';
 
 interface ConversationSidebarProps {
   conversations: Conversation[];
