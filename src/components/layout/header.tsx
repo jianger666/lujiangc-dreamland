@@ -75,29 +75,29 @@ export function Header({
       href: '/food-spinner',
     },
     {
-      title: '导航二',
-      href: '/nav2',
+      title: 'AI助手',
+      href: '/ai-assistant',
     },
-    {
-      title: '导航三',
-      href: '/nav3',
-    },
-    {
-      title: '导航四',
-      href: '/nav4',
-    },
-    {
-      title: '导航五',
-      href: '/nav5',
-    },
-    {
-      title: '导航六',
-      href: '/nav6',
-    },
-    {
-      title: '导航七',
-      href: '/nav7',
-    },
+    // {
+    //   title: '导航三',
+    //   href: '/nav3',
+    // },
+    // {
+    //   title: '导航四',
+    //   href: '/nav4',
+    // },
+    // {
+    //   title: '导航五',
+    //   href: '/nav5',
+    // },
+    // {
+    //   title: '导航六',
+    //   href: '/nav6',
+    // },
+    // {
+    //   title: '导航七',
+    //   href: '/nav7',
+    // },
     // 有子菜单的导航项
     // {
     //   title: '导航',

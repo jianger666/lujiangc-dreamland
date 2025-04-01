@@ -5,12 +5,12 @@ import { FilterPanel, FilterFormValues } from './filter-panel';
 import { WheelSpinner } from './wheel-spinner';
 import { RestaurantList } from './restaurant-list';
 import { LocationWeather } from './location-weather';
-import { Restaurant } from './types';
+import { Restaurant } from '../types';
 import {
-  searchNearbyRestaurants,
   getCurrentLocation,
+  searchNearbyRestaurants,
   AMapPoiItem,
-} from './amap-service';
+} from '../utils';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loading } from '@/components/ui/loading';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Restaurant } from './types';
+import { Restaurant } from '../types';
 import {
   Dialog,
   DialogContent,
@@ -11,10 +11,10 @@ import {
   DialogBody,
 } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
-import { Search, ChevronRight, Store, Bot } from 'lucide-react';
+import { Search, ChevronRight, Store } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
-import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
+// import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
 
 interface RestaurantListProps {
   restaurants: Restaurant[];
@@ -138,7 +138,7 @@ export function RestaurantList({ restaurants, title }: RestaurantListProps) {
                         </p>
 
                         <div className="mt-3 flex justify-end space-x-2">
-                          <AIAssistant
+                          {/* <AIAssistant
                             initialPrompt={`请帮我查询一下这家餐厅："${restaurant.name}"怎么样？它位于${restaurant.address}。请帮我分析一下这家店的评价和值得推荐的菜品。`}
                             searchQuery={`${restaurant.name} ${restaurant.address} 点评 推荐菜品`}
                             triggerLabel={
@@ -147,7 +147,7 @@ export function RestaurantList({ restaurants, title }: RestaurantListProps) {
                                 问问江耳的替身
                               </div>
                             }
-                          />
+                          /> */}
                         </div>
                       </div>
                     </div>

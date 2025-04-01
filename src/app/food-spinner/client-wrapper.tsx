@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 // 动态导入食品转盘组件，禁用SSR
 const FoodSpinnerContainer = dynamic(
   () =>
-    import('./_components/food-spinner-container').then(
+    import('./components/food-spinner-container').then(
       (mod) => mod.FoodSpinnerContainer,
     ),
   { ssr: false },

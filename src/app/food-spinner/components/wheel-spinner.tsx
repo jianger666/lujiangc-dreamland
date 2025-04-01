@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Restaurant } from './types';
+import { Restaurant } from '../types';
 import { Utensils, Frown, Store } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wheel } from 'react-custom-roulette';

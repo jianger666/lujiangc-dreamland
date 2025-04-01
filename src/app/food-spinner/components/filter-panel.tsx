@@ -7,6 +7,7 @@ import {
   InputField,
 } from '@/components/forms';
 import { z } from 'zod';
+import { FoodCategory, FilterOptions } from '../types';
 
 // 默认美食分类
 const defaultCategories = [

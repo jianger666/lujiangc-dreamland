@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/header';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Noto_Sans_SC } from 'next/font/google';
 import { Metadata, Viewport } from 'next';
-import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
+// import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
 import { Suspense } from 'react';
 
 // Noto Sans SC 支持中文和拉丁字符，是一个全面的字体选择
@@ -47,7 +47,7 @@ export default function RootLayout({
               <Header />
             </Suspense>
             <main className="min-h-[calc(100vh-4rem)]">{children}</main>
-            <AIAssistant isFloating />
+            {/* <AIAssistant isFloating /> */}
           </ThemeProvider>
         </NuqsAdapter>
       </body>

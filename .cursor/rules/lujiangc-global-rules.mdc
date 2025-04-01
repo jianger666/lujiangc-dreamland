@@ -102,9 +102,9 @@ alwaysApply: true
   ```
 
 • **组件分类**
-  • 私有组件：在 `/app` 子目录创建 `_components` 文件夹
+  • 私有组件：在 `/app` 子目录创建 `components` 文件夹
   • 共享组件：跨页面/功能复用的组件放 `/src/components`
-  • 模块化架构：大型项目可为每个功能模块创建独立目录（包含组件、hooks、工具函数）
+  • 模块化架构：大型项目可为每个功能模块创建独立目录（包含components、hooks、utils）
 
 • **开发原则**
   • 遵循 Next.js 官方文档的：

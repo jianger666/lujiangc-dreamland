@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { WeatherInfo } from './types';
+import { WeatherInfo } from '../types';
 import { MapPin, CloudRain, Cloud, Sun, CloudSun } from 'lucide-react';
-import { getWeatherInfo } from './amap-service';
+import { getWeatherInfo } from '../utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface LocationWeatherProps {
