@@ -3,10 +3,8 @@ import OpenAI from 'openai';
 
 // 设置DeepSeek客户端配置
 const DEEPSEEK_CONFIG = {
-  baseURL: process.env.DEEPSEEK_API_BASE_URL || 'https://a.henhuoai.com/v1',
-  apiKey:
-    process.env.DEEPSEEK_API_KEY ||
-    'sk-qY6gdsIUdeBJUKSVWqgZI6t1idJhqzAHmVHQM0LU7FWREJPY',
+  baseURL: 'https://a.henhuoai.com/v1',
+  apiKey: process.env.HENHUO_API_KEY,
   model: 'DeepSeek-V3-0324',
 };
 

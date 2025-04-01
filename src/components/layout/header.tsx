@@ -78,26 +78,6 @@ export function Header({
       title: 'AI助手',
       href: '/ai-assistant',
     },
-    // {
-    //   title: '导航三',
-    //   href: '/nav3',
-    // },
-    // {
-    //   title: '导航四',
-    //   href: '/nav4',
-    // },
-    // {
-    //   title: '导航五',
-    //   href: '/nav5',
-    // },
-    // {
-    //   title: '导航六',
-    //   href: '/nav6',
-    // },
-    // {
-    //   title: '导航七',
-    //   href: '/nav7',
-    // },
     // 有子菜单的导航项
     // {
     //   title: '导航',
@@ -150,7 +130,7 @@ export function Header({
 
   return (
     <header className="sticky left-0 top-0 z-40 w-full border-b border-border bg-background shadow-sm backdrop-blur-sm">
-      <div className="container relative mx-auto flex h-16 items-center justify-between">
+      <div className="relative flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <LogoComponent width={140} height={42} className="h-10 w-auto" />
         </div>

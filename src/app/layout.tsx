@@ -6,6 +6,7 @@ import { Noto_Sans_SC } from 'next/font/google';
 import { Metadata, Viewport } from 'next';
 // import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
 import { Suspense } from 'react';
+import { cn } from '@/lib';
 
 // Noto Sans SC 支持中文和拉丁字符，是一个全面的字体选择
 const notoSansSC = Noto_Sans_SC({
@@ -30,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh" suppressHydrationWarning>
-      <body className={notoSansSC.className}>
+    <html lang="zh" suppressHydrationWarning className="h-full">
+      <body className={cn(notoSansSC.className, 'flex h-full flex-col')}>
         <NuqsAdapter>
           <ThemeProvider
             attribute="class"
@@ -46,7 +47,9 @@ export default function RootLayout({
             >
               <Header />
             </Suspense>
-            <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+            <main className="flex flex-1 flex-col overflow-y-auto">
+              {children}
+            </main>
             {/* <AIAssistant isFloating /> */}
           </ThemeProvider>
         </NuqsAdapter>

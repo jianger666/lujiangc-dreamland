@@ -1,6 +1,6 @@
 export interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   thinking?: string;
 }
@@ -17,7 +17,7 @@ export interface Conversation {
 
 export interface AIModel {
   id: string;
-  provider: string;
+  name: string;
 }
 
 export interface StreamingMessage {

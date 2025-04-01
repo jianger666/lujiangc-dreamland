@@ -1,5 +1,16 @@
 'use client';
 
+/**
+ * AI 助手页面组件
+ *
+ * 该页面提供了一个类似 ChatGPT 的 AI 对话界面，功能包括：
+ * - 创建、切换、删除对话
+ * - 支持多种 AI 模型选择
+ * - 实时流式响应
+ * - 自动生成对话标题
+ * - 消息历史管理
+ */
+
 import React, {
   useState,
   useEffect,
@@ -16,7 +27,7 @@ import { Loading } from '@/components/ui/loading';
 import {
   createNewConversation,
   fetchAvailableModels,
-  handleStreamWithEventSource,
+  handleStreamWithFetchEventSource,
   getAllConversations,
   getActiveConversationId,
   saveConversations,
@@ -24,70 +35,63 @@ import {
   saveConversation,
   deleteConversation as deleteConversationFromDB,
   generateConversationTitle,
+  optimizeConversationHistory,
 } from './utils';
-import {
-  Conversation,
-  Message,
-  AIModel,
-  ConversationStreamState,
-  StreamingState,
-} from './types';
+import { Conversation, Message, AIModel, StreamingState } from './types';
 import { generateUUID } from '@/lib/uuid';
 
 export default function AIAssistantPage() {
-  // 存储所有对话
+  // ==== 状态管理 ====
+  // 所有对话列表
   const [conversations, setConversations] = useState<Conversation[]>([]);
-
-  // 当前活跃对话ID
+  // 当前激活的对话ID
   const [activeConversationId, setActiveConversationId] = useState<string>('');
-
-  // 可用的AI模型
+  // 可用的AI模型列表
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
-
-  // 是否已完成初始化
+  // 页面初始化状态标记
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // 每个对话的流式生成状态
+  // 各对话的流式响应状态
   const [streamingState, setStreamingState] = useState<StreamingState>({});
-
-  // 记录需要生成标题的对话ID
+  // 等待生成标题的对话ID集合
   const [pendingTitleGeneration, setPendingTitleGeneration] = useState<
     Set<string>
   >(new Set());
 
-  // 每个会话的EventSource引用
-  const eventSourcesRef = useRef<Record<string, EventSource | null>>({});
+  // ==== Refs ====
+  // 存储每个对话的AbortController实例，用于流式响应
+  const abortControllersRef = useRef<Record<string, AbortController | null>>(
+    {},
+  );
 
-  // 获取当前活跃对话
+  // ==== 计算属性 ====
+  // 当前激活的对话对象
   const activeConversation = useMemo(
     () => conversations.find((conv) => conv.id === activeConversationId),
     [conversations, activeConversationId],
   );
 
-  // 获取当前对话的流式状态
+  // 当前对话的流式响应状态
   const currentStreamingState = useMemo(
     () =>
-      streamingState[activeConversationId] ||
-      ({
+      streamingState[activeConversationId] || {
         content: '',
         thinking: '',
         isLoading: false,
-      } as ConversationStreamState),
+      },
     [streamingState, activeConversationId],
   );
 
-  // 是否有可用模型
+  // 是否有可用的AI模型
   const hasModels = useMemo(
     () => availableModels.length > 0,
     [availableModels],
   );
 
-  // 加载初始数据并设置数据变化的保存
+  // ==== 初始化数据加载 ====
   useEffect(() => {
-    // 加载初始数据
     const loadData = async () => {
       try {
-        // 从 IndexedDB 加载数据
+        // 并行加载所有对话、当前活跃对话ID和可用模型
         const [storedConversations, storedActiveId, models] = await Promise.all(
           [
             getAllConversations(),
@@ -100,7 +104,7 @@ export default function AIAssistantPage() {
         setActiveConversationId(storedActiveId);
         setAvailableModels(models);
 
-        // 如果没有对话，创建第一个默认对话
+        // 如果没有对话且有可用模型，创建默认对话
         if (storedConversations.length === 0 && models.length > 0) {
           const newConversation = createNewConversation(
             models[0].id,
@@ -108,15 +112,9 @@ export default function AIAssistantPage() {
             models,
           );
 
-          // 更新状态
           setConversations([newConversation]);
           setActiveConversationId(newConversation.id);
-
-          // 保存到数据库
-          await Promise.all([
-            saveConversation(newConversation),
-            saveActiveConversationId(newConversation.id),
-          ]);
+          await saveConversation(newConversation);
         }
 
         setIsInitialized(true);
@@ -128,104 +126,62 @@ export default function AIAssistantPage() {
 
     loadData();
 
-    // 组件卸载时清理所有EventSource
+    const currentAbortControllers = abortControllersRef.current;
+
     return () => {
-      Object.values(eventSourcesRef.current).forEach((eventSource) => {
-        if (eventSource) {
-          eventSource.close();
-        }
+      Object.values(currentAbortControllers).forEach((controller) => {
+        controller?.abort();
       });
     };
   }, []);
 
-  // 处理流式生成完成的回调
-  const handleStreamingComplete = useCallback((conversationId: string) => {
-    console.log('流式生成完成:', conversationId);
-
-    // 直接从当前状态获取conversation会有闭包问题，使用回调函数形式确保获取最新状态
-    setConversations((currentConversations) => {
-      const conversation = currentConversations.find(
-        (conv) => conv.id === conversationId,
-      );
-
-      // 如果对话没有生成过标题，将其添加到待生成标题队列
-      if (
-        conversation &&
-        !conversation.hasGeneratedTitle &&
-        conversation.messages.length >= 2 // 确保至少有一问一答（用户+AI）
-      ) {
-        console.log(
-          '添加到标题生成队列:',
-          conversationId,
-          '消息数量:',
-          conversation.messages.length,
-        );
-
-        // 使用React状态来跟踪待生成标题的对话ID，这样更符合React范式
-        setPendingTitleGeneration((prev) => {
-          const newSet = new Set(prev);
-          newSet.add(conversationId);
-          return newSet;
-        });
-      }
-
-      return currentConversations;
-    });
-  }, []);
-
-  // 从待生成标题集合中移除对话ID的通用函数
-  const removePendingTitleGeneration = useCallback((conversationId: string) => {
-    setPendingTitleGeneration((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(conversationId);
-      return newSet;
-    });
-  }, []);
-
-  // 处理需要生成标题的对话
+  // ==== 数据持久化 ====
   useEffect(() => {
-    // 不需要生成标题时直接返回
+    // 只有初始化完成后才进行保存操作
+    if (!isInitialized) return;
+
+    const saveData = async () => {
+      try {
+        // 保存所有对话和当前活跃对话ID
+        await Promise.all([
+          saveConversations(conversations),
+          saveActiveConversationId(activeConversationId),
+        ]);
+      } catch (error) {
+        console.error('保存数据失败:', error);
+      }
+    };
+
+    saveData();
+  }, [conversations, activeConversationId, isInitialized]);
+
+  // ==== 自动标题生成处理 ====
+  useEffect(() => {
+    // 只有初始化完成且有待处理的标题生成请求时才执行
     if (!isInitialized || pendingTitleGeneration.size === 0) return;
 
-    console.log(
-      '开始生成标题，待处理对话数量:',
-      pendingTitleGeneration.size,
-      '待处理ID:',
-      [...pendingTitleGeneration],
-    );
-
-    // 定义异步函数处理标题生成
     const generateTitles = async () => {
-      // 创建处理ID的集合
       const processedIds = new Set<string>();
 
-      // 遍历待处理的对话ID
+      // 遍历所有需要生成标题的对话
       for (const conversationId of pendingTitleGeneration) {
         const conversation = conversations.find(
           (conv) => conv.id === conversationId,
         );
 
-        // 检查对话是否符合生成标题的条件
-        const shouldGenerateTitle =
+        // 只处理未生成过标题且至少有两条消息的对话
+        if (
           conversation &&
           !conversation.hasGeneratedTitle &&
-          conversation.messages.length >= 2;
-
-        if (shouldGenerateTitle) {
+          conversation.messages.length >= 2
+        ) {
           try {
-            console.log(
-              '为对话生成标题:',
-              conversationId,
-              '消息数量:',
-              conversation.messages.length,
-            );
-
-            // 生成标题并更新对话
+            // 调用API生成标题
             const newTitle = await generateConversationTitle(
               conversation.messages,
             );
-            console.log('标题生成成功:', newTitle);
 
+            // 更新对话标题
             setConversations((prev) =>
               prev.map((conv) =>
                 conv.id === conversationId
@@ -236,21 +192,13 @@ export default function AIAssistantPage() {
           } catch (error) {
             console.error('生成标题失败:', error);
           }
-        } else {
-          console.log(
-            '跳过标题生成:',
-            conversationId,
-            conversation
-              ? `已生成:${conversation.hasGeneratedTitle}, 消息数量:${conversation.messages.length}`
-              : '对话不存在',
-          );
         }
 
-        // 无论成功失败，都将此ID标记为已处理
+        // 标记为已处理
         processedIds.add(conversationId);
       }
 
-      // 批量移除已处理的ID
+      // 批量移除已处理的ID，避免频繁更新状态
       if (processedIds.size > 0) {
         setPendingTitleGeneration((prev) => {
           const newSet = new Set(prev);
@@ -265,34 +213,49 @@ export default function AIAssistantPage() {
     generateTitles();
   }, [conversations, isInitialized, pendingTitleGeneration]);
 
-  // 保存数据变化到 IndexedDB
-  useEffect(() => {
-    if (!isInitialized) return;
+  // ==== 流式响应完成后的处理 ====
+  const handleStreamingComplete = useCallback((conversationId: string) => {
+    setConversations((currentConversations) => {
+      const conversation = currentConversations.find(
+        (conv) => conv.id === conversationId,
+      );
 
-    // 保存对话和活跃对话ID
-    const saveData = async () => {
-      try {
-        await Promise.all([
-          saveConversations(conversations),
-          saveActiveConversationId(activeConversationId),
-        ]);
-      } catch (error) {
-        console.error('保存数据失败:', error);
+      // 检查是否需要生成标题（未生成过且至少有两条消息）
+      if (
+        conversation &&
+        !conversation.hasGeneratedTitle &&
+        conversation.messages.length >= 2
+      ) {
+        setPendingTitleGeneration((prev) => {
+          const newSet = new Set(prev);
+          newSet.add(conversationId);
+          return newSet;
+        });
       }
-    };
 
-    saveData();
-  }, [conversations, activeConversationId, isInitialized]);
+      return currentConversations;
+    });
+  }, []);
 
-  // 清理特定对话的EventSource
-  const cleanupEventSource = useCallback((conversationId: string) => {
-    if (eventSourcesRef.current[conversationId]) {
-      eventSourcesRef.current[conversationId]?.close();
-      eventSourcesRef.current[conversationId] = null;
+  // ==== 辅助函数 ====
+  // 从待处理标题生成队列中移除指定对话
+  const removePendingTitleGeneration = useCallback((conversationId: string) => {
+    setPendingTitleGeneration((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(conversationId);
+      return newSet;
+    });
+  }, []);
+
+  // 清理指定对话的AbortController连接
+  const cleanupAbortController = useCallback((conversationId: string) => {
+    if (abortControllersRef.current[conversationId]) {
+      abortControllersRef.current[conversationId]?.abort();
+      abortControllersRef.current[conversationId] = null;
     }
   }, []);
 
-  // 重置特定对话的流式状态
+  // 重置指定对话的流式响应状态
   const resetStreamingState = useCallback((conversationId: string) => {
     setStreamingState((prev) => ({
       ...prev,
@@ -304,84 +267,8 @@ export default function AIAssistantPage() {
     }));
   }, []);
 
-  // 添加新对话
-  const addNewConversation = useCallback(() => {
-    if (!hasModels) return;
-
-    const newConversation = createNewConversation(
-      availableModels[0].id,
-      conversations,
-      availableModels,
-    );
-
-    setConversations([...conversations, newConversation]);
-    setActiveConversationId(newConversation.id);
-  }, [hasModels, availableModels, conversations]);
-
-  // 删除对话
-  const deleteConversation = useCallback(
-    async (id: string) => {
-      try {
-        // 清理对应的EventSource
-        cleanupEventSource(id);
-
-        // 从待生成标题列表中移除
-        removePendingTitleGeneration(id);
-
-        // 从 IndexedDB 删除
-        await deleteConversationFromDB(id);
-
-        // 更新状态
-        const newConversations = conversations.filter((conv) => conv.id !== id);
-        setConversations(newConversations);
-
-        // 更新streaming状态
-        setStreamingState((prev) => {
-          const newState = { ...prev };
-          delete newState[id];
-          return newState;
-        });
-
-        // 如果删除的是当前活跃对话，切换到第一个对话，或者创建新对话
-        if (id === activeConversationId) {
-          if (newConversations.length > 0) {
-            setActiveConversationId(newConversations[0].id);
-          } else if (hasModels) {
-            // 创建新对话
-            addNewEmptyConversation();
-          } else {
-            setActiveConversationId('');
-          }
-        }
-      } catch (error) {
-        console.error('删除对话失败:', error);
-      }
-    },
-    [
-      cleanupEventSource,
-      removePendingTitleGeneration,
-      activeConversationId,
-      conversations,
-      hasModels,
-    ],
-  );
-
-  // 创建新的空对话并设为活跃
-  const addNewEmptyConversation = useCallback(async () => {
-    if (!hasModels) return;
-
-    const newConversation = createNewConversation(
-      availableModels[0].id,
-      [],
-      availableModels,
-    );
-
-    setConversations([newConversation]);
-    setActiveConversationId(newConversation.id);
-    await saveConversation(newConversation);
-  }, [hasModels, availableModels]);
-
-  // 更新对话属性
+  // ==== 对话操作函数 ====
+  // 更新指定对话的属性
   const updateConversation = useCallback(
     (id: string, updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>) => {
       setConversations((currentConversations) =>
@@ -399,15 +286,82 @@ export default function AIAssistantPage() {
     [],
   );
 
-  // 保存编辑的标题
+  // 创建新对话
+  const addNewConversation = useCallback(() => {
+    if (!hasModels) return;
+
+    const newConversation = createNewConversation(
+      availableModels[0].id,
+      conversations,
+      availableModels,
+    );
+
+    setConversations([...conversations, newConversation]);
+    setActiveConversationId(newConversation.id);
+  }, [hasModels, availableModels, conversations]);
+
+  // 删除对话
+  const deleteConversation = useCallback(
+    async (id: string) => {
+      try {
+        // 清理相关资源
+        cleanupAbortController(id);
+        removePendingTitleGeneration(id);
+        await deleteConversationFromDB(id);
+
+        // 更新对话列表
+        const newConversations = conversations.filter((conv) => conv.id !== id);
+        setConversations(newConversations);
+
+        // 清理流式响应状态
+        setStreamingState((prev) => {
+          const newState = { ...prev };
+          delete newState[id];
+          return newState;
+        });
+
+        // 如果删除的是当前激活的对话，则需要切换到其他对话
+        if (id === activeConversationId) {
+          if (newConversations.length > 0) {
+            // 有其他对话，切换到第一个
+            setActiveConversationId(newConversations[0].id);
+          } else if (hasModels) {
+            // 没有其他对话但有可用模型，创建新对话
+            const newConversation = createNewConversation(
+              availableModels[0].id,
+              [],
+              availableModels,
+            );
+
+            setConversations([newConversation]);
+            setActiveConversationId(newConversation.id);
+            await saveConversation(newConversation);
+          } else {
+            // 没有其他对话也没有可用模型，清空激活ID
+            setActiveConversationId('');
+          }
+        }
+      } catch (error) {
+        console.error('删除对话失败:', error);
+      }
+    },
+    [
+      cleanupAbortController,
+      removePendingTitleGeneration,
+      activeConversationId,
+      conversations,
+      hasModels,
+      availableModels,
+    ],
+  );
+
+  // 保存编辑后的对话标题
   const saveEditedTitle = useCallback(
     (title: string) => {
       if (!activeConversation) return;
 
-      // 用户手动编辑了标题，从待生成标题列表中移除
+      // 手动编辑了标题，从待生成队列中移除
       removePendingTitleGeneration(activeConversationId);
-
-      // 更新对话标题和生成状态
       updateConversation(activeConversationId, {
         title,
         hasGeneratedTitle: true,
@@ -421,7 +375,7 @@ export default function AIAssistantPage() {
     ],
   );
 
-  // 切换模型
+  // 更改当前对话使用的AI模型
   const changeModel = useCallback(
     (model: string) => {
       if (!activeConversation) return;
@@ -430,109 +384,120 @@ export default function AIAssistantPage() {
     [activeConversation, activeConversationId, updateConversation],
   );
 
-  // 处理发送消息
-  const handleSendMessage = useCallback(
-    (content: string) => {
-      if (
-        !content.trim() ||
-        currentStreamingState.isLoading ||
-        !activeConversation
-      )
-        return;
-
-      // 添加用户消息
-      const userMessage: Message = {
-        id: generateUUID(),
-        role: 'user',
-        content,
-      };
-
-      // 更新对话并启动流式处理
-      setConversations((currentConversations) => {
-        // 添加用户消息到对话
-        const updatedConversations = currentConversations.map((conv) =>
-          conv.id === activeConversationId
-            ? {
-                ...conv,
-                messages: [...conv.messages, userMessage],
-                updatedAt: new Date().toISOString(),
-              }
-            : conv,
-        );
-
-        // 查找更新后的对话
-        const updatedConversation = updatedConversations.find(
-          (conv) => conv.id === activeConversationId,
-        );
-
-        if (updatedConversation) {
-          // 获取当前对话的EventSource引用
-          const conversationEventSourceRef = {
-            current: eventSourcesRef.current[activeConversationId] || null,
-          };
-
-          // 启动流式处理
-          const eventSource = handleStreamWithEventSource(
-            updatedConversation.messages,
-            updatedConversation.modelId,
-            conversationEventSourceRef,
-            setStreamingState,
-            activeConversationId,
-            updatedConversations,
-            setConversations,
-            handleStreamingComplete,
-          );
-
-          // 保存到对应的对话的引用中
-          eventSourcesRef.current[activeConversationId] = eventSource;
-        }
-
-        return updatedConversations;
-      });
-    },
-    [
-      activeConversation,
-      activeConversationId,
-      currentStreamingState.isLoading,
-      handleStreamingComplete,
-    ],
-  );
-
-  // 清空当前对话的消息
+  // 清空当前对话的所有消息
   const clearMessages = useCallback(() => {
     if (!activeConversation) return;
 
-    // 清理对应的EventSource
-    cleanupEventSource(activeConversationId);
-
-    // 从待生成标题的列表中移除
+    // 清理相关资源
+    cleanupAbortController(activeConversationId);
     removePendingTitleGeneration(activeConversationId);
 
-    // 更新对话，清空消息，重置标题
+    // 重置对话内容和标题
     updateConversation(activeConversationId, {
       messages: [],
       title: '新对话',
       hasGeneratedTitle: false,
     });
 
-    // 重置流式状态
+    // 重置流式响应状态
     resetStreamingState(activeConversationId);
   }, [
     activeConversation,
     activeConversationId,
-    cleanupEventSource,
+    cleanupAbortController,
     removePendingTitleGeneration,
     updateConversation,
     resetStreamingState,
   ]);
 
-  // 如果还未初始化，显示加载状态
-  if (!isInitialized) {
-    return <Loading fullPage text="加载中..." />;
-  }
+  // 发送用户消息并处理AI响应
+  const sendMessage = useCallback(
+    async (userInput: string) => {
+      if (!activeConversationId || !userInput.trim() || !activeConversation)
+        return;
 
-  return (
-    <main className="flex h-[calc(100vh-4rem)] flex-col md:flex-row">
+      try {
+        // 创建新的用户消息
+        const userMessage: Message = {
+          id: generateUUID(),
+          role: 'user',
+          content: userInput.trim(),
+        };
+
+        // 更新对话消息列表
+        setConversations((currentConversations) => {
+          const updatedConversations = currentConversations.map((conv) =>
+            conv.id === activeConversationId
+              ? {
+                  ...conv,
+                  messages: [...conv.messages, userMessage],
+                  updatedAt: new Date().toISOString(),
+                }
+              : conv,
+          );
+          return updatedConversations;
+        });
+
+        // 准备请求消息列表（包含历史消息和当前用户输入）
+        const currentConversation = conversations.find(
+          (conv) => conv.id === activeConversationId,
+        );
+
+        if (!currentConversation) return;
+
+        // 发起流式响应请求
+        const allMessages = [...currentConversation.messages, userMessage];
+
+        // 优化历史记录，减少传输到AI的上下文量
+        const optimizedMessages = optimizeConversationHistory(allMessages);
+
+        console.log(
+          `优化前消息数: ${allMessages.length}, 优化后: ${optimizedMessages.length}`,
+        );
+
+        await handleStreamWithFetchEventSource(
+          optimizedMessages,
+          activeConversation.modelId,
+          { current: abortControllersRef.current[activeConversationId] },
+          setStreamingState,
+          activeConversationId,
+          conversations,
+          setConversations,
+          handleStreamingComplete,
+        );
+      } catch (error) {
+        console.error('发送消息失败:', error);
+      }
+    },
+    [
+      activeConversationId,
+      activeConversation,
+      conversations,
+      handleStreamingComplete,
+    ],
+  );
+
+  // 中止当前进行中的AI响应
+  const stopResponding = useCallback(() => {
+    if (!activeConversationId) return;
+
+    cleanupAbortController(activeConversationId);
+
+    // 重置流式状态
+    setStreamingState((prev) => ({
+      ...prev,
+      [activeConversationId]: {
+        ...prev[activeConversationId],
+        isLoading: false,
+      },
+    }));
+  }, [activeConversationId, cleanupAbortController]);
+
+  // ==== 页面渲染 ====
+  return !isInitialized ? (
+    <Loading fullPage text="加载中..." />
+  ) : (
+    <div className="flex h-0 flex-1 flex-col overflow-auto md:flex-row">
       {/* 侧边栏: 对话列表 */}
       <ConversationSidebar
         conversations={conversations}
@@ -547,14 +512,13 @@ export default function AIAssistantPage() {
       <div className="flex flex-1 flex-col overflow-hidden">
         {activeConversation ? (
           <>
-            {/* 对话标题栏 */}
+            {/* 对话头部: 显示标题、提供编辑功能 */}
             <ConversationHeader
               conversation={activeConversation}
-              onClearMessages={clearMessages}
               onSaveTitle={saveEditedTitle}
             />
 
-            {/* 消息区域 */}
+            {/* 消息列表区域: 显示对话历史和流式响应 */}
             <div className="flex-1 overflow-y-auto p-4">
               <MessageList
                 messages={activeConversation.messages}
@@ -566,19 +530,22 @@ export default function AIAssistantPage() {
               />
             </div>
 
-            {/* 输入区域 */}
+            {/* 输入区域: 提供消息输入、模型切换和清空对话功能 */}
             <ChatInput
               isLoading={currentStreamingState.isLoading}
               modelId={activeConversation.modelId}
               availableModels={availableModels}
-              onSendMessage={handleSendMessage}
+              onSendMessage={sendMessage}
+              onStopResponding={stopResponding}
               onChangeModel={changeModel}
+              onClearMessages={clearMessages}
             />
           </>
         ) : (
+          // 无活跃对话时显示空状态
           <EmptyConversation onCreateConversation={addNewConversation} />
         )}
       </div>
-    </main>
+    </div>
   );
 }

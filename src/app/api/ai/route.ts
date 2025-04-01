@@ -8,18 +8,13 @@ import type {
 // 预设API配置
 const API_CONFIG = {
   DEEPSEEK: {
-    baseURL: process.env.DEEPSEEK_API_BASE_URL || 'https://a.henhuoai.com/v1',
-    apiKey:
-      process.env.DEEPSEEK_API_KEY ||
-      'sk-qY6gdsIUdeBJUKSVWqgZI6t1idJhqzAHmVHQM0LU7FWREJPY',
+    baseURL: 'https://a.henhuoai.com/v1',
+    apiKey: process.env.HENHUO_API_KEY,
     models: ['deepseek-ai/DeepSeek-R1', 'DeepSeek-V3-0324'],
   },
   GOOGLE: {
-    baseURL:
-      process.env.GOOGLE_API_BASE_URL ||
-      'https://generativelanguage.googleapis.com/v1beta/openai',
-    apiKey:
-      process.env.GOOGLE_API_KEY || 'AIzaSyBwnDATAbg6JZq4xRYyu_BwhwwEktEzdMQ',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: process.env.GEMINI_API_KEY,
     models: [
       'gemini-2.5-pro-exp-03-25',
       'gemini-2.0-flash',
@@ -112,9 +107,9 @@ async function handleStreamResponse(
 
     // 有实际内容时进行处理
     if (content) {
+      let processedContent = content.replace(/\\n/g, '\n');
       if (isThinkMode) {
         // 处理思考内容
-        let processedContent = content.replace(/\\n/g, '\n');
 
         if (isFirstThinkBlock && processedContent) {
           processedContent = processedContent.replace(/^[\n\r]+/, '');
@@ -123,9 +118,6 @@ async function handleStreamResponse(
 
         controller.enqueue(encodeSSEMessage('think', processedContent));
       } else {
-        // 处理普通文本
-        let processedContent = content;
-
         if (isFirstTextBlock && processedContent) {
           processedContent = processedContent.replace(/^[\n\r]+/, '');
           isFirstTextBlock = false;
@@ -213,7 +205,13 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const messages = parseMessagesFromURL(searchParams);
-    const modelName = searchParams.get('model') || 'gemini-2.5-pro-exp-03-25';
+    const model = searchParams.get('model');
+    if (!model) {
+      return new Response(JSON.stringify({ error: '没有提供模型名称' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     if (messages.length === 0) {
       return new Response(JSON.stringify({ error: '没有提供消息' }), {
@@ -222,7 +220,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return await handleAIModelRequest(messages, modelName);
+    return await handleAIModelRequest(messages, model);
   } catch (error) {
     console.error('处理GET请求错误:', error);
     return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
@@ -233,17 +231,21 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * POST请求处理器 - 仅用于处理其他操作
+ * POST请求处理器 - 用于流式响应和其他操作
  */
 export async function POST(req: NextRequest) {
   try {
-    // 解析请求体但目前不支持任何操作
-    await req.json();
+    const requestData = await req.json();
+    const { messages, model } = requestData;
 
-    return new Response(JSON.stringify({ error: '未知操作' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return new Response(JSON.stringify({ error: '没有提供有效的消息' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    return await handleAIModelRequest(messages, model);
   } catch (error) {
     console.error('处理POST请求错误:', error);
     return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
