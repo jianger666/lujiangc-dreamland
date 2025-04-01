@@ -58,23 +58,6 @@ function getClientConfigForModel(modelName: string) {
 }
 
 /**
- * 获取所有可用模型列表
- */
-export function getAvailableModels() {
-  const deepseekModels = API_CONFIG.DEEPSEEK.models.map((model) => ({
-    id: model,
-    provider: 'DeepSeek',
-  }));
-
-  const googleModels = API_CONFIG.GOOGLE.models.map((model) => ({
-    id: model,
-    provider: 'Google',
-  }));
-
-  return [...deepseekModels, ...googleModels];
-}
-
-/**
  * 将数据编码为SSE格式
  */
 function encodeSSEMessage(type: StreamChunkType, message: string) {
@@ -250,18 +233,12 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * POST请求处理器 - 目前仅支持获取可用模型列表
+ * POST请求处理器 - 仅用于处理其他操作
  */
 export async function POST(req: NextRequest) {
   try {
-    const { action } = await req.json();
-
-    if (action === 'getAvailableModels') {
-      return new Response(JSON.stringify({ models: getAvailableModels() }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    // 解析请求体但目前不支持任何操作
+    await req.json();
 
     return new Response(JSON.stringify({ error: '未知操作' }), {
       status: 400,

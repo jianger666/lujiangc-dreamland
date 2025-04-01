@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Message, StreamingMessage } from './types';
+import { Message, StreamingMessage } from '../types';
 
 interface MessageListProps {
   messages: Message[];
