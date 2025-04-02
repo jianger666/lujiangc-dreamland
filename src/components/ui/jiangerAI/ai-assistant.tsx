@@ -253,7 +253,7 @@ export function AIAssistant({
                 {message.role === 'user' ? (
                   message.content
                 ) : (
-                  <div className="prose prose-sm dark:prose-invert max-w-none overflow-auto whitespace-pre-wrap">
+                  <div className="prose prose-sm max-w-none overflow-auto whitespace-pre-wrap dark:prose-invert">
                     {message.content}
                   </div>
                 )}
@@ -264,7 +264,7 @@ export function AIAssistant({
           {streamingMessage && (
             <div className="mb-3 flex items-start justify-start">
               <div className="max-w-[90%] rounded-lg bg-muted px-4 py-2 md:max-w-[80%]">
-                <div className="prose prose-sm dark:prose-invert max-w-none overflow-auto whitespace-pre-wrap">
+                <div className="prose prose-sm max-w-none overflow-auto whitespace-pre-wrap dark:prose-invert">
                   {streamingMessage}
                 </div>
               </div>
