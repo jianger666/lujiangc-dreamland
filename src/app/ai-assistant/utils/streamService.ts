@@ -189,65 +189,32 @@ export async function startStreamResponse({
 }: {
   messages: Message[];
   modelId: string;
-  abortControllerRef:
-    | { current: AbortController | null }
-    | React.MutableRefObject<Record<string, AbortController | null>>;
+  abortControllerRef: React.MutableRefObject<
+    Record<string, AbortController | null>
+  >;
   setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
   conversationId: string;
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   onComplete?: (conversationId: string) => void;
 }): Promise<void> {
-  // 1. 根据类型检查，确定是Record类型引用还是简单引用
-  const isRefRecord =
-    'current' in abortControllerRef &&
-    typeof abortControllerRef.current === 'object' &&
-    abortControllerRef.current !== null &&
-    Object.prototype.hasOwnProperty.call(
-      abortControllerRef.current,
-      conversationId,
-    );
-
-  // 2. 创建新的AbortController实例
+  // 1. 创建新的AbortController实例
   const abortController = new AbortController();
 
-  if (isRefRecord) {
-    // 3a. 处理Record类型引用 (页面组件中的useRef)
-    const refRecord = abortControllerRef as React.MutableRefObject<
-      Record<string, AbortController | null>
-    >;
-
-    // 清理现有请求
-    try {
-      if (
-        refRecord.current[conversationId] &&
-        typeof refRecord.current[conversationId]?.abort === 'function'
-      ) {
-        console.log('清理现有请求(Record类型):', conversationId);
-        refRecord.current[conversationId]?.abort();
-      }
-    } catch (e) {
-      console.error('中止现有请求失败:', e);
+  // 2. 清理现有请求
+  try {
+    if (
+      abortControllerRef.current[conversationId] &&
+      typeof abortControllerRef.current[conversationId]?.abort === 'function'
+    ) {
+      console.log('清理现有请求:', conversationId);
+      abortControllerRef.current[conversationId]?.abort();
     }
-
-    // 保存新控制器
-    refRecord.current[conversationId] = abortController;
-  } else {
-    // 3b. 处理简单引用 (直接传入的对象)
-    const simpleRef = abortControllerRef as { current: AbortController | null };
-
-    // 清理现有请求
-    try {
-      if (simpleRef.current && typeof simpleRef.current.abort === 'function') {
-        console.log('清理现有请求(简单引用):', conversationId);
-        simpleRef.current.abort();
-      }
-    } catch (e) {
-      console.error('中止现有请求失败:', e);
-    }
-
-    // 保存新控制器
-    simpleRef.current = abortController;
+  } catch (e) {
+    console.error('中止现有请求失败:', e);
   }
+
+  // 3. 保存新控制器
+  abortControllerRef.current[conversationId] = abortController;
 
   // 4. 执行流式请求
   return executeStreamRequest({
@@ -396,9 +363,9 @@ export function stopStreamResponse({
   setConversations,
   streamingState,
 }: {
-  abortControllerRef:
-    | { current: AbortController | null }
-    | React.MutableRefObject<Record<string, AbortController | null>>;
+  abortControllerRef: React.MutableRefObject<
+    Record<string, AbortController | null>
+  >;
   conversationId: string;
   setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
@@ -413,59 +380,22 @@ export function stopStreamResponse({
     updates: { isLoading: false },
   });
 
-  // 判断引用类型并中止请求
-  const isRefRecord =
-    'current' in abortControllerRef &&
-    typeof abortControllerRef.current === 'object' &&
-    abortControllerRef.current !== null &&
-    Object.prototype.hasOwnProperty.call(
-      abortControllerRef.current,
-      conversationId,
-    );
-
-  if (isRefRecord) {
-    // 处理Record类型引用
-    const refRecord = abortControllerRef as React.MutableRefObject<
-      Record<string, AbortController | null>
-    >;
-    try {
-      if (
-        refRecord.current[conversationId] &&
-        typeof refRecord.current[conversationId]?.abort === 'function'
-      ) {
-        console.log('中止控制器(Record类型)存在，开始中止:', conversationId);
-        refRecord.current[conversationId]?.abort();
-        refRecord.current[conversationId] = null;
-      } else {
-        console.log(
-          '中止控制器(Record类型)不存在或无效，跳过中止:',
-          conversationId,
-        );
-      }
-    } catch (e) {
-      console.error('中止请求失败:', e);
-      // 即使中止失败，也清理引用
-      refRecord.current[conversationId] = null;
+  // 中止请求
+  try {
+    if (
+      abortControllerRef.current[conversationId] &&
+      typeof abortControllerRef.current[conversationId]?.abort === 'function'
+    ) {
+      console.log('中止控制器存在，开始中止:', conversationId);
+      abortControllerRef.current[conversationId]?.abort();
+      abortControllerRef.current[conversationId] = null;
+    } else {
+      console.log('中止控制器不存在或无效，跳过中止:', conversationId);
     }
-  } else {
-    // 处理简单引用
-    const simpleRef = abortControllerRef as { current: AbortController | null };
-    try {
-      if (simpleRef.current && typeof simpleRef.current.abort === 'function') {
-        console.log('中止控制器(简单引用)存在，开始中止:', conversationId);
-        simpleRef.current.abort();
-        simpleRef.current = null;
-      } else {
-        console.log(
-          '中止控制器(简单引用)不存在或无效，跳过中止:',
-          conversationId,
-        );
-      }
-    } catch (e) {
-      console.error('中止请求失败:', e);
-      // 即使中止失败，也清理引用
-      simpleRef.current = null;
-    }
+  } catch (e) {
+    console.error('中止请求失败:', e);
+    // 即使中止失败，也清理引用
+    abortControllerRef.current[conversationId] = null;
   }
 
   // 保存已累积的内容

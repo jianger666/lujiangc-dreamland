@@ -3,17 +3,19 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Edit, Send, X } from 'lucide-react';
+import { Edit, Send, X, Trash2 } from 'lucide-react';
 import { Conversation } from '../types';
 
 interface ConversationHeaderProps {
   conversation: Conversation;
   onSaveTitle: (title: string) => void;
+  onClearMessages: () => void;
 }
 
 export function ConversationHeader({
   conversation,
   onSaveTitle,
+  onClearMessages,
 }: ConversationHeaderProps) {
   const [editingTitle, setEditingTitle] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -67,7 +69,7 @@ export function ConversationHeader({
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9"
+              className="h-8 w-8"
               onClick={startEditingTitle}
             >
               <Edit className="h-4 w-4" />
@@ -75,6 +77,16 @@ export function ConversationHeader({
           </>
         )}
       </div>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onClearMessages}
+        title="清空对话"
+      >
+        <Trash2 className="h-4 w-4" />
+        清空对话
+      </Button>
     </div>
   );
 }

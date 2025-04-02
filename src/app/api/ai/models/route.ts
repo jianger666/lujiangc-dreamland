@@ -5,8 +5,8 @@ const API_CONFIG: Record<string, { models: { id: string; name?: string }[] }> =
   {
     DEEPSEEK: {
       models: [
-        { id: 'deepseek-ai/DeepSeek-R1', name: 'DeepSeek-R1' },
         { id: 'DeepSeek-V3-0324', name: 'DeepSeek-V3-0324' },
+        { id: 'deepseek-ai/DeepSeek-R1', name: 'DeepSeek-R1' },
       ],
     },
     GOOGLE: {
