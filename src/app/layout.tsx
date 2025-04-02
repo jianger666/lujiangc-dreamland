@@ -1,4 +1,6 @@
 import './globals.css';
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github.css';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Header } from '@/components/layout/header';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';

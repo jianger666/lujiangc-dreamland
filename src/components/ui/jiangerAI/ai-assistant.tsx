@@ -207,11 +207,6 @@ export function AIAssistant({
     };
   }, []);
 
-  // 对话消息自动滚动
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streamingMessage]);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

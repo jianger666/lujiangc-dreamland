@@ -14,6 +14,10 @@ import { Send, Trash2, StopCircle } from 'lucide-react';
 import { AIModel } from '../types';
 import { cn } from '@/lib/utils';
 
+// 定义文本框行数的常量
+const MIN_TEXTAREA_ROWS = 2;
+const MAX_TEXTAREA_ROWS = 10;
+
 interface ChatInputProps {
   isLoading: boolean;
   modelId: string;
@@ -34,13 +38,13 @@ export function ChatInput({
   onStopResponding,
 }: ChatInputProps) {
   const [input, setInput] = useState('');
-  const [rows, setRows] = useState(3); // 初始行数为3
+  const [rows, setRows] = useState(MIN_TEXTAREA_ROWS); // 初始行数
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 计算文本的行数
   const calculateRows = (text: string) => {
-    if (!textareaRef.current) return 3;
+    if (!textareaRef.current) return MIN_TEXTAREA_ROWS;
 
     const textarea = textareaRef.current;
     const style = window.getComputedStyle(textarea);
@@ -64,8 +68,8 @@ export function ChatInput({
     // 但我们用wrappedLines已经包含了所有行，所以不需要额外加上newlineCount
     const totalRows = Math.max(wrappedLines, newlineCount + 1);
 
-    // 限制在3-10行之间
-    return Math.min(Math.max(totalRows, 3), 10);
+    // 限制在MIN_TEXTAREA_ROWS-MAX_TEXTAREA_ROWS行之间
+    return Math.min(Math.max(totalRows, MIN_TEXTAREA_ROWS), MAX_TEXTAREA_ROWS);
   };
 
   // 输入变化时更新行数
@@ -82,7 +86,7 @@ export function ChatInput({
 
     onSendMessage(input);
     setInput('');
-    setRows(3); // 提交后重置行数
+    setRows(MIN_TEXTAREA_ROWS); // 提交后重置行数
   };
 
   return (
@@ -111,10 +115,10 @@ export function ChatInput({
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="default"
               onClick={onClearMessages}
               title="清空对话"
-              className="h-8 px-2 text-xs"
+              className="px-2 text-xs"
             >
               <Trash2 className="mr-1 h-4 w-4" />
               清空对话
@@ -130,9 +134,13 @@ export function ChatInput({
             rows={rows}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="resize-none border-0 pb-10 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="resize-none border-0 pb-14 focus-visible:ring-0 focus-visible:ring-offset-0"
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (
+                e.key === 'Enter' &&
+                !e.shiftKey &&
+                !e.nativeEvent.isComposing
+              ) {
                 e.preventDefault();
                 handleSubmit(e);
               }
@@ -143,22 +151,22 @@ export function ChatInput({
             {isLoading && onStopResponding && (
               <Button
                 type="button"
-                size="sm"
-                variant="outline"
+                size="lg"
+                variant="destructive"
                 onClick={onStopResponding}
-                className="h-8 w-8 rounded-full p-0"
+                className="h-10 w-10 rounded-full p-0"
                 title="停止响应"
               >
-                <StopCircle className="h-4 w-4" />
+                <StopCircle className="h-5 w-5" />
               </Button>
             )}
             <Button
               type="submit"
-              size="sm"
+              size="lg"
               disabled={isLoading || !input.trim()}
-              className="h-8 w-8 rounded-full p-0"
+              className="h-10 w-10 rounded-full p-0"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-5 w-5" />
             </Button>
           </div>
         </div>

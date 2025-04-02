@@ -481,9 +481,7 @@ export default function AIAssistantPage() {
   const stopResponding = useCallback(() => {
     if (!activeConversationId) return;
 
-    cleanupAbortController(activeConversationId);
-
-    // 重置流式状态
+    // 先将isLoading设置为false使界面立即反应
     setStreamingState((prev) => ({
       ...prev,
       [activeConversationId]: {
@@ -491,7 +489,50 @@ export default function AIAssistantPage() {
         isLoading: false,
       },
     }));
-  }, [activeConversationId, cleanupAbortController]);
+
+    // 确保中止控制器存在且调用abort()
+    if (abortControllersRef.current[activeConversationId]) {
+      console.log('正在中止响应:', activeConversationId);
+      abortControllersRef.current[activeConversationId]?.abort();
+      abortControllersRef.current[activeConversationId] = null;
+    }
+
+    // 如果当前有累积的内容，添加到消息列表中
+    const currentStreamState = streamingState[activeConversationId];
+    if (currentStreamState?.content) {
+      const newMessage: Message = {
+        id: generateUUID(),
+        role: 'assistant',
+        content: currentStreamState.content + '\n\n[回答已被中断]',
+        ...(currentStreamState.thinking
+          ? { thinking: currentStreamState.thinking }
+          : {}),
+      };
+
+      // 更新对话
+      setConversations((currentConversations) =>
+        currentConversations.map((conv) =>
+          conv.id === activeConversationId
+            ? {
+                ...conv,
+                messages: [...conv.messages, newMessage],
+                updatedAt: new Date().toISOString(),
+              }
+            : conv,
+        ),
+      );
+
+      // 清空流式状态
+      setStreamingState((prev) => ({
+        ...prev,
+        [activeConversationId]: {
+          content: '',
+          thinking: '',
+          isLoading: false,
+        },
+      }));
+    }
+  }, [activeConversationId, streamingState, setConversations]);
 
   // ==== 页面渲染 ====
   return !isInitialized ? (
@@ -527,6 +568,7 @@ export default function AIAssistantPage() {
                   thinking: currentStreamingState.thinking,
                 }}
                 isLoading={currentStreamingState.isLoading}
+                conversationId={activeConversationId}
               />
             </div>
 

@@ -182,61 +182,13 @@ async function handleAIModelRequest(messages: Message[], modelName: string) {
 }
 
 /**
- * 从请求URL中解析消息数组
- */
-function parseMessagesFromURL(searchParams: URLSearchParams): Message[] {
-  const messages: Message[] = [];
-
-  for (let i = 0; ; i++) {
-    const role = searchParams.get(`messages[${i}][role]`);
-    const content = searchParams.get(`messages[${i}][content]`);
-
-    if (!role || !content) break;
-    messages.push({ role, content });
-  }
-
-  return messages;
-}
-
-/**
- * GET请求处理器 - 用于EventSource流式响应
- */
-export async function GET(req: NextRequest) {
-  try {
-    const searchParams = req.nextUrl.searchParams;
-    const messages = parseMessagesFromURL(searchParams);
-    const model = searchParams.get('model');
-    if (!model) {
-      return new Response(JSON.stringify({ error: '没有提供模型名称' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    if (messages.length === 0) {
-      return new Response(JSON.stringify({ error: '没有提供消息' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    return await handleAIModelRequest(messages, model);
-  } catch (error) {
-    console.error('处理GET请求错误:', error);
-    return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-}
-
-/**
  * POST请求处理器 - 用于流式响应和其他操作
  */
 export async function POST(req: NextRequest) {
   try {
     const requestData = await req.json();
     const { messages, model } = requestData;
+    const modelName = model || 'gemini-2.5-pro-exp-03-25';
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: '没有提供有效的消息' }), {
@@ -245,7 +197,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return await handleAIModelRequest(messages, model);
+    return await handleAIModelRequest(messages, modelName);
   } catch (error) {
     console.error('处理POST请求错误:', error);
     return new Response(JSON.stringify({ error: '服务器处理请求时出错' }), {
