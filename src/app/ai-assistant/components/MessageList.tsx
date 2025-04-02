@@ -275,6 +275,15 @@ export function MessageList({
                             </code>
                           );
                         },
+                        pre(props) {
+                          const { className, ...rest } = props;
+                          return (
+                            <pre
+                              className={cn(className, 'p-0', 'bg-transparent')}
+                              {...rest}
+                            />
+                          );
+                        },
                       }}
                     >
                       {streamingMessage.content}
