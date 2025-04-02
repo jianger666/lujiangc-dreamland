@@ -75,7 +75,7 @@ export function Header({
       href: '/food-spinner',
     },
     {
-      title: 'AI助手',
+      title: '江耳助手',
       href: '/ai-assistant',
     },
     // 有子菜单的导航项

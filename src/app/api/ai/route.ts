@@ -23,6 +23,9 @@ const API_CONFIG = {
   },
 };
 
+// 江耳助手预设词
+const JIANGER_PRESET = process.env.JIANGER_ASSISTANT_PRESET || '';
+
 // 消息类型定义
 type Message = { role: string; content: string };
 type StreamChunkType = 'text' | 'think';
@@ -141,10 +144,15 @@ async function handleAIModelRequest(messages: Message[], modelName: string) {
   const clientConfig = getClientConfigForModel(modelName);
   const aiClient = new OpenAI(clientConfig);
 
+  // 添加系统预设消息到消息列表开头
+  const messagesWithPreset = JIANGER_PRESET
+    ? [{ role: 'system', content: JIANGER_PRESET }, ...messages]
+    : messages;
+
   // 构建请求参数
   const requestOptions = {
     model: modelName,
-    messages: messages as ChatCompletionCreateParams['messages'],
+    messages: messagesWithPreset as ChatCompletionCreateParams['messages'],
     stream: true,
   };
 
