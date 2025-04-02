@@ -11,13 +11,50 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import rehypeHighlight from 'rehype-highlight';
+// 使用Next.js内置的代码高亮组件（基于prism.js）
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import {
+  oneLight,
+  oneDark,
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useTheme } from 'next-themes';
 
 interface MessageListProps {
   messages: Message[];
   streamingMessage: StreamingMessage;
   isLoading: boolean;
   conversationId?: string;
+}
+
+// 创建一个代码高亮组件封装器解决类型问题
+function CodeBlock({
+  language,
+  children,
+}: {
+  language: string;
+  children: string;
+}) {
+  const { resolvedTheme } = useTheme();
+  // 根据当前主题选择合适的样式
+  const style = (resolvedTheme === 'dark' ? oneDark : oneLight) as Record<
+    string,
+    React.CSSProperties
+  >;
+
+  return (
+    <SyntaxHighlighter
+      language={language}
+      style={style}
+      PreTag="div"
+      customStyle={{
+        fontSize: '0.9rem', // 固定字体大小，与其他文本一致
+        lineHeight: '1.5',
+        borderRadius: '0.375rem',
+      }}
+    >
+      {children}
+    </SyntaxHighlighter>
+  );
 }
 
 export function MessageList({
@@ -136,11 +173,11 @@ export function MessageList({
               message.thinking &&
               message.thinking.trim() !== '' && (
                 <div className="flex justify-start">
-                  <div className="bg-muted/50 max-w-[85%] rounded-lg border border-dashed p-3 md:max-w-[70%] xl:max-w-[800px]">
+                  <div className="bg-muted/50 max-w-[85%] rounded-lg border border-dashed p-3 text-xs md:max-w-[70%] xl:max-w-[800px]">
                     <div className="text-xs font-medium text-muted-foreground">
                       思考过程
                     </div>
-                    <div className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
+                    <div className="mt-1 whitespace-pre-wrap text-muted-foreground">
                       {message.thinking}
                     </div>
                   </div>
@@ -154,7 +191,7 @@ export function MessageList({
             >
               <div
                 className={cn(
-                  'max-w-[85%] rounded-lg px-4 py-2 md:max-w-[70%] xl:max-w-[800px]',
+                  'max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted',
@@ -166,7 +203,31 @@ export function MessageList({
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-                      rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                      components={{
+                        code(props) {
+                          const { children, className, ...rest } = props;
+                          const match = /language-(\w+)/.exec(className || '');
+                          return match ? (
+                            <CodeBlock language={match[1]}>
+                              {String(children).replace(/\n$/, '')}
+                            </CodeBlock>
+                          ) : (
+                            <code className={className} {...rest}>
+                              {children}
+                            </code>
+                          );
+                        },
+                        pre(props) {
+                          const { className, ...rest } = props;
+                          return (
+                            <pre
+                              className={cn(className, 'p-0', 'bg-transparent')}
+                              {...rest}
+                            />
+                          );
+                        },
+                      }}
                     >
                       {message.content}
                     </ReactMarkdown>
@@ -183,11 +244,11 @@ export function MessageList({
             {streamingMessage.thinking &&
               streamingMessage.thinking.trim() !== '' && (
                 <div className="flex justify-start">
-                  <div className="bg-muted/50 max-w-[85%] rounded-lg border border-dashed p-3 md:max-w-[70%] xl:max-w-[800px]">
+                  <div className="bg-muted/50 max-w-[85%] rounded-lg border border-dashed p-3 text-xs md:max-w-[70%] xl:max-w-[800px]">
                     <div className="text-xs font-medium text-muted-foreground">
                       思考过程
                     </div>
-                    <div className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
+                    <div className="mt-1 whitespace-pre-wrap text-muted-foreground">
                       {streamingMessage.thinking}
                     </div>
                   </div>
@@ -195,11 +256,26 @@ export function MessageList({
               )}
             {streamingMessage.content && (
               <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-lg bg-muted px-4 py-2 md:max-w-[70%] xl:max-w-[800px]">
+                <div className="max-w-[85%] rounded-lg bg-muted px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]">
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-                      rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                      components={{
+                        code(props) {
+                          const { children, className, ...rest } = props;
+                          const match = /language-(\w+)/.exec(className || '');
+                          return match ? (
+                            <CodeBlock language={match[1]}>
+                              {String(children).replace(/\n$/, '')}
+                            </CodeBlock>
+                          ) : (
+                            <code className={className} {...rest}>
+                              {children}
+                            </code>
+                          );
+                        },
+                      }}
                     >
                       {streamingMessage.content}
                     </ReactMarkdown>
