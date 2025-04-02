@@ -27,7 +27,6 @@ import { Loading } from '@/components/ui/loading';
 import {
   createNewConversation,
   fetchAvailableModels,
-  handleStreamWithFetchEventSource,
   getAllConversations,
   getActiveConversationId,
   saveConversations,
@@ -37,6 +36,11 @@ import {
   generateConversationTitle,
   optimizeConversationHistory,
 } from './utils';
+import {
+  resetStreamingState,
+  startStreamResponse,
+  stopStreamResponse,
+} from './utils/streamService';
 import { Conversation, Message, AIModel, StreamingState } from './types';
 import { generateUUID } from '@/lib/uuid';
 
@@ -250,21 +254,10 @@ export default function AIAssistantPage() {
   // 清理指定对话的AbortController连接
   const cleanupAbortController = useCallback((conversationId: string) => {
     if (abortControllersRef.current[conversationId]) {
+      console.log('清理AbortController:', conversationId);
       abortControllersRef.current[conversationId]?.abort();
       abortControllersRef.current[conversationId] = null;
     }
-  }, []);
-
-  // 重置指定对话的流式响应状态
-  const resetStreamingState = useCallback((conversationId: string) => {
-    setStreamingState((prev) => ({
-      ...prev,
-      [conversationId]: {
-        content: '',
-        thinking: '',
-        isLoading: false,
-      },
-    }));
   }, []);
 
   // ==== 对话操作函数 ====
@@ -296,7 +289,7 @@ export default function AIAssistantPage() {
       availableModels,
     );
 
-    setConversations([...conversations, newConversation]);
+    setConversations((prev) => [...prev, newConversation]);
     setActiveConversationId(newConversation.id);
   }, [hasModels, availableModels, conversations]);
 
@@ -400,14 +393,13 @@ export default function AIAssistantPage() {
     });
 
     // 重置流式响应状态
-    resetStreamingState(activeConversationId);
+    resetStreamingState(setStreamingState, activeConversationId);
   }, [
     activeConversation,
     activeConversationId,
     cleanupAbortController,
     removePendingTitleGeneration,
     updateConversation,
-    resetStreamingState,
   ]);
 
   // 发送用户消息并处理AI响应
@@ -455,16 +447,16 @@ export default function AIAssistantPage() {
           `优化前消息数: ${allMessages.length}, 优化后: ${optimizedMessages.length}`,
         );
 
-        await handleStreamWithFetchEventSource(
-          optimizedMessages,
-          activeConversation.modelId,
-          { current: abortControllersRef.current[activeConversationId] },
+        // 启动流式响应
+        await startStreamResponse({
+          messages: optimizedMessages,
+          modelId: activeConversation.modelId,
+          abortControllerRef: abortControllersRef,
           setStreamingState,
-          activeConversationId,
-          conversations,
+          conversationId: activeConversationId,
           setConversations,
-          handleStreamingComplete,
-        );
+          onComplete: handleStreamingComplete,
+        });
       } catch (error) {
         console.error('发送消息失败:', error);
       }
@@ -481,58 +473,16 @@ export default function AIAssistantPage() {
   const stopResponding = useCallback(() => {
     if (!activeConversationId) return;
 
-    // 先将isLoading设置为false使界面立即反应
-    setStreamingState((prev) => ({
-      ...prev,
-      [activeConversationId]: {
-        ...prev[activeConversationId],
-        isLoading: false,
-      },
-    }));
+    console.log('调用停止响应:', activeConversationId);
 
-    // 确保中止控制器存在且调用abort()
-    if (abortControllersRef.current[activeConversationId]) {
-      console.log('正在中止响应:', activeConversationId);
-      abortControllersRef.current[activeConversationId]?.abort();
-      abortControllersRef.current[activeConversationId] = null;
-    }
-
-    // 如果当前有累积的内容，添加到消息列表中
-    const currentStreamState = streamingState[activeConversationId];
-    if (currentStreamState?.content) {
-      const newMessage: Message = {
-        id: generateUUID(),
-        role: 'assistant',
-        content: currentStreamState.content + '\n\n[回答已被中断]',
-        ...(currentStreamState.thinking
-          ? { thinking: currentStreamState.thinking }
-          : {}),
-      };
-
-      // 更新对话
-      setConversations((currentConversations) =>
-        currentConversations.map((conv) =>
-          conv.id === activeConversationId
-            ? {
-                ...conv,
-                messages: [...conv.messages, newMessage],
-                updatedAt: new Date().toISOString(),
-              }
-            : conv,
-        ),
-      );
-
-      // 清空流式状态
-      setStreamingState((prev) => ({
-        ...prev,
-        [activeConversationId]: {
-          content: '',
-          thinking: '',
-          isLoading: false,
-        },
-      }));
-    }
-  }, [activeConversationId, streamingState, setConversations]);
+    stopStreamResponse({
+      abortControllerRef: abortControllersRef,
+      conversationId: activeConversationId,
+      setStreamingState,
+      setConversations,
+      streamingState,
+    });
+  }, [activeConversationId, streamingState]);
 
   // ==== 页面渲染 ====
   return !isInitialized ? (
