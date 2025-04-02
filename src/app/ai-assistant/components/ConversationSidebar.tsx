@@ -38,7 +38,7 @@ const ConversationItem = memo(
       )}
       onClick={onSelect}
     >
-      <div className="flex items-center gap-2 truncate">
+      <div className="flex items-center gap-2 truncate text-sm">
         {isLoading && (
           <LoaderCircle className="h-3 w-3 animate-spin text-primary" />
         )}
@@ -47,10 +47,10 @@ const ConversationItem = memo(
       <Button
         variant="ghost"
         size="icon"
-        className="h-6 w-6 flex-shrink-0"
+        className="h-4 w-4 flex-shrink-0"
         onClick={onDelete}
       >
-        <Trash2 className="h-4 w-4" />
+        <Trash2 />
       </Button>
     </div>
   ),
@@ -69,16 +69,16 @@ export const ConversationSidebar = memo(
   }: ConversationSidebarProps) => {
     return (
       <div className="flex h-full w-full flex-shrink-0 flex-col border-r border-border md:w-64">
-        <div className="flex flex-shrink-0 items-center border-b border-border p-4">
+        <div className="flex flex-shrink-0 items-center border-b border-border p-3">
           <div className="flex w-full items-center justify-between">
-            <h2 className="text-lg font-medium">对话列表</h2>
+            <h3 className="font-medium">对话列表</h3>
             <Button variant="outline" size="icon" onClick={onAddConversation}>
-              <Plus className="h-4 w-4" />
+              <Plus />
             </Button>
           </div>
         </div>
 
-        <div className="h-0 flex-1 overflow-y-auto p-4">
+        <div className="h-0 flex-1 overflow-y-auto p-3">
           <div className="space-y-2">
             {conversations.map((conversation) => {
               const isLoading = Boolean(

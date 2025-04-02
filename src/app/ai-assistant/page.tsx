@@ -560,7 +560,7 @@ export default function AIAssistantPage() {
             />
 
             {/* 消息列表区域: 显示对话历史和流式响应 */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto px-3">
               <MessageList
                 messages={activeConversation.messages}
                 streamingMessage={{

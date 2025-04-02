@@ -98,7 +98,7 @@ export function ChatInput({
             isFocused && 'border-primary shadow-sm',
           )}
         >
-          <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
+          <div className="flex items-center justify-between gap-2 border-b border-border px-2 py-1">
             <Select value={modelId} onValueChange={onChangeModel}>
               <SelectTrigger className="w-auto border-none shadow-none focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="选择模型" />
@@ -114,60 +114,59 @@ export function ChatInput({
 
             <Button
               type="button"
-              variant="outline"
-              size="default"
+              variant="ghost"
+              size="sm"
               onClick={onClearMessages}
               title="清空对话"
-              className="px-2 text-xs"
             >
-              <Trash2 className="mr-1 h-4 w-4" />
+              <Trash2 />
               清空对话
             </Button>
           </div>
 
-          <Textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="发送消息..."
-            disabled={isLoading}
-            rows={rows}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className="resize-none border-0 pb-14 focus-visible:ring-0 focus-visible:ring-offset-0"
-            onKeyDown={(e) => {
-              if (
-                e.key === 'Enter' &&
-                !e.shiftKey &&
-                !e.nativeEvent.isComposing
-              ) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-          />
+          <div className="flex flex-col">
+            <Textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="shift+enter可换行，发送消息..."
+              disabled={isLoading}
+              rows={rows}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className="resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  !e.shiftKey &&
+                  !e.nativeEvent.isComposing
+                ) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+            />
 
-          <div className="absolute bottom-3 right-3 flex gap-2">
-            {isLoading && onStopResponding && (
+            <div className="flex justify-end gap-2 px-3 pb-2">
+              {isLoading && onStopResponding && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={onStopResponding}
+                  className="h-8 w-8 rounded-full p-0"
+                  title="停止响应"
+                >
+                  <StopCircle />
+                </Button>
+              )}
               <Button
-                type="button"
-                size="lg"
-                variant="destructive"
-                onClick={onStopResponding}
-                className="h-10 w-10 rounded-full p-0"
-                title="停止响应"
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="h-8 w-8 rounded-full p-0"
               >
-                <StopCircle className="h-5 w-5" />
+                <Send />
               </Button>
-            )}
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isLoading || !input.trim()}
-              className="h-10 w-10 rounded-full p-0"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            </div>
           </div>
         </div>
       </form>
