@@ -18,7 +18,7 @@ const notoSansSC = Noto_Sans_SC({
 
 export const metadata: Metadata = {
   title: '江耳的梦境',
-  description: '江耳的梦境 - 一些江耳的奇思妙想的实现以及个人简介和记录',
+  description: '江耳的梦境 - 一些江耳的奇思妙想',
 };
 
 export const viewport: Viewport = {
