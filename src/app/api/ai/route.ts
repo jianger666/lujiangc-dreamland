@@ -5,6 +5,8 @@ import type {
   ChatCompletionCreateParams,
 } from 'openai/resources';
 
+export const runtime = 'edge';
+
 // 预设API配置
 const API_CONFIG = {
   DEEPSEEK: {
