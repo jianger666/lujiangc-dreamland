@@ -1,23 +1,17 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
+import { AIModelEnum } from '../_types';
+import { getClientConfigForModel } from '../_config';
 
-// 设置DeepSeek客户端配置
-const DEEPSEEK_CONFIG = {
-  baseURL: 'https://a.henhuoai.com/v1',
-  apiKey: process.env.HENHUO_API_KEY,
-  model: 'DeepSeek-V3-0324',
-};
+// 标题生成使用的模型ID
+const TITLE_GENERATOR_MODEL = AIModelEnum.DeepSeekV30324;
 
 /**
  * POST处理器 - 根据对话内容生成标题
  */
 export async function POST(req: NextRequest) {
-  console.log('标题生成API被调用');
-
   try {
     const { messages } = await req.json();
-
-    console.log('接收到标题生成请求，消息数:', messages?.length);
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       console.error('无效的消息格式');
@@ -30,17 +24,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 使用DeepSeek模型
-    const aiClient = new OpenAI({
-      apiKey: DEEPSEEK_CONFIG.apiKey,
-      baseURL: DEEPSEEK_CONFIG.baseURL,
-    });
+    // 获取模型配置
+    const clientConfig = getClientConfigForModel(TITLE_GENERATOR_MODEL);
+    const aiClient = new OpenAI(clientConfig);
 
-    console.log('使用模型生成标题:', DEEPSEEK_CONFIG.model);
+    console.log('使用模型生成标题:', TITLE_GENERATOR_MODEL);
 
     // 发送请求到AI模型获取标题
     const response = await aiClient.chat.completions.create({
-      model: DEEPSEEK_CONFIG.model,
+      model: TITLE_GENERATOR_MODEL,
       messages: messages,
       max_tokens: 50,
       temperature: 0.3, // 降低温度以获得更稳定的结果
@@ -48,7 +40,6 @@ export async function POST(req: NextRequest) {
 
     // 提取生成的标题
     const title = response.choices[0]?.message?.content?.trim() || '新对话';
-    console.log('生成的标题:', title);
 
     return new Response(JSON.stringify({ title }), {
       status: 200,
