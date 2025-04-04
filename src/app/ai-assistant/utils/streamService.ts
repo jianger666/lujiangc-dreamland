@@ -257,6 +257,10 @@ async function executeStreamRequest({
 
   // 标记请求是否被中止
   const isAborted = { value: false };
+  // 跟踪连接尝试次数
+  let connectionAttempts = 0;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 1000;
 
   // 监听中止事件
   abortController.signal.addEventListener('abort', () => {
@@ -267,88 +271,170 @@ async function executeStreamRequest({
   try {
     console.log('启动流式响应:', conversationId);
 
-    await fetchEventSource('/api/ai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messages,
-        model: modelId,
-      }),
-      signal: abortController.signal,
-      onmessage: (event) => {
-        // 如果请求已被中止，不再处理消息
-        if (isAborted.value) {
-          console.log('请求已中止，忽略后续消息:', conversationId);
-          return;
-        }
+    // 自定义重试逻辑
+    const makeStreamRequest = async (): Promise<void> => {
+      try {
+        await fetchEventSource('/api/ai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-transform',
+            Connection: 'keep-alive',
+            'X-Client-ID': conversationId,
+          },
+          body: JSON.stringify({
+            messages,
+            model: modelId,
+          }),
+          openWhenHidden: true,
+          signal: abortController.signal,
+          onopen: async (response) => {
+            console.log(
+              `[连接已打开] 状态: ${response.status}`,
+              conversationId,
+            );
+            if (response.ok) {
+              // 重置尝试次数
+              connectionAttempts = 0;
+              return;
+            }
+            // 处理HTTP错误
+            if (response.status >= 400 && response.status < 500) {
+              console.error(`[客户端错误] ${response.status}:`, conversationId);
+              throw new Error(
+                `错误 ${response.status}: ${await response.text()}`,
+              );
+            }
+            console.error(`[服务器错误] ${response.status}:`, conversationId);
+            throw new Error(`服务器错误 ${response.status}`);
+          },
+          onmessage: (event) => {
+            if (isAborted.value) {
+              console.log('请求已中止，忽略后续消息:', conversationId);
+              return;
+            }
 
-        // 处理完成事件
-        if (event.data === '[DONE]') {
-          handleStreamComplete({
-            accumulatedContent,
-            accumulatedThinking,
-            setStreamingState,
-            setConversations,
-            conversationId,
-            onComplete,
-          });
-          return;
-        }
-
-        // 处理消息事件
-        try {
-          const data = JSON.parse(event.data);
-          const { type, message } = data;
-
-          if (type === 'text') {
-            processAccumulatedContent(accumulatedContent, message, (content) =>
-              updateStreamingContent(
+            if (event.data === '[DONE]') {
+              handleStreamComplete({
+                accumulatedContent,
+                accumulatedThinking,
                 setStreamingState,
+                setConversations,
                 conversationId,
-                content,
-              ),
-            );
-          } else if (type === 'think') {
-            processAccumulatedContent(
-              accumulatedThinking,
-              message,
-              (thinking) =>
-                updateStreamingThinking(
-                  setStreamingState,
-                  conversationId,
-                  thinking,
-                ),
-            );
-          }
-        } catch (parseError) {
-          console.error('解析事件数据出错:', parseError);
-        }
-      },
-      onerror: (error: Error) => {
-        // 如果请求已被中止，不处理错误
-        if (isAborted.value) {
-          console.log('请求已中止，忽略错误:', conversationId);
-          throw error; // 仍然抛出错误以终止fetchEventSource
-        }
+                onComplete,
+              });
+              return;
+            }
 
-        handleStreamError({
-          error,
-          setStreamingState,
-          setConversations,
-          conversationId,
-          onComplete,
+            try {
+              const data = JSON.parse(event.data);
+              const { type, message } = data;
+
+              if (type === 'text') {
+                processAccumulatedContent(
+                  accumulatedContent,
+                  message,
+                  (content) =>
+                    updateStreamingContent(
+                      setStreamingState,
+                      conversationId,
+                      content,
+                    ),
+                );
+              } else if (type === 'think') {
+                processAccumulatedContent(
+                  accumulatedThinking,
+                  message,
+                  (thinking) =>
+                    updateStreamingThinking(
+                      setStreamingState,
+                      conversationId,
+                      thinking,
+                    ),
+                );
+              }
+            } catch (parseError) {
+              console.error('解析事件数据出错:', parseError);
+            }
+          },
+          onerror: (error: Error) => {
+            if (isAborted.value) {
+              console.log('请求已中止，忽略错误:', conversationId);
+              throw error;
+            }
+
+            console.error('[SSE错误]', error.message, conversationId);
+
+            // 自定义重试逻辑
+            const shouldRetry =
+              connectionAttempts < MAX_RETRIES &&
+              !isAborted.value &&
+              (error.message.includes('network') ||
+                error.message.includes('Failed to fetch') ||
+                error.message.includes('timeout'));
+
+            if (shouldRetry) {
+              connectionAttempts++;
+              console.log(
+                `[重试] 第${connectionAttempts}次尝试...`,
+                conversationId,
+              );
+              // 不抛出错误，让fetchEventSource继续
+              // 而是在下面的setTimeout中重新调用makeStreamRequest
+              return;
+            }
+
+            // 超过重试次数或不应重试的错误，处理为终止状态
+            handleStreamError({
+              error,
+              setStreamingState,
+              setConversations,
+              conversationId,
+              onComplete,
+            });
+            throw error;
+          },
         });
-        throw error; // 抛出错误以终止fetchEventSource
-      },
-    });
+      } catch (fetchError) {
+        if (
+          !isAborted.value &&
+          connectionAttempts < MAX_RETRIES &&
+          fetchError instanceof Error &&
+          !(fetchError.name === 'AbortError')
+        ) {
+          connectionAttempts++;
+          console.log(
+            `[请求异常，重试] 第${connectionAttempts}次尝试...`,
+            conversationId,
+            fetchError,
+          );
+          // 延迟一点时间后重试
+          await new Promise((resolve) =>
+            setTimeout(resolve, RETRY_DELAY * connectionAttempts),
+          );
+          return makeStreamRequest();
+        }
+        // 其他错误或超过重试次数，直接抛出
+        throw fetchError;
+      }
+    };
+
+    // 启动请求
+    await makeStreamRequest();
   } catch (error: unknown) {
     // 处理中止错误
     if (error instanceof Error && error.name === 'AbortError') {
       console.log('请求中止错误已处理:', conversationId);
-    } else {
+    } else if (!isAborted.value) {
       console.error('流式响应异常:', error);
+      // 确保错误状态被处理
+      handleStreamError({
+        error: error instanceof Error ? error : new Error(String(error)),
+        setStreamingState,
+        setConversations,
+        conversationId,
+        onComplete,
+      });
     }
   }
 }
@@ -373,14 +459,12 @@ export function stopStreamResponse({
 }): void {
   console.log('开始中止流式响应:', conversationId);
 
-  // 立即更新UI状态
   updateStreamState({
     setStreamingState,
     conversationId,
     updates: { isLoading: false },
   });
 
-  // 中止请求
   try {
     if (
       abortControllerRef.current[conversationId] &&
@@ -394,11 +478,9 @@ export function stopStreamResponse({
     }
   } catch (e) {
     console.error('中止请求失败:', e);
-    // 即使中止失败，也清理引用
     abortControllerRef.current[conversationId] = null;
   }
 
-  // 保存已累积的内容
   const currentStreamState = streamingState[conversationId];
   if (currentStreamState?.content) {
     addInterruptedMessageToConversation({
@@ -408,7 +490,6 @@ export function stopStreamResponse({
       thinking: currentStreamState.thinking,
     });
 
-    // 重置流式状态
     resetStreamingState(setStreamingState, conversationId);
   }
 }
@@ -435,7 +516,6 @@ function handleStreamComplete({
 }): void {
   console.log('流处理完成:', conversationId);
 
-  // 添加累积的消息
   if (accumulatedContent.value || accumulatedThinking.value) {
     const newMessage: Message = {
       id: generateUUID(),
@@ -453,10 +533,8 @@ function handleStreamComplete({
     });
   }
 
-  // 重置状态
   resetStreamingState(setStreamingState, conversationId);
 
-  // 调用完成回调
   if (onComplete) {
     console.log('调用流完成回调:', conversationId);
     onComplete(conversationId);
@@ -481,17 +559,39 @@ function handleStreamError({
 }): void {
   console.error('流处理错误:', error, conversationId);
 
-  // 添加错误消息
-  const errorMessage: Message = {
+  // 获取更友好的错误消息
+  let errorMessage = '抱歉，我暂时无法回答您的问题。请稍后再试或尝试其他问题。';
+
+  // 根据错误类型提供具体错误信息
+  if (
+    error.message.includes('Failed to fetch') ||
+    error.message.includes('network')
+  ) {
+    errorMessage = '网络连接中断。请检查您的网络连接后重试。';
+  } else if (error.message.includes('timeout')) {
+    errorMessage = '连接超时。服务器响应时间过长，请稍后再试。';
+  } else if (error.message.includes('500')) {
+    errorMessage = '服务器内部错误。我们的服务器遇到了问题，技术团队正在处理。';
+  } else if (error.message.includes('429')) {
+    errorMessage = '请求过于频繁。请稍等片刻再发送新的消息。';
+  }
+
+  // 添加错误消息到对话
+  const errorContent: Message = {
     id: generateUUID(),
     role: 'assistant',
-    content: '抱歉，我暂时无法回答您的问题。请稍后再试或尝试其他问题。',
+    content: errorMessage,
   };
+
+  // 添加调试信息（仅在非生产环境）
+  if (process.env.NODE_ENV !== 'production') {
+    errorContent.content += `\n\n[调试信息: ${error.message}]`;
+  }
 
   addMessageToConversation({
     setConversations,
     conversationId,
-    message: errorMessage,
+    message: errorContent,
   });
 
   // 重置状态
