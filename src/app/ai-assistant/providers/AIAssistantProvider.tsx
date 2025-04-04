@@ -486,12 +486,6 @@ export function AIAssistantProvider({
         });
       } catch (error) {
         console.error('发送消息失败:', error);
-
-        // 显示错误提示
-        const errorMessage =
-          error instanceof Error ? error.message : '发送消息时发生未知错误';
-
-        alert(`发送消息失败: ${errorMessage}. 请稍后重试。`);
       }
     },
     [

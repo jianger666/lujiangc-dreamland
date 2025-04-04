@@ -6,15 +6,6 @@ import {
   StreamingState,
   ConversationStreamState,
 } from '../types';
-import {
-  LongRunningTask,
-  createTask,
-  updateTaskContent,
-  updateTaskThinking,
-  completeTask,
-  markTaskError,
-  getTask,
-} from './taskStore';
 
 /**
  * 流式响应服务
@@ -23,7 +14,6 @@ import {
  * - 请求创建和中止
  * - 消息累积和状态更新
  * - 流完成后的回调
- * - 长时间运行任务的恢复和重连
  */
 
 // ===== 状态更新相关函数 =====
@@ -186,35 +176,6 @@ export function addInterruptedMessageToConversation({
 // ===== 流式响应处理 =====
 
 /**
- * 创建或恢复长时间运行任务
- */
-function createOrResumeTask(
-  conversationId: string,
-  modelId: string,
-  messages: Message[],
-): LongRunningTask {
-  // 检查是否有未完成的相同对话任务
-  const pendingTask = window.localStorage.getItem(
-    `pending_task_${conversationId}`,
-  );
-
-  if (pendingTask) {
-    const taskId = pendingTask;
-    const task = getTask(taskId);
-
-    if (task && !task.isComplete && !task.isError) {
-      console.log('恢复未完成任务:', taskId);
-      return task;
-    }
-  }
-
-  // 创建新任务
-  const task = createTask(conversationId, modelId, messages);
-  window.localStorage.setItem(`pending_task_${conversationId}`, task.id);
-  return task;
-}
-
-/**
  * 创建流式响应实例
  */
 export async function startStreamResponse({
@@ -238,71 +199,37 @@ export async function startStreamResponse({
 }): Promise<void> {
   // 1. 创建新的AbortController实例
   const abortController = new AbortController();
+
+  // 2. 清理现有请求
+  try {
+    if (
+      abortControllerRef.current[conversationId] &&
+      typeof abortControllerRef.current[conversationId]?.abort === 'function'
+    ) {
+      console.log('清理现有请求:', conversationId);
+      abortControllerRef.current[conversationId]?.abort();
+    }
+  } catch (e) {
+    console.error('中止现有请求失败:', e);
+  }
+
+  // 3. 保存新控制器
   abortControllerRef.current[conversationId] = abortController;
 
-  // 创建或恢复任务
-  const task = createOrResumeTask(conversationId, modelId, messages);
-
-  // 如果任务有内容，立即更新UI状态
-  if (task.content || task.thinking) {
-    console.log('从存储恢复状态:', {
-      content: task.content.length,
-      thinking: task.thinking.length,
-    });
-
-    initializeStreamingState(setStreamingState, conversationId);
-
-    if (task.content) {
-      updateStreamingContent(setStreamingState, conversationId, task.content);
-    }
-
-    if (task.thinking) {
-      updateStreamingThinking(setStreamingState, conversationId, task.thinking);
-    }
-  }
-
-  // 2. 执行流式请求
-  try {
-    await executeStreamRequest({
-      messages,
-      modelId,
-      abortController,
-      setStreamingState,
-      conversationId,
-      setConversations,
-      onComplete,
-      taskId: task.id,
-    });
-  } catch (error) {
-    console.error('流式响应发生错误:', error);
-
-    // 如果任务有内容，则将其添加为中断的消息
-    if (task.content) {
-      addInterruptedMessageToConversation({
-        setConversations,
-        conversationId,
-        content: task.content,
-        thinking: task.thinking,
-      });
-    }
-
-    // 重置状态
-    resetStreamingState(setStreamingState, conversationId);
-
-    // 标记任务出错
-    if (error instanceof Error) {
-      markTaskError(task.id, error.message);
-    } else {
-      markTaskError(task.id, '未知错误');
-    }
-
-    // 清除挂起任务引用
-    window.localStorage.removeItem(`pending_task_${conversationId}`);
-  }
+  // 4. 执行流式请求
+  return executeStreamRequest({
+    messages,
+    modelId,
+    abortController,
+    setStreamingState,
+    conversationId,
+    setConversations,
+    onComplete,
+  });
 }
 
 /**
- * 执行流式请求
+ * 执行流式请求的核心逻辑
  */
 async function executeStreamRequest({
   messages,
@@ -312,7 +239,6 @@ async function executeStreamRequest({
   conversationId,
   setConversations,
   onComplete,
-  taskId,
 }: {
   messages: Message[];
   modelId: string;
@@ -321,7 +247,6 @@ async function executeStreamRequest({
   conversationId: string;
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   onComplete?: (conversationId: string) => void;
-  taskId: string;
 }): Promise<void> {
   // 初始化流式状态
   initializeStreamingState(setStreamingState, conversationId);
@@ -329,29 +254,6 @@ async function executeStreamRequest({
   // 用于累积内容的引用对象
   const accumulatedContent = { value: '' };
   const accumulatedThinking = { value: '' };
-
-  // 从任务中恢复内容（如果有）
-  const task = getTask(taskId);
-  if (task) {
-    accumulatedContent.value = task.content || '';
-    accumulatedThinking.value = task.thinking || '';
-
-    if (accumulatedContent.value) {
-      updateStreamingContent(
-        setStreamingState,
-        conversationId,
-        accumulatedContent.value,
-      );
-    }
-
-    if (accumulatedThinking.value) {
-      updateStreamingThinking(
-        setStreamingState,
-        conversationId,
-        accumulatedThinking.value,
-      );
-    }
-  }
 
   // 标记请求是否被中止
   const isAborted = { value: false };
@@ -383,7 +285,6 @@ async function executeStreamRequest({
           body: JSON.stringify({
             messages,
             model: modelId,
-            clientId: taskId, // 传递任务ID给服务器
           }),
           openWhenHidden: true,
           signal: abortController.signal,
@@ -421,7 +322,6 @@ async function executeStreamRequest({
                 setConversations,
                 conversationId,
                 onComplete,
-                taskId,
               });
               return;
             }
@@ -434,33 +334,24 @@ async function executeStreamRequest({
                 processAccumulatedContent(
                   accumulatedContent,
                   message,
-                  (content) => {
+                  (content) =>
                     updateStreamingContent(
                       setStreamingState,
                       conversationId,
                       content,
-                    );
-                    // 更新任务内容
-                    updateTaskContent(taskId, content);
-                  },
+                    ),
                 );
               } else if (type === 'think') {
                 processAccumulatedContent(
                   accumulatedThinking,
                   message,
-                  (thinking) => {
+                  (thinking) =>
                     updateStreamingThinking(
                       setStreamingState,
                       conversationId,
                       thinking,
-                    );
-                    // 更新任务思考内容
-                    updateTaskThinking(taskId, thinking);
-                  },
+                    ),
                 );
-              } else if (type === 'task') {
-                // 处理任务状态更新
-                console.log('任务状态更新:', data);
               }
             } catch (parseError) {
               console.error('解析事件数据出错:', parseError);
@@ -493,30 +384,13 @@ async function executeStreamRequest({
               return;
             }
 
-            // 超过重试次数或不应重试的错误，查看是否可以从本地存储恢复
-            if (accumulatedContent.value) {
-              // 如果有内容，标记为部分完成
-              handleStreamComplete({
-                accumulatedContent,
-                accumulatedThinking,
-                setStreamingState,
-                setConversations,
-                conversationId,
-                onComplete,
-                taskId,
-                isPartial: true,
-              });
-              return;
-            }
-
-            // 没有内容可恢复，处理为终止状态
+            // 超过重试次数或不应重试的错误，处理为终止状态
             handleStreamError({
               error,
               setStreamingState,
               setConversations,
               conversationId,
               onComplete,
-              taskId,
             });
             throw error;
           },
@@ -560,7 +434,6 @@ async function executeStreamRequest({
         setConversations,
         conversationId,
         onComplete,
-        taskId,
       });
     }
   }
@@ -584,39 +457,47 @@ export function stopStreamResponse({
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   streamingState: StreamingState;
 }): void {
-  const controller = abortControllerRef.current[conversationId];
+  console.log('开始中止流式响应:', conversationId);
 
-  if (controller) {
-    try {
-      // 中止控制器
-      controller.abort();
+  updateStreamState({
+    setStreamingState,
+    conversationId,
+    updates: { isLoading: false },
+  });
+
+  try {
+    if (
+      abortControllerRef.current[conversationId] &&
+      typeof abortControllerRef.current[conversationId]?.abort === 'function'
+    ) {
+      console.log('中止控制器存在，开始中止:', conversationId);
+      abortControllerRef.current[conversationId]?.abort();
       abortControllerRef.current[conversationId] = null;
-
-      // 获取当前流式内容
-      const currentState = streamingState[conversationId];
-      if (currentState && (currentState.content || currentState.thinking)) {
-        // 将当前状态添加为一条消息
-        addInterruptedMessageToConversation({
-          setConversations,
-          conversationId,
-          content: currentState.content,
-          thinking: currentState.thinking,
-        });
-
-        // 清除待处理任务标记
-        window.localStorage.removeItem(`pending_task_${conversationId}`);
-      }
-
-      // 重置流式状态
-      resetStreamingState(setStreamingState, conversationId);
-    } catch (error) {
-      console.error('停止流式响应出错:', error);
+    } else {
+      console.log('中止控制器不存在或无效，跳过中止:', conversationId);
     }
+  } catch (e) {
+    console.error('中止请求失败:', e);
+    abortControllerRef.current[conversationId] = null;
+  }
+
+  const currentStreamState = streamingState[conversationId];
+  if (currentStreamState?.content) {
+    addInterruptedMessageToConversation({
+      setConversations,
+      conversationId,
+      content: currentStreamState.content,
+      thinking: currentStreamState.thinking,
+    });
+
+    resetStreamingState(setStreamingState, conversationId);
   }
 }
 
+// ===== 辅助函数 =====
+
 /**
- * 处理流完成
+ * 处理流完成事件
  */
 function handleStreamComplete({
   accumulatedContent,
@@ -625,8 +506,6 @@ function handleStreamComplete({
   setConversations,
   conversationId,
   onComplete,
-  taskId,
-  isPartial = false,
 }: {
   accumulatedContent: { value: string };
   accumulatedThinking: { value: string };
@@ -634,51 +513,36 @@ function handleStreamComplete({
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   conversationId: string;
   onComplete?: (conversationId: string) => void;
-  taskId: string;
-  isPartial?: boolean;
 }): void {
-  try {
-    // 添加AI回复消息
+  console.log('流处理完成:', conversationId);
+
+  if (accumulatedContent.value || accumulatedThinking.value) {
     const newMessage: Message = {
       id: generateUUID(),
       role: 'assistant',
-      content: accumulatedContent.value.trim(),
+      content: accumulatedContent.value,
       ...(accumulatedThinking.value
-        ? { thinking: accumulatedThinking.value.trim() }
+        ? { thinking: accumulatedThinking.value }
         : {}),
     };
 
-    if (isPartial) {
-      newMessage.content += '\n\n[由于服务超时，回答可能不完整]';
-    }
-
-    // 将消息添加到对话中
     addMessageToConversation({
       setConversations,
       conversationId,
       message: newMessage,
     });
+  }
 
-    // 在任务存储中标记为完成
-    completeTask(taskId, accumulatedContent.value, accumulatedThinking.value);
+  resetStreamingState(setStreamingState, conversationId);
 
-    // 清除待处理任务标记
-    window.localStorage.removeItem(`pending_task_${conversationId}`);
-
-    // 重置流式状态
-    resetStreamingState(setStreamingState, conversationId);
-
-    // 调用完成回调
-    if (onComplete) {
-      onComplete(conversationId);
-    }
-  } catch (error) {
-    console.error('处理流完成出错:', error);
+  if (onComplete) {
+    console.log('调用流完成回调:', conversationId);
+    onComplete(conversationId);
   }
 }
 
 /**
- * 处理流错误
+ * 处理流错误事件
  */
 function handleStreamError({
   error,
@@ -686,44 +550,56 @@ function handleStreamError({
   setConversations,
   conversationId,
   onComplete,
-  taskId,
 }: {
   error: Error;
   setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   conversationId: string;
   onComplete?: (conversationId: string) => void;
-  taskId: string;
 }): void {
-  try {
-    // 添加错误消息
-    const errorMessage: Message = {
-      id: generateUUID(),
-      role: 'assistant',
-      content: `生成回答时出错: ${error.message}`,
-    };
+  console.error('流处理错误:', error, conversationId);
 
-    // 将错误消息添加到对话中
-    addMessageToConversation({
-      setConversations,
-      conversationId,
-      message: errorMessage,
-    });
+  // 获取更友好的错误消息
+  let errorMessage = '抱歉，我暂时无法回答您的问题。请稍后再试或尝试其他问题。';
 
-    // 标记任务为错误状态
-    markTaskError(taskId, error.message);
+  // 根据错误类型提供具体错误信息
+  if (
+    error.message.includes('Failed to fetch') ||
+    error.message.includes('network')
+  ) {
+    errorMessage = '网络连接中断。请检查您的网络连接后重试。';
+  } else if (error.message.includes('timeout')) {
+    errorMessage = '连接超时。服务器响应时间过长，请稍后再试。';
+  } else if (error.message.includes('500')) {
+    errorMessage = '服务器内部错误。我们的服务器遇到了问题，技术团队正在处理。';
+  } else if (error.message.includes('429')) {
+    errorMessage = '请求过于频繁。请稍等片刻再发送新的消息。';
+  }
 
-    // 清除待处理任务标记
-    window.localStorage.removeItem(`pending_task_${conversationId}`);
+  // 添加错误消息到对话
+  const errorContent: Message = {
+    id: generateUUID(),
+    role: 'assistant',
+    content: errorMessage,
+  };
 
-    // 重置流式状态
-    resetStreamingState(setStreamingState, conversationId);
+  // 添加调试信息（仅在非生产环境）
+  if (process.env.NODE_ENV !== 'production') {
+    errorContent.content += `\n\n[调试信息: ${error.message}]`;
+  }
 
-    // 调用完成回调
-    if (onComplete) {
-      onComplete(conversationId);
-    }
-  } catch (callbackError) {
-    console.error('处理流错误出错:', callbackError);
+  addMessageToConversation({
+    setConversations,
+    conversationId,
+    message: errorContent,
+  });
+
+  // 重置状态
+  resetStreamingState(setStreamingState, conversationId);
+
+  // 调用完成回调
+  if (onComplete) {
+    console.log('因错误调用流完成回调:', conversationId);
+    onComplete(conversationId);
   }
 }
