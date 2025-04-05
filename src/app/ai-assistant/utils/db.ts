@@ -1,5 +1,5 @@
 import { DBSchema, IDBPDatabase } from 'idb';
-import { createDBInstance } from '@/lib/db';
+import { createDBInstance } from '@/lib';
 import type { Conversation } from '../types';
 
 // 定义AI助手数据库Schema

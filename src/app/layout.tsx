@@ -8,6 +8,7 @@ import { Metadata, Viewport } from 'next';
 // import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
 import { Suspense } from 'react';
 import { cn } from '@/lib';
+import { Toaster } from '@/components/ui/toaster';
 
 // Noto Sans SC 支持中文和拉丁字符，是一个全面的字体选择
 const notoSansSC = Noto_Sans_SC({
@@ -52,6 +53,7 @@ export default function RootLayout({
               {children}
             </main>
             {/* <AIAssistant isFloating /> */}
+            <Toaster />
           </ThemeProvider>
         </NuqsAdapter>
       </body>

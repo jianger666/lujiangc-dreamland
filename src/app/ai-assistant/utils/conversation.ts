@@ -67,13 +67,11 @@ export async function generateConversationTitle(
       throw new Error(`生成标题失败: ${response.status}`);
     }
 
-    const data = await response.json();
+    const { data: title } = await response.json();
 
     // 处理API返回的数据
-    if (data.title && typeof data.title === 'string') {
-      return (
-        data.title.trim().slice(0, 20) || extractFallbackTitle(userMessages[0])
-      );
+    if (title && typeof title === 'string') {
+      return title.trim().slice(0, 20) || extractFallbackTitle(userMessages[0]);
     }
 
     // 无有效标题时使用回退方案
@@ -107,8 +105,9 @@ export async function fetchAvailableModels(): Promise<AIModel[]> {
       },
     });
 
-    const data = await response.json();
-    return data.models && Array.isArray(data.models) ? data.models : [];
+    const { data: models } = await response.json();
+
+    return models && Array.isArray(models) ? models : [];
   } catch (error) {
     console.error('获取模型列表失败:', error);
     return [];
