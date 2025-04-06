@@ -64,6 +64,7 @@ specifiers:
   remark-gfm: ^4.0.1
   remark-math: ^6.0.0
   shadcn-ui: ^0.9.5
+  swr: ^2.3.3
   tailwind-merge: ^3.0.2
   tailwindcss: 3.4.17
   tailwindcss-animate: ^1.0.7
@@ -117,6 +118,7 @@ dependencies:
   remark-gfm: registry.npmmirror.com/remark-gfm/4.0.1
   remark-math: registry.npmmirror.com/remark-math/6.0.0
   shadcn-ui: registry.npmmirror.com/shadcn-ui/0.9.5
+  swr: registry.npmmirror.com/swr/2.3.3_react@19.0.0
   tailwind-merge: registry.npmmirror.com/tailwind-merge/3.0.2
   tw-animate-css: registry.npmmirror.com/tw-animate-css/1.2.4
   usehooks-ts: registry.npmmirror.com/usehooks-ts/3.1.1_react@19.0.0
@@ -7246,6 +7248,19 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  registry.npmmirror.com/swr/2.3.3_react@19.0.0:
+    resolution: {integrity: sha512-dshNvs3ExOqtZ6kJBaAsabhPdHyeY4P2cKwRCniDVifBMoG/SVI7tfLWqPXriVspf2Rg4tPzXJTnwaihIeFw2A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/swr/-/swr-2.3.3.tgz}
+    id: registry.npmmirror.com/swr/2.3.3
+    name: swr
+    version: 2.3.3
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    dependencies:
+      dequal: registry.npmmirror.com/dequal/2.0.3
+      react: registry.npmmirror.com/react/19.0.0
+      use-sync-external-store: registry.npmmirror.com/use-sync-external-store/1.5.0_react@19.0.0
+    dev: false
+
   registry.npmmirror.com/synckit/0.10.3:
     resolution: {integrity: sha512-R1urvuyiTaWfeCggqEvpDJwAlDVdsT9NM+IP//Tk2x7qHCkSvBk/fwFgw/TLAHzZlrAnnazMcRw0ZD8HlYFTEQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/synckit/-/synckit-0.10.3.tgz}
     name: synckit
@@ -7625,6 +7640,17 @@ packages:
       detect-node-es: registry.npmmirror.com/detect-node-es/1.1.0
       react: registry.npmmirror.com/react/19.0.0
       tslib: registry.npmmirror.com/tslib/2.8.1
+    dev: false
+
+  registry.npmmirror.com/use-sync-external-store/1.5.0_react@19.0.0:
+    resolution: {integrity: sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/use-sync-external-store/-/use-sync-external-store-1.5.0.tgz}
+    id: registry.npmmirror.com/use-sync-external-store/1.5.0
+    name: use-sync-external-store
+    version: 1.5.0
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    dependencies:
+      react: registry.npmmirror.com/react/19.0.0
     dev: false
 
   registry.npmmirror.com/usehooks-ts/3.1.1_react@19.0.0:

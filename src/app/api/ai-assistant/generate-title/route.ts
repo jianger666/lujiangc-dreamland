@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
-import { AIModelEnum } from '../_types';
 import { getClientConfigForModel } from '../_config';
 import { apiHandler } from '@/lib/api/handler';
 import { createErrorResponse } from '@/lib/api/response';
+import { AIModelEnum } from '@/types/ai-assistant';
 
 // 标题生成使用的模型ID
 const TITLE_GENERATOR_MODEL = AIModelEnum.DeepSeekV30324;

@@ -1,10 +1,10 @@
 import type { ChatCompletionChunk } from 'openai/resources';
-import { StreamChunkType } from '../_types';
+import { AiStreamChunkTypeEnum } from '@/types/ai-assistant';
 
 /**
  * 将数据编码为SSE格式
  */
-export function encodeSSEMessage(type: StreamChunkType, message: string) {
+export function encodeSSEMessage(type: AiStreamChunkTypeEnum, message: string) {
   const encoder = new TextEncoder();
   return encoder.encode(`data: ${JSON.stringify({ type, message })}\n\n`);
 }
@@ -43,7 +43,9 @@ export async function handleStreamResponse({
           isFirstThinkBlock = false;
         }
 
-        controller.enqueue(encodeSSEMessage('think', processedReasoning));
+        controller.enqueue(
+          encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedReasoning),
+        );
         continue;
       }
 
@@ -69,14 +71,18 @@ export async function handleStreamResponse({
             isFirstThinkBlock = false;
           }
 
-          controller.enqueue(encodeSSEMessage('think', processedContent));
+          controller.enqueue(
+            encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedContent),
+          );
         } else {
           if (isFirstTextBlock && processedContent) {
             processedContent = processedContent.replace(/^[\n\r]+/, '');
             isFirstTextBlock = false;
           }
 
-          controller.enqueue(encodeSSEMessage('text', processedContent));
+          controller.enqueue(
+            encodeSSEMessage(AiStreamChunkTypeEnum.Text, processedContent),
+          );
         }
       }
     }

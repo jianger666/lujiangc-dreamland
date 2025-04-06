@@ -1,18 +1,25 @@
-import { AIModel, Conversation, Message } from '../types';
-import { generateUUID } from '@/lib/uuid';
+import {
+  AIModel,
+  AiRoleEnum,
+  Conversation,
+  Message,
+} from '@/types/ai-assistant';
+import { generateUUID } from '@/lib';
+import { generateTitle as generateTitleService } from '@/lib/services/ai-assistant';
 
 /**
  * 创建新对话
  * @param modelId 模型ID
- * @param existingConversations 现有对话列表
  * @param availableModels 可用模型列表
  * @returns 新创建的对话
  */
-export function createNewConversation(
-  modelId: string,
-  existingConversations: Conversation[],
-  availableModels: AIModel[],
-): Conversation {
+export function createNewConversation({
+  modelId,
+  availableModels,
+}: {
+  modelId: string;
+  availableModels: AIModel[];
+}): Conversation {
   const now = new Date().toISOString();
   return {
     id: generateUUID(),
@@ -48,26 +55,16 @@ export async function generateConversationTitle(
     const requestBody = {
       messages: [
         {
-          role: 'system',
+          role: AiRoleEnum.System,
           content:
             '你是一个标题生成助手。根据用户的提问生成一个简短的标题（10个字以内），标题应该概括对话的主题或目的。只返回标题，不要包含任何其他文字或标点符号。',
         },
-        { role: 'user', content: firstUserMsg },
+        { role: AiRoleEnum.User, content: firstUserMsg },
       ],
     };
 
-    // 发送请求到API
-    const response = await fetch('/api/ai/generate-title', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      throw new Error(`生成标题失败: ${response.status}`);
-    }
-
-    const { data: title } = await response.json();
+    // 使用服务层API调用
+    const title = await generateTitleService(requestBody);
 
     // 处理API返回的数据
     if (title && typeof title === 'string') {
@@ -90,28 +87,6 @@ export async function generateConversationTitle(
 // 从用户消息提取回退标题
 function extractFallbackTitle(message: Message): string {
   return message.content.slice(0, 15) + '...';
-}
-
-/**
- * 获取可用模型
- * @returns 可用的AI模型列表
- */
-export async function fetchAvailableModels(): Promise<AIModel[]> {
-  try {
-    const response = await fetch('/api/ai/models', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const { data: models } = await response.json();
-
-    return models && Array.isArray(models) ? models : [];
-  } catch (error) {
-    console.error('获取模型列表失败:', error);
-    return [];
-  }
 }
 
 /**
@@ -231,7 +206,7 @@ export function optimizeConversationHistory(
     if (skippedCount > 0) {
       const summaryMessage: Message = {
         id: 'history-summary',
-        role: 'system',
+        role: AiRoleEnum.System,
         content: `[系统提示: 这里省略了 ${skippedCount} 条较早的对话消息，下面是最近的对话内容]`,
       };
       recentMessages.unshift(summaryMessage);

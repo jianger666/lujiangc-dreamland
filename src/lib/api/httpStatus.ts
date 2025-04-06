@@ -3,6 +3,9 @@
  * 常用HTTP状态码的枚举定义，便于API路由统一使用
  */
 export enum HttpStatus {
+  // 0xx - 未知错误
+  UNKNOWN = 0,
+
   // 2xx - 成功响应
   OK = 200,
   CREATED = 201,
@@ -30,6 +33,7 @@ export enum HttpStatus {
   UNSUPPORTED_MEDIA_TYPE = 415,
   UNPROCESSABLE_ENTITY = 422,
   TOO_MANY_REQUESTS = 429,
+  CLIENT_CLOSED_REQUEST = 499,
 
   // 5xx - 服务端错误
   INTERNAL_SERVER_ERROR = 500,
@@ -46,6 +50,10 @@ export enum HttpStatus {
  */
 export function getStatusMessage(statusCode: HttpStatus): string {
   switch (statusCode) {
+    // 0
+    case HttpStatus.UNKNOWN:
+      return '未知错误';
+
     // 2xx
     case HttpStatus.OK:
       return '请求成功';
@@ -73,6 +81,8 @@ export function getStatusMessage(statusCode: HttpStatus): string {
       return '请求参数有误';
     case HttpStatus.TOO_MANY_REQUESTS:
       return '请求过于频繁';
+    case HttpStatus.CLIENT_CLOSED_REQUEST:
+      return '请求被取消';
 
     // 5xx
     case HttpStatus.INTERNAL_SERVER_ERROR:

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Send, StopCircle } from 'lucide-react';
-import { AIModel } from '../types';
+import { AIModel } from '@/types/ai-assistant';
 import { cn } from '@/lib/utils';
 
 // 定义文本框行数的常量
@@ -22,9 +22,9 @@ interface ChatInputProps {
   isLoading: boolean;
   modelId: string;
   availableModels: AIModel[];
-  onSendMessage: (content: string) => void;
+  onSendMessage: (message: string) => void;
+  onStopResponding: () => void;
   onChangeModel: (modelId: string) => void;
-  onStopResponding?: () => void;
 }
 
 export function ChatInput({
@@ -32,8 +32,8 @@ export function ChatInput({
   modelId,
   availableModels,
   onSendMessage,
-  onChangeModel,
   onStopResponding,
+  onChangeModel,
 }: ChatInputProps) {
   const [input, setInput] = useState('');
   const [rows, setRows] = useState(MIN_TEXTAREA_ROWS); // 初始行数

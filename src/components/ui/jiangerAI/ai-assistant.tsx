@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Send, Bot, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 // 消息类型
 interface Message {
@@ -88,7 +88,9 @@ export function AIAssistant({
     });
 
     // 创建新的EventSource
-    const eventSource = new EventSource(`/api/ai?${params.toString()}`);
+    const eventSource = new EventSource(
+      `/api/ai-assistant?${params.toString()}`,
+    );
     eventSourceRef.current = eventSource;
 
     // 处理消息事件

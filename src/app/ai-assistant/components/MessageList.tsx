@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Bot, ArrowDown, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Message, StreamingMessage } from '../types';
+import { Message, StreamingMessage } from '@/types/ai-assistant';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -19,7 +19,7 @@ import {
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
 import { Components } from 'react-markdown';
-import { useCopyToClipboard } from '../hooks/useCopy';
+import { useCopy } from '../hooks';
 
 /**
  * 复制按钮组件
@@ -56,7 +56,7 @@ function CodeBlock({
   children: string;
 }) {
   const { resolvedTheme } = useTheme();
-  const { copied, copyToClipboard } = useCopyToClipboard();
+  const { copied, copyToClipboard } = useCopy();
   const style = (resolvedTheme === 'dark' ? oneDark : oneLight) as Record<
     string,
     React.CSSProperties
@@ -174,7 +174,7 @@ function MessageContent({
 function MessageItem({ message }: { message: Message | StreamingMessage }) {
   const role = 'role' in message ? message.role : 'assistant';
   const thinking = 'thinking' in message ? message.thinking : undefined;
-  const { copied, copyToClipboard } = useCopyToClipboard();
+  const { copied, copyToClipboard } = useCopy();
 
   const handleCopy = () => {
     copyToClipboard(message.content);

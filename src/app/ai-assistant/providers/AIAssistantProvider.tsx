@@ -8,16 +8,15 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
+import useSWR from 'swr';
 import {
   createNewConversation,
-  fetchAvailableModels,
   getAllConversations,
   getActiveConversationId,
   saveConversations,
   saveActiveConversationId,
   saveConversation,
   deleteConversation as deleteConversationFromDB,
-  generateConversationTitle,
   optimizeConversationHistory,
 } from '../utils';
 import {
@@ -25,8 +24,16 @@ import {
   startStreamResponse,
   stopStreamResponse,
 } from '../utils/streamService';
-import { Conversation, Message, AIModel, StreamingState } from '../types';
-import { generateUUID } from '@/lib/uuid';
+import {
+  Conversation,
+  Message,
+  AIModel,
+  StreamingState,
+  AiRoleEnum,
+} from '@/types/ai-assistant';
+import { generateUUID } from '@/lib';
+import { useTitle } from '../hooks';
+import { getAvailableModels } from '@/lib/services/ai-assistant';
 
 // 定义上下文类型
 interface AIAssistantContextType {
@@ -48,10 +55,13 @@ interface AIAssistantContextType {
 
   // 方法
   setActiveConversationId: (id: string) => void;
-  updateConversation: (
-    id: string,
-    updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>,
-  ) => void;
+  updateConversation: ({
+    id,
+    updates,
+  }: {
+    id: string;
+    updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
+  }) => void;
   addNewConversation: () => void;
   deleteConversation: (id: string) => Promise<void>;
   saveEditedTitle: (title: string) => void;
@@ -77,8 +87,6 @@ export function AIAssistantProvider({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   // 当前激活的对话ID
   const [activeConversationId, setActiveConversationId] = useState<string>('');
-  // 可用的AI模型列表
-  const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   // 页面初始化状态标记
   const [isInitialized, setIsInitialized] = useState(false);
   // 各对话的流式响应状态
@@ -87,6 +95,15 @@ export function AIAssistantProvider({
   const [pendingTitleGeneration, setPendingTitleGeneration] = useState<
     Set<string>
   >(new Set());
+
+  // 获取模型列表
+  const { data: availableModels = [] } = useSWR<AIModel[]>(
+    'aiModels',
+    getAvailableModels,
+  );
+
+  // 获取标题生成函数
+  const { generateConversationTitle } = useTitle();
 
   // ==== Refs ====
   // 存储每个对话的AbortController实例，用于流式响应
@@ -122,26 +139,21 @@ export function AIAssistantProvider({
   useEffect(() => {
     const loadData = async () => {
       try {
-        // 并行加载所有对话、当前活跃对话ID和可用模型
-        const [storedConversations, storedActiveId, models] = await Promise.all(
-          [
-            getAllConversations(),
-            getActiveConversationId(),
-            fetchAvailableModels(),
-          ],
-        );
+        // 并行加载所有对话和当前活跃对话ID
+        const [storedConversations, storedActiveId] = await Promise.all([
+          getAllConversations(),
+          getActiveConversationId(),
+        ]);
 
         setConversations(storedConversations);
         setActiveConversationId(storedActiveId);
-        setAvailableModels(models);
 
         // 如果没有对话且有可用模型，创建默认对话
-        if (storedConversations.length === 0 && models.length > 0) {
-          const newConversation = createNewConversation(
-            models[0].id,
-            [],
-            models,
-          );
+        if (storedConversations.length === 0 && availableModels.length > 0) {
+          const newConversation = createNewConversation({
+            modelId: availableModels[0].id,
+            availableModels,
+          });
 
           setConversations([newConversation]);
           setActiveConversationId(newConversation.id);
@@ -164,7 +176,7 @@ export function AIAssistantProvider({
         controller?.abort();
       });
     };
-  }, []);
+  }, [availableModels]);
 
   // ==== 数据持久化 ====
   useEffect(() => {
@@ -242,7 +254,12 @@ export function AIAssistantProvider({
     };
 
     generateTitles();
-  }, [conversations, isInitialized, pendingTitleGeneration]);
+  }, [
+    conversations,
+    isInitialized,
+    pendingTitleGeneration,
+    generateConversationTitle,
+  ]);
 
   // ==== 流式响应完成后的处理 ====
   const handleStreamingComplete = useCallback((conversationId: string) => {
@@ -290,7 +307,13 @@ export function AIAssistantProvider({
   // ==== 对话操作函数 ====
   // 更新指定对话的属性
   const updateConversation = useCallback(
-    (id: string, updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>) => {
+    ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
+    }) => {
       setConversations((currentConversations) =>
         currentConversations.map((conv) =>
           conv.id === id
@@ -310,15 +333,14 @@ export function AIAssistantProvider({
   const addNewConversation = useCallback(() => {
     if (!hasModels) return;
 
-    const newConversation = createNewConversation(
-      availableModels[0].id,
-      conversations,
+    const newConversation = createNewConversation({
+      modelId: availableModels[0].id,
       availableModels,
-    );
+    });
 
     setConversations((prev) => [...prev, newConversation]);
     setActiveConversationId(newConversation.id);
-  }, [hasModels, availableModels, conversations]);
+  }, [hasModels, availableModels]);
 
   // 删除对话
   const deleteConversation = useCallback(
@@ -346,12 +368,10 @@ export function AIAssistantProvider({
             // 有其他对话，切换到第一个
             setActiveConversationId(newConversations[0].id);
           } else if (hasModels) {
-            // 没有其他对话但有可用模型，创建新对话
-            const newConversation = createNewConversation(
-              availableModels[0].id,
-              [],
+            const newConversation = createNewConversation({
+              modelId: availableModels[0].id,
               availableModels,
-            );
+            });
 
             setConversations([newConversation]);
             setActiveConversationId(newConversation.id);
@@ -382,9 +402,12 @@ export function AIAssistantProvider({
 
       // 手动编辑了标题，从待生成队列中移除
       removePendingTitleGeneration(activeConversationId);
-      updateConversation(activeConversationId, {
-        title,
-        hasGeneratedTitle: true,
+      updateConversation({
+        id: activeConversationId,
+        updates: {
+          title,
+          hasGeneratedTitle: true,
+        },
       });
     },
     [
@@ -399,7 +422,10 @@ export function AIAssistantProvider({
   const changeModel = useCallback(
     (model: string) => {
       if (!activeConversation) return;
-      updateConversation(activeConversationId, { modelId: model });
+      updateConversation({
+        id: activeConversationId,
+        updates: { modelId: model },
+      });
     },
     [activeConversation, activeConversationId, updateConversation],
   );
@@ -412,11 +438,13 @@ export function AIAssistantProvider({
     cleanupAbortController(activeConversationId);
     removePendingTitleGeneration(activeConversationId);
 
-    // 重置对话内容和标题
-    updateConversation(activeConversationId, {
-      messages: [],
-      title: '新对话',
-      hasGeneratedTitle: false,
+    updateConversation({
+      id: activeConversationId,
+      updates: {
+        messages: [],
+        title: '新对话',
+        hasGeneratedTitle: false,
+      },
     });
 
     // 重置流式响应状态
@@ -439,7 +467,7 @@ export function AIAssistantProvider({
         // 创建新的用户消息
         const userMessage: Message = {
           id: generateUUID(),
-          role: 'user',
+          role: AiRoleEnum.User,
           content: userInput.trim(),
         };
 
@@ -470,11 +498,6 @@ export function AIAssistantProvider({
         // 优化历史记录，减少传输到AI的上下文量
         const optimizedMessages = optimizeConversationHistory(allMessages);
 
-        console.log(
-          `优化前消息数: ${allMessages.length}, 优化后: ${optimizedMessages.length}`,
-        );
-
-        // 启动流式响应
         await startStreamResponse({
           messages: optimizedMessages,
           modelId: activeConversation.modelId,
@@ -500,8 +523,6 @@ export function AIAssistantProvider({
   const stopResponding = useCallback(() => {
     if (!activeConversationId) return;
 
-    console.log('调用停止响应:', activeConversationId);
-
     stopStreamResponse({
       abortControllerRef: abortControllersRef,
       conversationId: activeConversationId,
@@ -512,30 +533,51 @@ export function AIAssistantProvider({
   }, [activeConversationId, streamingState]);
 
   // 提供上下文值
-  const contextValue: AIAssistantContextType = {
-    // 状态
-    conversations,
-    activeConversationId,
-    availableModels,
-    isInitialized,
-    streamingState,
+  const contextValue = useMemo(
+    () => ({
+      // 状态
+      conversations,
+      activeConversationId,
+      availableModels,
+      isInitialized,
+      streamingState,
 
-    // 计算属性
-    activeConversation,
-    currentStreamingState,
-    hasModels,
+      // 计算属性
+      activeConversation,
+      currentStreamingState,
+      hasModels,
 
-    // 方法
-    setActiveConversationId,
-    updateConversation,
-    addNewConversation,
-    deleteConversation,
-    saveEditedTitle,
-    changeModel,
-    clearMessages,
-    sendMessage,
-    stopResponding,
-  };
+      // 方法
+      setActiveConversationId,
+      updateConversation,
+      addNewConversation,
+      deleteConversation,
+      saveEditedTitle,
+      changeModel,
+      clearMessages,
+      sendMessage,
+      stopResponding,
+    }),
+    [
+      conversations,
+      activeConversationId,
+      availableModels,
+      isInitialized,
+      streamingState,
+      activeConversation,
+      currentStreamingState,
+      hasModels,
+      setActiveConversationId,
+      updateConversation,
+      addNewConversation,
+      deleteConversation,
+      saveEditedTitle,
+      changeModel,
+      clearMessages,
+      sendMessage,
+      stopResponding,
+    ],
+  );
 
   return (
     <AIAssistantContext.Provider value={contextValue}>

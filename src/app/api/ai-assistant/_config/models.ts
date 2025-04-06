@@ -3,17 +3,12 @@
  * 包含所有支持的AI模型及其配置信息
  */
 
-import {
-  AIModelEnum,
-  ProviderConfig,
-  ClientConfig,
-  AIModel,
-} from '../_types/models';
+import { AIModelEnum, APIProviderConfig, AIModel } from '@/types/ai-assistant';
 
 /**
  * AI 服务提供商配置
  */
-export const API_PROVIDERS: Record<string, ProviderConfig> = {
+export const API_PROVIDERS: Record<string, APIProviderConfig> = {
   DEEPSEEK: {
     baseURL: 'https://a.henhuoai.com/v1',
     apiKey: process.env.HENHUO_API_KEY,
@@ -36,7 +31,7 @@ export const API_PROVIDERS: Record<string, ProviderConfig> = {
 /**
  * 获取所有可用模型列表
  */
-export function getAvailableModels(): AIModel[] {
+export function getAllModels(): AIModel[] {
   return Object.values(API_PROVIDERS).flatMap((provider) =>
     provider.models.map((model) => ({
       id: model.id,
@@ -48,7 +43,7 @@ export function getAvailableModels(): AIModel[] {
 /**
  * 根据模型ID获取适当的API配置
  */
-export function getClientConfigForModel(modelId: AIModelEnum): ClientConfig {
+export function getClientConfigForModel(modelId: AIModelEnum) {
   // 遍历所有提供商查找模型
   for (const provider of Object.values(API_PROVIDERS)) {
     if (provider.models.some((model) => model.id === modelId)) {

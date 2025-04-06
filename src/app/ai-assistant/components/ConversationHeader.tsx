@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Edit, Send, X, Trash2 } from 'lucide-react';
-import { Conversation } from '../types';
+import { Conversation } from '@/types/ai-assistant';
 
 interface ConversationHeaderProps {
   conversation: Conversation;

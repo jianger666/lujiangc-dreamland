@@ -1,4 +1,4 @@
-import { getAvailableModels } from '../_config';
+import { getAllModels } from '../_config';
 import { apiHandler } from '@/lib/api/handler';
 
 /**
@@ -7,8 +7,7 @@ import { apiHandler } from '@/lib/api/handler';
 
 const handleGetModels = apiHandler(async () => {
   try {
-    const models = getAvailableModels();
-    return models;
+    return getAllModels();
   } catch (error) {
     console.error('处理获取模型请求错误:', error);
     throw error;

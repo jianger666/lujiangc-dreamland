@@ -4,7 +4,7 @@ import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, LoaderCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Conversation, StreamingState } from '../types';
+import { Conversation, StreamingState } from '@/types/ai-assistant';
 import dayjs from 'dayjs';
 
 interface ConversationSidebarProps {

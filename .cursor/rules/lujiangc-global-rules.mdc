@@ -79,6 +79,12 @@ alwaysApply: true
   /src
     /app         # 应用逻辑
     /components  # 公共组件
+    /types       # 公共类型（最佳实践，在该文件夹下创建和页面名称相同的文件夹用于存放供服务端、客户端、页面共用的types）
+    /api         # 服务端api
+    /lib         # 工具
+      /api       # 客户端、服务端的工具
+      /service   # 客户端接口管理文件夹
+
   ```
   • 优势：
     ◦ 符合行业标准，便于协作

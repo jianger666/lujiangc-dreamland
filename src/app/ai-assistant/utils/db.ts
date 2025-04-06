@@ -1,6 +1,6 @@
 import { DBSchema, IDBPDatabase } from 'idb';
 import { createDBInstance } from '@/lib';
-import type { Conversation } from '../types';
+import type { Conversation } from '@/types/ai-assistant';
 
 // 定义AI助手数据库Schema
 interface AIAssistantDB extends DBSchema {

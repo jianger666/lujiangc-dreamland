@@ -1,27 +1,24 @@
 'use client';
 
 /**
- * AI 助手页面组件
+ * AI 助手页面
  *
- * 该页面提供了一个类似 ChatGPT 的 AI 对话界面，功能包括：
+ * 提供类似 ChatGPT 的交互式 AI 对话界面
  * - 创建、切换、删除对话
  * - 支持多种 AI 模型选择
  * - 实时流式响应
  * - 自动生成对话标题
- * - 消息历史管理
  */
 
-import React from 'react';
+import { AIAssistantProvider } from './providers';
+import { useAIAssistant } from './hooks';
+import { Loading } from '@/components/ui/loading';
 import { ConversationSidebar } from './components/ConversationSidebar';
 import { ConversationHeader } from './components/ConversationHeader';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { EmptyConversation } from './components/EmptyConversation';
-import { Loading } from '@/components/ui/loading';
-import { AIAssistantProvider } from './providers';
-import { useAIAssistant } from './hooks';
 
-// 页面包装组件
 export default function AIAssistantPage() {
   return (
     <AIAssistantProvider>
@@ -29,19 +26,18 @@ export default function AIAssistantPage() {
     </AIAssistantProvider>
   );
 }
-
 // 内容组件，使用上下文获取状态和方法
 function AIAssistantContent() {
   const {
     // 状态
     conversations,
     activeConversationId,
+    activeConversation,
     streamingState,
     isInitialized,
     availableModels,
 
     // 计算属性
-    activeConversation,
     currentStreamingState,
 
     // 方法
@@ -59,7 +55,7 @@ function AIAssistantContent() {
   return !isInitialized ? (
     <Loading fullPage text="加载中..." />
   ) : (
-    <div className="flex h-0 flex-1 flex-col overflow-auto md:flex-row">
+    <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
       {/* 侧边栏: 对话列表 */}
       <ConversationSidebar
         conversations={conversations}

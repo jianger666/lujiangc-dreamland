@@ -1,7 +1,8 @@
 'use client';
 
-import { HttpStatus } from '../httpStatus';
+import { getStatusMessage, HttpStatus } from '../httpStatus';
 import { toast } from '@/hooks/use-toast';
+import { ApiResponse } from '../response';
 
 /**
  * 请求取消映射
@@ -63,16 +64,13 @@ export interface RequestConfig<D = unknown> {
   retryDelay?: number;
   baseUrl?: string; // 可以覆盖实例的baseURL
   skipErrorHandler?: boolean; // 跳过错误处理
+  extractData?: boolean; // 是否从响应中提取data.data，默认为true
 }
 
-/**
- * 响应接口
- */
-export interface ApiResponse<T = unknown> {
-  data: T;
+export interface APIErrorResponse {
   status: number;
   statusText: string;
-  headers: Record<string, string>;
+  response: ApiResponse;
 }
 
 /**
@@ -98,7 +96,7 @@ export class HttpClient {
    */
   async request<T = unknown, D = unknown>(
     config: RequestConfig<D>,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const {
       url,
       method,
@@ -111,6 +109,7 @@ export class HttpClient {
       retryDelay = 1000,
       baseUrl,
       skipErrorHandler = false,
+      extractData = true,
     } = config;
 
     // 构建完整URL，优先使用传入的baseUrl
@@ -167,11 +166,11 @@ export class HttpClient {
       }
 
       // 响应拦截处理
-      const responseData = await this.responseInterceptor<T>(
+      return this.responseInterceptor<T>(
         response,
         skipErrorHandler,
+        extractData,
       );
-      return responseData;
     } catch (error) {
       // 清除AbortController引用
       if (cancelPrevious) {
@@ -205,7 +204,7 @@ export class HttpClient {
     url: string,
     params?: Record<string, JsonValue>,
     config?: Partial<RequestConfig<undefined>>,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request<T, undefined>({
       method: 'GET',
       url,
@@ -224,7 +223,7 @@ export class HttpClient {
     url: string,
     data?: D,
     config?: Partial<RequestConfig<D>>,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request<T, D>({
       method: 'POST',
       url,
@@ -243,7 +242,7 @@ export class HttpClient {
     url: string,
     data?: D,
     config?: Partial<RequestConfig<D>>,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request<T, D>({
       method: 'PUT',
       url,
@@ -262,7 +261,7 @@ export class HttpClient {
     url: string,
     params?: Record<string, JsonValue>,
     config?: Partial<RequestConfig<undefined>>,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     return this.request<T, undefined>({
       method: 'DELETE',
       url,
@@ -335,67 +334,56 @@ export class HttpClient {
    * 响应拦截器
    * @param response 响应对象
    * @param skipErrorHandler 是否跳过错误处理
+   * @param extractData 是否提取data.data
    */
   private async responseInterceptor<T>(
     response: Response,
     skipErrorHandler = false,
-  ): Promise<ApiResponse<T>> {
-    // 获取响应头
-    const headers: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      headers[key] = value;
-    });
-
+    extractData = true,
+  ): Promise<T> {
     // 处理不同的响应状态
     if (!response.ok) {
       // 解析错误响应
-      let errorData: Record<string, unknown>;
-      try {
-        errorData = await response.json();
-      } catch {
-        errorData = { message: response.statusText };
+
+      const errorData = await response.json();
+
+      // 如果skipErrorHandler为false，则进行错误提示
+      if (!skipErrorHandler) {
+        await this.handleHttpError(response.status, errorData);
       }
 
-      // 如果skipErrorHandler为true，则直接抛出错误，由调用者处理
-      if (skipErrorHandler) {
-        throw {
-          status: response.status,
-          statusText: response.statusText,
-          data: errorData,
-        };
-      }
-
-      // 根据不同状态码进行不同的错误处理
-      await this.handleHttpError(
-        response.status,
-        errorData,
-        response.statusText,
-      );
-
-      // 抛出错误以中断执行
-      throw {
+      return Promise.reject({
         status: response.status,
         statusText: response.statusText,
-        data: errorData,
-      };
+        response: errorData,
+      });
     }
 
     // 解析响应内容
-    let data: T;
+    let responseBody: unknown;
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
+      responseBody = await response.json();
     } else {
-      data = (await response.text()) as unknown as T;
+      responseBody = await response.text();
     }
 
-    // 返回标准化的响应
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    };
+    // 根据extractData选项决定是否提取data.data
+    let data: T;
+    if (
+      extractData &&
+      responseBody &&
+      typeof responseBody === 'object' &&
+      responseBody !== null &&
+      'data' in responseBody
+    ) {
+      data = (responseBody as Record<string, unknown>).data as T;
+    } else {
+      data = responseBody as T;
+    }
+
+    // 直接返回数据
+    return data;
   }
 
   /**
@@ -407,7 +395,6 @@ export class HttpClient {
   private async handleHttpError(
     status: number,
     errorData: Record<string, unknown>,
-    statusText: string,
   ): Promise<void> {
     // 处理特定状态码
     if (status === HttpStatus.UNAUTHORIZED) {
@@ -437,13 +424,6 @@ export class HttpClient {
         title: '请求失败',
         description: message,
       });
-    } else if (status === 0) {
-      // 网络错误
-      toast({
-        variant: 'destructive',
-        title: '网络错误',
-        description: '网络连接失败，请检查您的网络连接',
-      });
     } else if (status >= 500) {
       // 服务器错误
       toast({
@@ -458,7 +438,7 @@ export class HttpClient {
         title: '请求失败',
         description: errorData.message
           ? String(errorData.message)
-          : statusText || '请求处理失败',
+          : getStatusMessage(status) || '请求处理失败',
       });
     }
   }
@@ -471,7 +451,7 @@ export class HttpClient {
   private errorHandler<T>(
     error: unknown,
     skipErrorHandler = false,
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     // 错误类型断言
     const err = error as {
       status?: number;
@@ -488,44 +468,35 @@ export class HttpClient {
     // 检查是否是取消请求导致的错误
     if (error instanceof DOMException && error.name === 'AbortError') {
       // 请求被取消，通常不需要显示错误提示
+
       return Promise.reject({
-        status: 499, // 客户端关闭请求
-        statusText: 'Client Closed Request',
-        data: { message: error.message || '请求被取消' },
+        status: HttpStatus.CLIENT_CLOSED_REQUEST,
+        statusText: getStatusMessage(HttpStatus.CLIENT_CLOSED_REQUEST),
+        response: {
+          data: null,
+          message:
+            error.message || getStatusMessage(HttpStatus.CLIENT_CLOSED_REQUEST),
+          success: false,
+        },
       });
     }
 
-    // 检查是否是网络错误
-    if (error instanceof TypeError && error.message === 'Failed to fetch') {
-      // 网络错误处理
-      toast({
-        variant: 'destructive',
-        title: '网络错误',
-        description: '网络连接失败，请检查您的网络连接',
-      });
-
-      return Promise.reject({
-        status: 0,
-        statusText: 'Network Error',
-        data: { message: '网络错误，请检查您的网络连接' },
-      });
-    }
-
-    // 如果错误已经包含status，说明这是HTTP响应错误，已在responseInterceptor中处理
     // 这里只处理其他类型的错误
     if (!err.status) {
       toast({
         variant: 'destructive',
-        title: '请求错误',
         description: err.message || '请求处理失败',
       });
     }
 
-    // 返回标准化的错误
     return Promise.reject({
-      status: err.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      statusText: err.statusText || 'Internal Server Error',
-      data: err.data || { message: err.message || '请求处理失败' },
+      status: HttpStatus.UNKNOWN,
+      statusText: getStatusMessage(HttpStatus.UNKNOWN),
+      response: {
+        data: null,
+        message: err.message || getStatusMessage(HttpStatus.UNKNOWN),
+        success: false,
+      },
     });
   }
 }

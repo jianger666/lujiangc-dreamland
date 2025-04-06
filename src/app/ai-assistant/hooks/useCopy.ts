@@ -7,7 +7,7 @@ import { useState, useCallback } from 'react';
  * @param timeout 复制成功后显示成功状态的时间(毫秒)
  * @returns 复制状态和复制函数
  */
-export function useCopyToClipboard(timeout = 2000) {
+export function useCopy(timeout = 2000) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = useCallback(

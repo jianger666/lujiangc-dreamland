@@ -1,11 +1,13 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { generateUUID } from '@/lib/uuid';
+import { generateUUID } from '@/lib';
+
 import {
   Conversation,
   Message,
   StreamingState,
   ConversationStreamState,
-} from '../types';
+  AiRoleEnum,
+} from '@/types/ai-assistant';
 
 /**
  * 流式响应服务
@@ -161,7 +163,7 @@ export function addInterruptedMessageToConversation({
 }) {
   const newMessage: Message = {
     id: generateUUID(),
-    role: 'assistant',
+    role: AiRoleEnum.Assistant,
     content: content + '\n\n[回答已被中断]',
     ...(thinking ? { thinking } : {}),
   };
@@ -199,37 +201,33 @@ export async function startStreamResponse({
 }): Promise<void> {
   // 1. 创建新的AbortController实例
   const abortController = new AbortController();
-
-  // 2. 清理现有请求
-  try {
-    if (
-      abortControllerRef.current[conversationId] &&
-      typeof abortControllerRef.current[conversationId]?.abort === 'function'
-    ) {
-      console.log('清理现有请求:', conversationId);
-      abortControllerRef.current[conversationId]?.abort();
-    }
-  } catch (e) {
-    console.error('中止现有请求失败:', e);
-  }
-
-  // 3. 保存新控制器
   abortControllerRef.current[conversationId] = abortController;
 
-  // 4. 执行流式请求
-  return executeStreamRequest({
-    messages,
-    modelId,
-    abortController,
-    setStreamingState,
-    conversationId,
-    setConversations,
-    onComplete,
-  });
+  // 2. 初始化流式状态
+  initializeStreamingState(setStreamingState, conversationId);
+
+  // 3. 执行流式请求
+  try {
+    await executeStreamRequest({
+      messages,
+      modelId,
+      abortController,
+      setStreamingState,
+      conversationId,
+      setConversations,
+      onComplete,
+    });
+  } catch (error) {
+    console.error('Stream response error:', error);
+    resetStreamingState(setStreamingState, conversationId);
+  } finally {
+    // 清理AbortController引用
+    abortControllerRef.current[conversationId] = null;
+  }
 }
 
 /**
- * 执行流式请求的核心逻辑
+ * 执行流式请求
  */
 async function executeStreamRequest({
   messages,
@@ -248,19 +246,12 @@ async function executeStreamRequest({
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   onComplete?: (conversationId: string) => void;
 }): Promise<void> {
-  // 初始化流式状态
-  initializeStreamingState(setStreamingState, conversationId);
-
-  // 用于累积内容的引用对象
+  // 1. 初始化累积内容
   const accumulatedContent = { value: '' };
   const accumulatedThinking = { value: '' };
 
   // 标记请求是否被中止
   const isAborted = { value: false };
-  // 跟踪连接尝试次数
-  let connectionAttempts = 0;
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY = 1000;
 
   // 监听中止事件
   abortController.signal.addEventListener('abort', () => {
@@ -268,168 +259,125 @@ async function executeStreamRequest({
     console.log('流式请求被中止:', conversationId);
   });
 
+  // 2. 创建流式请求
   try {
-    console.log('启动流式响应:', conversationId);
-
-    // 自定义重试逻辑
     const makeStreamRequest = async (): Promise<void> => {
-      try {
-        await fetchEventSource('/api/ai', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-transform',
-            Connection: 'keep-alive',
-            'X-Client-ID': conversationId,
-          },
-          body: JSON.stringify({
-            messages,
-            model: modelId,
-          }),
-          openWhenHidden: true,
-          signal: abortController.signal,
-          onopen: async (response) => {
-            console.log(
-              `[连接已打开] 状态: ${response.status}`,
-              conversationId,
+      // 执行SSE请求
+      await fetchEventSource('/api/ai-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages,
+          model: modelId,
+        }),
+        signal: abortController.signal,
+        openWhenHidden: true,
+        onopen: async (response) => {
+          console.log(`[连接已打开] 状态: ${response.status}`, conversationId);
+          if (response.ok) {
+            return;
+          }
+          // 处理HTTP错误
+          if (response.status >= 400 && response.status < 500) {
+            console.error(`[客户端错误] ${response.status}:`, conversationId);
+            throw new Error(
+              `错误 ${response.status}: ${await response.text()}`,
             );
-            if (response.ok) {
-              // 重置尝试次数
-              connectionAttempts = 0;
-              return;
-            }
-            // 处理HTTP错误
-            if (response.status >= 400 && response.status < 500) {
-              console.error(`[客户端错误] ${response.status}:`, conversationId);
-              throw new Error(
-                `错误 ${response.status}: ${await response.text()}`,
-              );
-            }
-            console.error(`[服务器错误] ${response.status}:`, conversationId);
-            throw new Error(`服务器错误 ${response.status}`);
-          },
-          onmessage: (event) => {
-            if (isAborted.value) {
-              console.log('请求已中止，忽略后续消息:', conversationId);
-              return;
-            }
+          }
+          console.error(`[服务器错误] ${response.status}:`, conversationId);
+          throw new Error(`服务器错误 ${response.status}`);
+        },
+        onmessage: (event) => {
+          if (isAborted.value) {
+            console.log('请求已中止，忽略后续消息:', conversationId);
+            return;
+          }
 
-            if (event.data === '[DONE]') {
-              handleStreamComplete({
-                accumulatedContent,
-                accumulatedThinking,
-                setStreamingState,
-                setConversations,
-                conversationId,
-                onComplete,
-              });
-              return;
-            }
-
-            try {
-              const data = JSON.parse(event.data);
-              const { type, message } = data;
-
-              if (type === 'text') {
-                processAccumulatedContent(
-                  accumulatedContent,
-                  message,
-                  (content) =>
-                    updateStreamingContent(
-                      setStreamingState,
-                      conversationId,
-                      content,
-                    ),
-                );
-              } else if (type === 'think') {
-                processAccumulatedContent(
-                  accumulatedThinking,
-                  message,
-                  (thinking) =>
-                    updateStreamingThinking(
-                      setStreamingState,
-                      conversationId,
-                      thinking,
-                    ),
-                );
-              }
-            } catch (parseError) {
-              console.error('解析事件数据出错:', parseError);
-            }
-          },
-          onerror: (error: Error) => {
-            if (isAborted.value) {
-              console.log('请求已中止，忽略错误:', conversationId);
-              throw error;
-            }
-
-            console.error('[SSE错误]', error.message, conversationId);
-
-            // 自定义重试逻辑
-            const shouldRetry =
-              connectionAttempts < MAX_RETRIES &&
-              !isAborted.value &&
-              (error.message.includes('network') ||
-                error.message.includes('Failed to fetch') ||
-                error.message.includes('timeout'));
-
-            if (shouldRetry) {
-              connectionAttempts++;
-              console.log(
-                `[重试] 第${connectionAttempts}次尝试...`,
-                conversationId,
-              );
-              // 不抛出错误，让fetchEventSource继续
-              // 而是在下面的setTimeout中重新调用makeStreamRequest
-              return;
-            }
-
-            // 超过重试次数或不应重试的错误，处理为终止状态
-            handleStreamError({
-              error,
+          if (event.data === '[DONE]') {
+            handleStreamComplete({
+              accumulatedContent,
+              accumulatedThinking,
               setStreamingState,
               setConversations,
               conversationId,
               onComplete,
             });
+            return;
+          }
+
+          try {
+            const data = JSON.parse(event.data);
+            const { type, message } = data;
+
+            if (type === 'text') {
+              processAccumulatedContent(
+                accumulatedContent,
+                message,
+                (content) =>
+                  updateStreamingContent(
+                    setStreamingState,
+                    conversationId,
+                    content,
+                  ),
+              );
+            } else if (type === 'think') {
+              processAccumulatedContent(
+                accumulatedThinking,
+                message,
+                (thinking) =>
+                  updateStreamingThinking(
+                    setStreamingState,
+                    conversationId,
+                    thinking,
+                  ),
+              );
+            }
+          } catch (parseError) {
+            console.error('解析事件数据出错:', parseError);
+          }
+        },
+        onerror: (error) => {
+          if (isAborted.value) {
+            console.log('请求已中止，忽略错误:', conversationId);
             throw error;
-          },
-        });
-      } catch (fetchError) {
-        if (
-          !isAborted.value &&
-          connectionAttempts < MAX_RETRIES &&
-          fetchError instanceof Error &&
-          !(fetchError.name === 'AbortError')
-        ) {
-          connectionAttempts++;
-          console.log(
-            `[请求异常，重试] 第${connectionAttempts}次尝试...`,
+          }
+
+          console.error('[SSE错误]', error.message, conversationId);
+
+          // 自定义重试逻辑
+          const shouldRetry =
+            !isAborted.value &&
+            (error.message.includes('network') ||
+              error.message.includes('Failed to fetch') ||
+              error.message.includes('timeout'));
+
+          if (shouldRetry) {
+            // 不抛出错误，让fetchEventSource继续尝试
+            return;
+          }
+
+          // 不应重试的错误，处理为终止状态
+          handleStreamError({
+            error,
+            setStreamingState,
+            setConversations,
             conversationId,
-            fetchError,
-          );
-          // 延迟一点时间后重试
-          await new Promise((resolve) =>
-            setTimeout(resolve, RETRY_DELAY * connectionAttempts),
-          );
-          return makeStreamRequest();
-        }
-        // 其他错误或超过重试次数，直接抛出
-        throw fetchError;
-      }
+            onComplete,
+          });
+          throw error;
+        },
+      });
     };
 
-    // 启动请求
+    // 执行请求
     await makeStreamRequest();
-  } catch (error: unknown) {
-    // 处理中止错误
-    if (error instanceof Error && error.name === 'AbortError') {
-      console.log('请求中止错误已处理:', conversationId);
-    } else if (!isAborted.value) {
-      console.error('流式响应异常:', error);
-      // 确保错误状态被处理
+  } catch (error) {
+    // 只有未中止的请求才视为错误
+    if (!isAborted.value) {
       handleStreamError({
-        error: error instanceof Error ? error : new Error(String(error)),
+        error: error as Error,
         setStreamingState,
         setConversations,
         conversationId,
@@ -519,7 +467,7 @@ function handleStreamComplete({
   if (accumulatedContent.value || accumulatedThinking.value) {
     const newMessage: Message = {
       id: generateUUID(),
-      role: 'assistant',
+      role: AiRoleEnum.Assistant,
       content: accumulatedContent.value,
       ...(accumulatedThinking.value
         ? { thinking: accumulatedThinking.value }
@@ -579,7 +527,7 @@ function handleStreamError({
   // 添加错误消息到对话
   const errorContent: Message = {
     id: generateUUID(),
-    role: 'assistant',
+    role: AiRoleEnum.Assistant,
     content: errorMessage,
   };
 
