@@ -100,8 +100,12 @@ export function AIAssistantProvider({
   const { data: availableModels = [] } = useSWR<AIModel[]>(
     'aiModels',
     getAvailableModels,
+    {
+      revalidateOnFocus: false,
+    },
   );
 
+  console.log('availableModels', availableModels);
   // 获取标题生成函数
   const { generateConversationTitle } = useTitle();
 
