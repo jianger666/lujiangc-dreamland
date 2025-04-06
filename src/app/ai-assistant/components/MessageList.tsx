@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Bot, ArrowDown, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message, StreamingMessage } from '@/types/ai-assistant';
@@ -19,7 +19,7 @@ import {
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
 import { Components } from 'react-markdown';
-import { useCopy } from '../hooks';
+import { useCopy, useChatScroll } from '../hooks';
 
 /**
  * 复制按钮组件
@@ -223,15 +223,15 @@ function LoadingIndicator() {
     <div className="flex justify-start">
       <div className="max-w-[85%] rounded-lg bg-muted px-4 py-2 md:max-w-[70%] xl:max-w-[800px]">
         <div className="flex space-x-1">
-          <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"></div>
+          <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
           <div
             className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
             style={{ animationDelay: '0.2s' }}
-          ></div>
+          />
           <div
             className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
             style={{ animationDelay: '0.4s' }}
-          ></div>
+          />
         </div>
       </div>
     </div>
@@ -266,71 +266,25 @@ export function MessageList({
   isLoading,
   conversationId,
 }: MessageListProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const endRef = useRef<HTMLDivElement>(null);
-
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  const scrollToBottom = useCallback(() => {
-    if (!endRef.current) return;
-    requestAnimationFrame(() => {
-      endRef.current!.scrollIntoView({ behavior: 'instant', block: 'end' });
-      setShouldAutoScroll(true);
-      setShowScrollButton(false);
-    });
-  }, []);
-
-  const getDistanceFromBottom = useCallback(() => {
-    if (!containerRef.current) return 0;
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-    return scrollHeight - scrollTop - clientHeight;
-  }, []);
-
-  const isNearBottom = useCallback(() => {
-    return getDistanceFromBottom() < 20;
-  }, [getDistanceFromBottom]);
-
-  const isFarFromBottom = useCallback(() => {
-    return getDistanceFromBottom() > 100;
-  }, [getDistanceFromBottom]);
-
-  const handleScroll = useCallback(() => {
-    if (!containerRef.current) return;
-
-    const isAtBottom = isNearBottom();
-
-    if (!isAtBottom && shouldAutoScroll) {
-      setShouldAutoScroll(false);
-    } else if (isAtBottom && !shouldAutoScroll && isLoading) {
-      setShouldAutoScroll(true);
-    }
-
-    setShowScrollButton(isFarFromBottom());
-  }, [isNearBottom, isFarFromBottom, shouldAutoScroll, isLoading]);
-
-  useEffect(() => {
-    if (shouldAutoScroll) scrollToBottom();
-  }, [
-    messages,
-    streamingMessage.content,
-    streamingMessage.thinking,
-    shouldAutoScroll,
-    scrollToBottom,
-  ]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [conversationId, scrollToBottom]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (shouldAutoScroll) scrollToBottom();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [shouldAutoScroll, scrollToBottom]);
+  // 使用自定义的useChatScroll hook来管理滚动行为
+  const { containerRef, bottomRef, scrollToBottom, handleScroll } =
+    useChatScroll(
+      [
+        messages,
+        streamingMessage.content,
+        streamingMessage.thinking,
+        conversationId,
+      ],
+      {
+        scrollBehavior: 'instant',
+        threshold: 100,
+        onScrollStateChange: (isNearBottom) => {
+          setShowScrollButton(!isNearBottom);
+        },
+      },
+    );
 
   // 没有消息时显示空状态
   if (
@@ -364,7 +318,7 @@ export function MessageList({
           !streamingMessage.thinking && <LoadingIndicator />}
 
         {/* 滚动参考元素 */}
-        <div ref={endRef} className="h-0" />
+        <div ref={bottomRef} className="h-0" />
       </div>
 
       {/* 返回底部按钮 */}

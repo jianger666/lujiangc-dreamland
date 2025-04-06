@@ -5,3 +5,4 @@ export * from './useTitle';
 export * from './useConversations';
 export * from './useStreamResponse';
 export * from './useTitleGeneration';
+export * from './useChatScroll';
