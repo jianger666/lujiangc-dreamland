@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * AI 助手页面
  *
@@ -11,100 +9,16 @@
  */
 
 import { AIAssistantProvider } from './providers';
-import { useAIAssistant } from './hooks';
-import { Loading } from '@/components/ui/loading';
-import { ConversationSidebar } from './components/ConversationSidebar';
-import { ConversationHeader } from './components/ConversationHeader';
-import { MessageList } from './components/MessageList';
-import { ChatInput } from './components/ChatInput';
-import { EmptyConversation } from './components/EmptyConversation';
+import { getAllModels } from '@/app/api/ai-assistant/_config';
+import { ClientContent } from './components/ClientContent';
 
-export default function AIAssistantPage() {
+export default async function AIAssistantPage() {
+  // 在服务端获取可用模型列表
+  const availableModels = getAllModels();
+
   return (
-    <AIAssistantProvider>
-      <AIAssistantContent />
+    <AIAssistantProvider availableModels={availableModels}>
+      <ClientContent />
     </AIAssistantProvider>
-  );
-}
-// 内容组件，使用上下文获取状态和方法
-function AIAssistantContent() {
-  const {
-    // 状态
-    conversations,
-    activeConversationId,
-    activeConversation,
-    streamingState,
-    isInitialized,
-    availableModels,
-
-    // 计算属性
-    currentStreamingState,
-
-    // 方法
-    setActiveConversationId,
-    addNewConversation,
-    deleteConversation,
-    saveEditedTitle,
-    changeModel,
-    clearMessages,
-    sendMessage,
-    stopResponding,
-  } = useAIAssistant();
-
-  // ==== 页面渲染 ====
-  return !isInitialized ? (
-    <Loading fullPage text="加载中..." />
-  ) : (
-    <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
-      {/* 侧边栏: 对话列表 */}
-      <ConversationSidebar
-        conversations={conversations}
-        activeConversationId={activeConversationId}
-        onAddConversation={addNewConversation}
-        onDeleteConversation={deleteConversation}
-        onSelectConversation={setActiveConversationId}
-        streamingState={streamingState}
-      />
-
-      {/* 主内容区: 对话界面 */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {activeConversation ? (
-          <>
-            {/* 对话头部: 显示标题、提供编辑功能 */}
-            <ConversationHeader
-              conversation={activeConversation}
-              onSaveTitle={saveEditedTitle}
-              onClearMessages={clearMessages}
-            />
-
-            {/* 消息列表区域: 显示对话历史和流式响应 */}
-            <div className="flex-1 overflow-y-auto px-3">
-              <MessageList
-                messages={activeConversation.messages}
-                streamingMessage={{
-                  content: currentStreamingState.content,
-                  thinking: currentStreamingState.thinking,
-                }}
-                isLoading={currentStreamingState.isLoading}
-                conversationId={activeConversationId}
-              />
-            </div>
-
-            {/* 输入区域: 提供消息输入、模型切换和清空对话功能 */}
-            <ChatInput
-              isLoading={currentStreamingState.isLoading}
-              modelId={activeConversation.modelId}
-              availableModels={availableModels}
-              onSendMessage={sendMessage}
-              onStopResponding={stopResponding}
-              onChangeModel={changeModel}
-            />
-          </>
-        ) : (
-          // 无活跃对话时显示空状态
-          <EmptyConversation onCreateConversation={addNewConversation} />
-        )}
-      </div>
-    </div>
   );
 }

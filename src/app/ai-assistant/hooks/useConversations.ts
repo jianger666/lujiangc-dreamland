@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useState } from 'react';
+import { RefObject, useCallback, useState } from 'react';
 import {
   Conversation,
   AIModel,
@@ -15,14 +15,12 @@ import {
 import { generateUUID } from '@/lib';
 
 interface UseConversationsProps {
-  abortControllersRef: MutableRefObject<Record<string, AbortController | null>>;
+  abortControllersRef: RefObject<Record<string, AbortController | null>>;
   removePendingTitleGeneration: (conversationId: string) => void;
   startStreamResponse: (params: {
     messages: Message[];
     modelId: string;
-    abortControllerRef: MutableRefObject<
-      Record<string, AbortController | null>
-    >;
+    abortControllerRef: RefObject<Record<string, AbortController | null>>;
     setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
     conversationId: string;
     setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
@@ -86,18 +84,29 @@ export const useConversations = ({
   );
 
   // 创建新对话
-  const addNewConversation = useCallback((availableModels: AIModel[]) => {
-    if (!availableModels.length) return;
+  const addNewConversation = useCallback(
+    async (availableModels: AIModel[]) => {
+      if (!availableModels.length) return;
 
-    const newConversation = createNewConversation({
-      modelId: availableModels[0].id,
-      availableModels,
-    });
+      const newConversation = createNewConversation({
+        modelId: availableModels[0].id,
+        availableModels,
+      });
 
-    setConversations((prev) => [...prev, newConversation]);
-    setActiveConversationId(newConversation.id);
-    return newConversation;
-  }, []);
+      setConversations((prev) => [...prev, newConversation]);
+      setActiveConversationId(newConversation.id);
+
+      // 保存新对话到数据库
+      try {
+        await saveConversation(newConversation);
+      } catch (error) {
+        console.error('保存新对话失败:', error);
+      }
+
+      return newConversation;
+    },
+    [setActiveConversationId],
+  );
 
   // 删除对话
   const deleteConversation = useCallback(

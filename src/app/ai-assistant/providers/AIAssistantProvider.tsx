@@ -7,17 +7,13 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import useSWR from 'swr';
 import {
   getAllConversations,
   getActiveConversationId,
   saveConversations,
   saveActiveConversationId,
-  saveConversation,
-  createNewConversation,
 } from '../utils';
 import { Conversation, AIModel, StreamingState } from '@/types/ai-assistant';
-import { getAvailableModels } from '@/lib/services/ai-assistant';
 import {
   useConversations,
   useStreamResponse,
@@ -51,7 +47,7 @@ interface AIAssistantContextType {
     id: string;
     updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
   }) => void;
-  addNewConversation: () => void;
+  addNewConversation: () => Promise<Conversation | undefined>;
   deleteConversation: (id: string) => Promise<void>;
   saveEditedTitle: (title: string) => void;
   changeModel: (model: string) => void;
@@ -68,18 +64,11 @@ export const AIAssistantContext = createContext<AIAssistantContextType | null>(
 // 上下文提供者组件
 export function AIAssistantProvider({
   children,
+  availableModels = [],
 }: {
   children: React.ReactNode;
+  availableModels?: AIModel[];
 }) {
-  // 获取模型列表
-  const { data: availableModels = [] } = useSWR<AIModel[]>(
-    'aiModels',
-    getAvailableModels,
-    {
-      revalidateOnFocus: false,
-    },
-  );
-
   // 页面初始化状态标记
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -167,20 +156,22 @@ export function AIAssistantProvider({
           getActiveConversationId(),
         ]);
 
+        // 先设置现有对话
         setConversations(storedConversations);
-        setActiveConversationId(storedActiveId);
 
-        // 如果没有对话且有可用模型，创建默认对话
-        if (storedConversations.length === 0 && availableModels.length > 0) {
-          const newConversation = createNewConversation({
-            modelId: availableModels[0].id,
-            availableModels,
-          });
-
-          setConversations([newConversation]);
-          setActiveConversationId(newConversation.id);
-          await saveConversation(newConversation);
+        // 如果有对话且有有效的activeId，直接使用
+        if (
+          storedConversations.length > 0 &&
+          storedActiveId &&
+          storedConversations.some((conv) => conv.id === storedActiveId)
+        ) {
+          setActiveConversationId(storedActiveId);
         }
+        // 如果有对话但没有有效的activeId，设置第一个对话为激活对话
+        else if (storedConversations.length > 0) {
+          setActiveConversationId(storedConversations[0].id);
+        }
+        // 如果没有对话且有可用模型，稍后由ClientContent组件处理创建新对话
 
         setIsInitialized(true);
       } catch (error) {
@@ -257,9 +248,9 @@ export function AIAssistantProvider({
   ]);
 
   // ==== 对话操作函数的包装 ====
-  const addNewConversation = useCallback(() => {
+  const addNewConversation = useCallback(async () => {
     if (!hasModels) return;
-    addNewConversationBase(availableModels);
+    return await addNewConversationBase(availableModels);
   }, [hasModels, availableModels, addNewConversationBase]);
 
   const deleteConversation = useCallback(
