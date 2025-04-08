@@ -11,15 +11,34 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-// 使用Next.js内置的代码高亮组件（基于prism.js）
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import {
-  oneLight,
-  oneDark,
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import rehypePrism from 'rehype-prism';
 import { useTheme } from 'next-themes';
 import { Components } from 'react-markdown';
 import { useCopy, useChatScroll } from '../hooks';
+
+/**
+ * 代码高亮主题组件 - 使用JSX直接加载样式
+ */
+function PrismTheme() {
+  const { resolvedTheme } = useTheme();
+
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-css-tags */}
+      <link
+        rel="stylesheet"
+        href="/styles/prism-one-dark.css"
+        media={resolvedTheme === 'dark' ? 'all' : 'none'}
+      />
+      {/* eslint-disable-next-line @next/next/no-css-tags */}
+      <link
+        rel="stylesheet"
+        href="/styles/prism-one-light.css"
+        media={resolvedTheme === 'dark' ? 'none' : 'all'}
+      />
+    </>
+  );
+}
 
 /**
  * 复制按钮组件
@@ -47,83 +66,82 @@ export function CopyButton({
   );
 }
 
-// 代码高亮组件，带有语言显示和复制功能
-function CodeBlock({
-  language,
-  children,
-}: {
-  language: string;
-  children: string;
-}) {
-  const { resolvedTheme } = useTheme();
+// 代码复制按钮组件
+function CopyCodeButton({ code }: { code: string }) {
   const { copied, copyToClipboard } = useCopy();
-  const style = (resolvedTheme === 'dark' ? oneDark : oneLight) as Record<
-    string,
-    React.CSSProperties
-  >;
 
   const handleCopy = () => {
-    copyToClipboard(children);
+    copyToClipboard(code);
   };
 
-  const displayLanguage = language || 'text';
-
   return (
-    <div className="relative overflow-hidden rounded-md">
-      <div className="flex items-center justify-between bg-card px-4 py-1.5 text-xs text-muted-foreground">
-        <span>{displayLanguage}</span>
-        <button
-          onClick={handleCopy}
-          className="p-1 transition-colors hover:text-foreground focus:outline-none"
-          aria-label="复制代码"
-        >
-          {copied ? <Check size={14} /> : <Copy size={14} />}
-        </button>
-      </div>
-      <SyntaxHighlighter
-        language={language}
-        style={style}
-        PreTag="div"
-        customStyle={{
-          fontSize: '0.9rem',
-          lineHeight: '1.5',
-          margin: 0,
-          borderRadius: '0 0 0.375rem 0.375rem',
-        }}
-      >
-        {children}
-      </SyntaxHighlighter>
-    </div>
+    <button
+      onClick={handleCopy}
+      className="p-1 transition-colors hover:text-foreground focus:outline-none"
+      aria-label="复制代码"
+    >
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+    </button>
   );
 }
 
 // Markdown渲染配置
 const MarkdownComponents: Components = {
   code({ className, children, ...props }) {
+    return (
+      <code className={cn(className, 'text-xs')} {...props}>
+        {children}
+      </code>
+    );
+  },
+  pre(props) {
+    const { className, children } = props;
+
     const match = /language-(\w+)/.exec(className || '');
     // 检查是否为代码块还是内联代码
     const isCodeBlock = className?.includes('language-');
 
     if (isCodeBlock && match) {
+      let codeContent = '';
+
+      try {
+        // 简化实现，直接转换为字符串
+        const flattenChildren = (node: React.ReactNode): string => {
+          if (node == null) return '';
+          if (typeof node === 'string') return node;
+          if (typeof node === 'number') return String(node);
+          if (Array.isArray(node)) return node.map(flattenChildren).join('');
+
+          // 安全处理React元素
+          if (React.isValidElement(node)) {
+            const props = node.props as { children?: React.ReactNode };
+            return flattenChildren(props.children || '');
+          }
+          return '';
+        };
+
+        codeContent = flattenChildren(children);
+      } catch (error) {
+        console.error('提取代码内容时出错:', error);
+        codeContent = '';
+      }
+
       return (
-        <CodeBlock language={match[1]}>
-          {String(children).replace(/\n$/, '')}
-        </CodeBlock>
+        <div className="relative overflow-hidden rounded-md">
+          <div className="flex items-center justify-between bg-card px-4 py-1.5 text-xs text-muted-foreground">
+            <span>{match[1] || 'text'}</span>
+            <CopyCodeButton code={codeContent} />
+          </div>
+
+          <pre
+            {...props}
+            className={cn(className, 'm-0 rounded-none p-3 text-xs')}
+          />
+        </div>
       );
     }
 
-    return (
-      <code className={className} {...props}>
-        {children}
-      </code>
-    );
-  },
-  pre({ children, className, ...props }) {
-    return (
-      <pre className={cn(className, 'p-0', 'bg-transparent')} {...props}>
-        {children}
-      </pre>
-    );
+    return <pre {...props} />;
   },
 };
 
@@ -161,7 +179,7 @@ function MessageContent({
     <div className="prose prose-sm max-w-none dark:prose-invert">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-        rehypePlugins={[rehypeRaw, rehypeKatex]}
+        rehypePlugins={[rehypeRaw, rehypeKatex, rehypePrism]}
         components={MarkdownComponents}
       >
         {content}
@@ -298,6 +316,7 @@ export function MessageList({
 
   return (
     <div className="relative h-full">
+      <PrismTheme />
       <div
         ref={containerRef}
         className="h-full space-y-4 overflow-y-auto scroll-smooth px-1 py-2"
