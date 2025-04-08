@@ -36,40 +36,31 @@ export function ChatInput({
   onChangeModel,
 }: ChatInputProps) {
   const [input, setInput] = useState('');
-  const [rows, setRows] = useState(MIN_TEXTAREA_ROWS); // 初始行数
-  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
   const [prevIsLoading, setPrevIsLoading] = useState(isLoading);
 
-  // 计算文本的行数
-  const calculateRows = (text: string) => {
-    if (!textareaRef.current) return MIN_TEXTAREA_ROWS;
-
+  // 自动调整文本框高度
+  const adjustTextareaHeight = () => {
     const textarea = textareaRef.current;
-    const style = window.getComputedStyle(textarea);
-    const lineHeight = parseInt(style.lineHeight);
-    const paddingTop = parseInt(style.paddingTop);
-    const paddingBottom = parseInt(style.paddingBottom);
-    const borderTop = parseInt(style.borderTopWidth);
-    const borderBottom = parseInt(style.borderBottomWidth);
+    if (!textarea) return;
 
-    // 获取换行符数量
-    const newlineCount = (text.match(/\n/g) || []).length;
-
-    // 计算因容器宽度导致的自动换行
-    textarea.style.height = 'auto'; // 临时重置高度以获取正确的scrollHeight
+    textarea.style.height = 'auto';
     const scrollHeight = textarea.scrollHeight;
-    const visibleHeight =
-      scrollHeight - paddingTop - paddingBottom - borderTop - borderBottom;
-    const wrappedLines = Math.ceil(visibleHeight / lineHeight);
+    const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
+    const maxHeight = lineHeight * MAX_TEXTAREA_ROWS;
+    const newHeight = Math.min(
+      Math.max(lineHeight * MIN_TEXTAREA_ROWS, scrollHeight),
+      maxHeight,
+    );
 
-    // 总行数 = 换行符数量 + 1 (初始行) + 自动换行行数
-    // 但我们用wrappedLines已经包含了所有行，所以不需要额外加上newlineCount
-    const totalRows = Math.max(wrappedLines, newlineCount + 1);
-
-    // 限制在MIN_TEXTAREA_ROWS-MAX_TEXTAREA_ROWS行之间
-    return Math.min(Math.max(totalRows, MIN_TEXTAREA_ROWS), MAX_TEXTAREA_ROWS);
+    textarea.style.height = `${newHeight}px`;
   };
+
+  // 输入变化时更新高度
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [input]);
 
   // 聚焦输入框
   const focusTextarea = () => {
@@ -77,14 +68,6 @@ export function ChatInput({
       textareaRef.current.focus();
     }
   };
-
-  // 输入变化时更新行数
-  useEffect(() => {
-    const newRows = calculateRows(input);
-    if (newRows !== rows) {
-      setRows(newRows);
-    }
-  }, [input, rows]);
 
   // 当isLoading从true变为false时自动聚焦
   useEffect(() => {
@@ -100,7 +83,10 @@ export function ChatInput({
 
     onSendMessage(input);
     setInput('');
-    setRows(MIN_TEXTAREA_ROWS); // 提交后重置行数
+    // 重置高度
+    if (textareaRef.current) {
+      textareaRef.current.style.height = `${parseInt(window.getComputedStyle(textareaRef.current).lineHeight) * MIN_TEXTAREA_ROWS}px`;
+    }
   };
 
   // 点击容器时聚焦输入框
@@ -132,9 +118,9 @@ export function ChatInput({
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="shift+enter可换行，发送消息..."
+            placeholder="shift+enter可换行，enter发送消息..."
             disabled={isLoading}
-            rows={rows}
+            rows={MIN_TEXTAREA_ROWS}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className="resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
