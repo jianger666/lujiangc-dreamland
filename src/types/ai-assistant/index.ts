@@ -73,6 +73,8 @@ export enum AIModelEnum {
   Gemini25ProExp0325 = 'gemini-2.5-pro-exp-03-25',
   Gemini20Flash = 'gemini-2.0-flash',
   Gemini15ProLatest = 'gemini-1.5-pro-latest',
+  DeepSeekChatV30324Free = 'deepseek/deepseek-chat-v3-0324:free',
+  OpenRouterGemini25ProExp0325 = 'google/gemini-2.5-pro-exp-03-25:free',
 }
 
 /**

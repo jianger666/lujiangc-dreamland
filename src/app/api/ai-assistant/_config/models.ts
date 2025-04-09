@@ -26,6 +26,20 @@ export const API_PROVIDERS: Record<string, APIProviderConfig> = {
       { id: AIModelEnum.Gemini15ProLatest, name: 'gemini-1.5-pro-latest' },
     ],
   },
+  OPENROUTER: {
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: process.env.OPENROUTER_API_KEY,
+    models: [
+      {
+        id: AIModelEnum.DeepSeekChatV30324Free,
+        name: 'deepseek/deepseek-chat-v3-0324:free',
+      },
+      {
+        id: AIModelEnum.OpenRouterGemini25ProExp0325,
+        name: 'google/gemini-2.5-pro-exp-03-25:free',
+      },
+    ],
+  },
 };
 
 /**
