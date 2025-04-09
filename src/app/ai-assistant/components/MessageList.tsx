@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Bot, ArrowDown, Copy, Check } from 'lucide-react';
+import React from 'react';
+import { Bot, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message, StreamingMessage } from '@/types/ai-assistant';
-import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -14,7 +13,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypePrism from 'rehype-prism';
 import { useTheme } from 'next-themes';
 import { Components } from 'react-markdown';
-import { useCopy, useChatScroll } from '../hooks';
+import { useCopy } from '../hooks';
 
 /**
  * 代码高亮主题组件 - 使用JSX直接加载样式
@@ -282,27 +281,8 @@ export function MessageList({
   messages,
   streamingMessage,
   isLoading,
-  conversationId,
 }: MessageListProps) {
-  const [showScrollButton, setShowScrollButton] = useState(false);
-
   // 使用自定义的useChatScroll hook来管理滚动行为
-  const { containerRef, bottomRef, scrollToBottom, handleScroll } =
-    useChatScroll(
-      [
-        messages,
-        streamingMessage.content,
-        streamingMessage.thinking,
-        conversationId,
-      ],
-      {
-        scrollBehavior: 'instant',
-        threshold: 100,
-        onScrollStateChange: (isNearBottom) => {
-          setShowScrollButton(!isNearBottom);
-        },
-      },
-    );
 
   // 没有消息时显示空状态
   if (
@@ -317,11 +297,7 @@ export function MessageList({
   return (
     <div className="relative h-full">
       <PrismTheme />
-      <div
-        ref={containerRef}
-        className="h-full space-y-4 overflow-y-auto scroll-smooth px-1 py-2"
-        onScroll={handleScroll}
-      >
+      <div className="h-full space-y-4 overflow-y-auto scroll-smooth px-1 py-2">
         {messages.map((message) => (
           <MessageItem key={message.id} message={message} />
         ))}
@@ -335,23 +311,7 @@ export function MessageList({
         {isLoading &&
           !streamingMessage.content &&
           !streamingMessage.thinking && <LoadingIndicator />}
-
-        {/* 滚动参考元素 */}
-        <div ref={bottomRef} className="h-0" />
       </div>
-
-      {/* 返回底部按钮 */}
-      {showScrollButton && (
-        <Button
-          variant="outline"
-          size="default"
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border bg-card font-semibold text-card-foreground shadow-lg"
-          onClick={scrollToBottom}
-        >
-          <ArrowDown className="mr-1 h-4 w-4" />
-          <span className="text-xs">返回底部</span>
-        </Button>
-      )}
     </div>
   );
 }
