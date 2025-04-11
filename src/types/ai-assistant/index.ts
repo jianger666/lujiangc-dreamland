@@ -29,6 +29,7 @@ export interface AIModel {
 export interface StreamingMessage {
   content: string;
   thinking: string;
+  role?: never;
 }
 
 // 单个对话的流式状态

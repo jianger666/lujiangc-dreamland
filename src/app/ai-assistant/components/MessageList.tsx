@@ -1,9 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Bot, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Message, StreamingMessage } from '@/types/ai-assistant';
+import { AiRoleEnum, Message, StreamingMessage } from '@/types/ai-assistant';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -14,6 +20,7 @@ import rehypeHighlight from 'rehype-highlight';
 import { useTheme } from 'next-themes';
 import { Components } from 'react-markdown';
 import { useCopy } from '../hooks';
+import { VariableSizeList, ListChildComponentProps } from 'react-window';
 
 /**
  * 代码高亮主题组件 - 使用JSX直接加载样式
@@ -87,8 +94,6 @@ function CopyCodeButton({ code }: { code: string }) {
 // Markdown渲染配置
 const MarkdownComponents: Components = {
   code({ className, children, ...rest }) {
-    console.log('渲染');
-
     const match = /language-(\w+)/.exec(className || '');
     const language = match?.[1];
 
@@ -179,9 +184,9 @@ function MessageContent({
   role,
 }: {
   content: string;
-  role: 'user' | 'assistant' | 'system';
+  role: AiRoleEnum;
 }) {
-  if (role === 'user') {
+  if (role === AiRoleEnum.User) {
     return <div className="whitespace-pre-wrap">{content}</div>;
   }
 
@@ -198,69 +203,70 @@ function MessageContent({
   );
 }
 
-// 单个消息组件
-function MessageItem({ message }: { message: Message | StreamingMessage }) {
-  const role = 'role' in message ? message.role : 'assistant';
-  const thinking = 'thinking' in message ? message.thinking : undefined;
+// 单个消息组件 - 用于虚拟列表
+function MessageItem({
+  message,
+  style,
+  setSize,
+  index,
+}: {
+  message: Message | StreamingMessage;
+  style: React.CSSProperties;
+  setSize: (index: number, size: number) => void;
+  index: number;
+}) {
+  const itemRef = useRef<HTMLDivElement>(null);
+  const role = message.role ?? AiRoleEnum.Assistant;
+  const thinking = message.thinking ?? undefined;
   const { copied, copyToClipboard } = useCopy();
+
+  // 在组件挂载和更新后更新高度
+  useEffect(() => {
+    if (itemRef.current) {
+      const height = itemRef.current.getBoundingClientRect().height;
+
+      setSize(index, height);
+    }
+  }, [message.content, thinking, setSize, index]);
 
   const handleCopy = () => {
     copyToClipboard(message.content);
   };
 
   return (
-    <div className="space-y-2">
-      {thinking && <ThinkingBlock content={thinking} />}
+    <div style={style}>
+      <div ref={itemRef} className="space-y-2 p-3">
+        {thinking && <ThinkingBlock content={thinking} />}
 
-      {message.content && (
-        <div
-          className={cn(
-            'group flex',
-            role === 'user' ? 'justify-end' : 'justify-start',
-          )}
-        >
+        {message.content && (
           <div
             className={cn(
-              'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
-              role === 'user'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted',
+              'group flex',
+              role === AiRoleEnum.User ? 'justify-end' : 'justify-start',
             )}
           >
-            <MessageContent content={message.content} role={role} />
-
-            {/* 复制按钮 - 根据消息位置显示在左侧或右侧 */}
             <div
               className={cn(
-                'absolute top-2 opacity-0 transition-opacity group-hover:opacity-100',
-                role === 'user' ? '-left-10' : '-right-10',
+                'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
+                role === AiRoleEnum.User
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted',
               )}
             >
-              <CopyButton onClick={handleCopy} copied={copied} />
+              <MessageContent content={message.content} role={role} />
+
+              {/* 复制按钮 - 根据消息位置显示在左侧或右侧 */}
+              <div
+                className={cn(
+                  'absolute top-2 opacity-0 transition-opacity group-hover:opacity-100',
+                  role === AiRoleEnum.User ? '-left-10' : '-right-10',
+                )}
+              >
+                <CopyButton onClick={handleCopy} copied={copied} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// 加载指示器组件
-function LoadingIndicator() {
-  return (
-    <div className="flex justify-start">
-      <div className="max-w-[85%] rounded-lg bg-muted px-4 py-2 md:max-w-[70%] xl:max-w-[800px]">
-        <div className="flex space-x-1">
-          <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
-          <div
-            className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-            style={{ animationDelay: '0.2s' }}
-          />
-          <div
-            className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-            style={{ animationDelay: '0.4s' }}
-          />
-        </div>
+        )}
       </div>
     </div>
   );
@@ -288,41 +294,164 @@ interface MessageListProps {
   conversationId?: string;
 }
 
+interface ItemData {
+  messages: (Message | StreamingMessage)[];
+  setSize: (index: number, size: number) => void;
+  isGenerating: boolean;
+  isRequesting: boolean;
+}
+
+// 虚拟列表渲染的列表项
+const Row = React.memo(
+  ({ data, index, style }: ListChildComponentProps<ItemData>) => {
+    const { messages, setSize, isRequesting } = data;
+
+    // 显示加载指示器
+    if (isRequesting && index === messages.length) {
+      return (
+        <div style={{ ...style, height: 'auto', minHeight: 50 }}>
+          <div className="flex justify-start px-1 py-2">
+            <div className="max-w-[85%] rounded-lg bg-muted px-4 py-2 md:max-w-[70%] xl:max-w-[800px]">
+              <div className="flex space-x-1">
+                <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
+                <div
+                  className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
+                  style={{ animationDelay: '0.2s' }}
+                />
+                <div
+                  className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
+                  style={{ animationDelay: '0.4s' }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 显示消息
+    return (
+      <MessageItem
+        message={messages[index]}
+        style={style}
+        setSize={setSize}
+        index={index}
+      />
+    );
+  },
+);
+
+Row.displayName = 'VirtualRow';
+
 export function MessageList({
   messages,
   streamingMessage,
   isLoading,
+  conversationId,
 }: MessageListProps) {
-  // 使用自定义的useChatScroll hook来管理滚动行为
+  const listRef = useRef<VariableSizeList>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(0);
 
-  // 没有消息时显示空状态
-  if (
-    messages.length === 0 &&
-    !streamingMessage.content &&
-    !streamingMessage.thinking &&
-    !isLoading
-  ) {
-    return <EmptyState />;
-  }
+  // 创建高度缓存系统 - 使用ref而不是state避免渲染中更新状态
+  const itemHeightsRef = useRef<Record<number, number>>({});
+  const defaultItemHeight = 80; // 默认高度
+
+  // 有内容或思考过程了
+  const isGenerating = useMemo(
+    () => !!streamingMessage.content || !!streamingMessage.thinking,
+    [streamingMessage],
+  );
+  // 还处于请求中，没有内容或思考过程，展示加载指示器
+  const isRequesting = useMemo(
+    () => isLoading && !isGenerating,
+    [isLoading, isGenerating],
+  );
+
+  // 合并所有消息为一个数组
+  const allMessages = useMemo(() => {
+    const result: (Message | StreamingMessage)[] = [...messages];
+
+    // 只有存在内容或思考过程时才添加流式消息
+    if (isGenerating) result.push(streamingMessage);
+
+    return result;
+  }, [messages, streamingMessage, isGenerating]);
+
+  // 计算列表总项数, 如果还处于请求中，则总项数+1（加上指示器的位置）
+  const itemCount = allMessages.length + (isRequesting ? 1 : 0);
+
+  // 设置单个项的高度 - 使用useCallback优化性能
+  const setSize = useCallback((index: number, size: number) => {
+    if (itemHeightsRef.current[index] !== size) {
+      itemHeightsRef.current[index] = size;
+      listRef.current?.resetAfterIndex(index);
+    }
+  }, []);
+
+  // 获取项高度的函数
+  const getItemHeight = useCallback(
+    (index: number) => {
+      // 加载指示器不处理高度
+      if (isRequesting && index === allMessages.length) return 0;
+
+      return itemHeightsRef.current[index] || defaultItemHeight;
+    },
+    [defaultItemHeight, isRequesting, allMessages.length],
+  );
+
+  // 监听容器尺寸变化
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+
+    const updateHeight = () => {
+      setContainerHeight(container.clientHeight);
+    };
+
+    updateHeight();
+
+    const resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.unobserve(container);
+    };
+  }, []);
+
+  // 重置List组件 - 在对话切换时重置
+  useEffect(() => {
+    listRef.current?.resetAfterIndex(0);
+  }, [conversationId]);
+
+  // 准备虚拟列表的数据
+  const itemData: ItemData = {
+    messages: allMessages,
+    setSize,
+    isGenerating,
+    isRequesting,
+  };
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full" ref={containerRef}>
       <HighlightTheme />
-      <div className="h-full space-y-4 overflow-y-auto scroll-smooth px-1 py-2">
-        {messages.map((message) => (
-          <MessageItem key={message.id} message={message} />
-        ))}
-
-        {/* 流式生成的消息 */}
-        {(streamingMessage.content || streamingMessage.thinking) && (
-          <MessageItem message={streamingMessage} />
-        )}
-
-        {/* 加载指示器 */}
-        {isLoading &&
-          !streamingMessage.content &&
-          !streamingMessage.thinking && <LoadingIndicator />}
-      </div>
+      {messages.length === 0 && !isLoading ? (
+        <EmptyState />
+      ) : (
+        <VariableSizeList
+          ref={listRef}
+          height={containerHeight}
+          width="100%"
+          itemCount={itemCount}
+          itemSize={getItemHeight}
+          itemData={itemData}
+          // className="scrollbar-thin scrollbar-thumb-rounded scrollbar-track-transparent scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/30"
+          overscanCount={5}
+        >
+          {Row}
+        </VariableSizeList>
+      )}
     </div>
   );
 }
