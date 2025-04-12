@@ -22,7 +22,7 @@ export default function NotFound() {
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Button asChild>
+          <Button asChild title="返回首页">
             <Link href="/">返回首页</Link>
           </Button>
         </CardFooter>

@@ -167,6 +167,7 @@ export function WheelSpinner({
           <Button
             onClick={handleSpinClick}
             disabled={mustSpin || wheelData.length === 0}
+            title="开始转动"
             className="mt-4"
             size="lg"
           >

@@ -214,13 +214,14 @@ export function AIAssistant({
       <DialogTrigger asChild>
         {isFloating ? (
           <Button
+            title="打开对话框"
             size="icon"
             className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full shadow-lg"
           >
             <Bot className="h-6 w-6" />
           </Button>
         ) : (
-          <Button variant="outline" size="sm">
+          <Button title={''} variant="outline" size="sm">
             {triggerLabel}
           </Button>
         )}
@@ -309,6 +310,7 @@ export function AIAssistant({
               />
               {input && (
                 <Button
+                  title="清除输入"
                   type="button"
                   variant="ghost"
                   size="icon"
@@ -321,6 +323,7 @@ export function AIAssistant({
               )}
             </div>
             <Button
+              title="发送消息"
               type="submit"
               size="icon"
               disabled={isLoading || !input.trim()}

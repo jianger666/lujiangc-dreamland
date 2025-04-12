@@ -60,6 +60,7 @@ const ConversationItem = memo(
           variant="ghost"
           size="icon"
           className="h-8 w-8"
+          title="删除对话"
           onClick={onDelete}
         >
           <Trash2 className="h-4 w-4" />

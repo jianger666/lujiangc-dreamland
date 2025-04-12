@@ -568,27 +568,38 @@ function ComponentsShowcase() {
               <p>这是卡片内容区域，可以放置文本、图片或其他组件。</p>
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-2">
-              <Button variant="outline">取消</Button>
-              <Button>确认</Button>
+              <Button title="取消" variant="outline">
+                取消
+              </Button>
+              <Button title="确认">确认</Button>
             </CardFooter>
           </Card>
 
           <div className="space-y-4">
             <h3 className="text-xl font-medium">按钮组件</h3>
             <div className="flex flex-wrap gap-3">
-              <Button>主要按钮</Button>
-              <Button variant="secondary">次要按钮</Button>
-              <Button variant="outline">轮廓按钮</Button>
-              <Button variant="destructive">危险按钮</Button>
-              <Button variant="ghost">幽灵按钮</Button>
-              <Button variant="link">链接按钮</Button>
+              <Button title="主要按钮">主要按钮</Button>
+              <Button title="次要按钮" variant="secondary">
+                次要按钮
+              </Button>
+              <Button title="轮廓按钮" variant="outline">
+                轮廓按钮
+              </Button>
+              <Button title="危险按钮" variant="destructive">
+                危险按钮
+              </Button>
+              <Button title="幽灵按钮" variant="ghost">
+                幽灵按钮
+              </Button>
             </div>
             <div className="mt-2 flex flex-wrap gap-3">
-              <Button loading>加载中按钮</Button>
-              <Button variant="secondary" loading>
+              <Button title="加载中按钮" loading>
+                加载中按钮
+              </Button>
+              <Button title="加载中" variant="secondary" loading>
                 加载中
               </Button>
-              <Button variant="outline" loading>
+              <Button title="加载中" variant="outline" loading>
                 加载中
               </Button>
             </div>

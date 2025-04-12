@@ -135,7 +135,4 @@ alwaysApply: true
 
 编写新组件或页面时，请遵循此文档中的颜色、间距和阴影等规范，确保整个应用程序的一致性和统一性。使用预定义的Tailwind类，如`text-primary`、`bg-card`、`p-md`、`shadow-lg`等来应用这些样式。
 
-当需要创建与主容器(Main)等高并支持滚动的容器时，应使用以下CSS类组合:
-- `h-0 flex-1 overflow-auto`
-
     

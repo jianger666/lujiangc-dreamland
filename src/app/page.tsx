@@ -11,7 +11,7 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-          <Button asChild>
+          <Button asChild title="查看UI风格规范">
             <Link href="/ui-showcase">查看UI风格规范</Link>
           </Button>
         </div>

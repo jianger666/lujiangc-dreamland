@@ -348,6 +348,7 @@ export function FormContainer<T extends FieldValues>({
           {showReset && (
             <Button
               type="button"
+              title={resetText}
               variant="outline"
               onClick={handleReset}
               disabled={disabled || loading}
@@ -357,6 +358,8 @@ export function FormContainer<T extends FieldValues>({
           )}
 
           <Button
+            type="button"
+            title={submitText}
             onClick={async () => {
               if (!loading) {
                 // 在提交前进行所有字段触发验证

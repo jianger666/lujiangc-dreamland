@@ -166,6 +166,7 @@ export function ChatInput({
                 type="submit"
                 disabled={isLoading || !input.trim()}
                 className="h-8 w-8 rounded-full p-0"
+                title="发送消息"
               >
                 <Send className="h-4 w-4" />
               </Button>

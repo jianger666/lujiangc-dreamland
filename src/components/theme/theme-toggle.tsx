@@ -20,6 +20,7 @@ export function ThemeToggle() {
 
   return (
     <Button
+      title={theme === 'dark' ? '切换至亮色模式' : '切换至暗色模式'}
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

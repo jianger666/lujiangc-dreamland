@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { Bot, Copy, Check } from 'lucide-react';
+import { Bot, Copy, Check, ChevronsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AiRoleEnum, Message, StreamingMessage } from '@/types/ai-assistant';
 import ReactMarkdown from 'react-markdown';
@@ -21,6 +21,8 @@ import { useTheme } from 'next-themes';
 import { Components } from 'react-markdown';
 import { useCopy } from '../hooks';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
+import { DotLoading } from '@/components/ui/dot-loading';
+import { Button } from '@/components/ui/button';
 
 /**
  * 代码高亮主题组件 - 使用JSX直接加载样式
@@ -47,47 +49,36 @@ function HighlightTheme() {
 }
 
 /**
- * 复制按钮组件
+ * 通用复制按钮组件
  */
 interface CopyButtonProps {
-  onClick: () => void;
-  copied: boolean;
+  textToCopy: string;
   className?: string;
+  title?: string;
 }
 
 export function CopyButton({
-  onClick,
-  copied,
+  textToCopy,
   className = '',
+  title = '复制',
 }: CopyButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={`bg-background/80 rounded-full p-1.5 text-muted-foreground backdrop-blur-sm transition-colors hover:bg-background hover:text-foreground focus:outline-none ${className}`}
-      aria-label="复制消息"
-      title="复制消息"
-    >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
-  );
-}
-
-// 代码复制按钮组件
-function CopyCodeButton({ code }: { code: string }) {
   const { copied, copyToClipboard } = useCopy();
 
   const handleCopy = () => {
-    copyToClipboard(code);
+    copyToClipboard(textToCopy);
   };
 
   return (
-    <button
+    <Button
       onClick={handleCopy}
-      className="p-1 transition-colors hover:text-foreground focus:outline-none"
-      aria-label="复制代码"
+      type="button"
+      variant="ghost"
+      size="icon"
+      className={cn('h-6 w-6', className)}
+      title={title}
     >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
+      {copied ? <Check /> : <Copy />}
+    </Button>
   );
 }
 
@@ -137,7 +128,7 @@ const MarkdownComponents: Components = {
       <div className="relative overflow-hidden rounded-md">
         <div className="flex items-center justify-between bg-card px-4 py-1.5 text-xs text-muted-foreground">
           <span>{language}</span>
-          <CopyCodeButton code={codeContent} />
+          <CopyButton textToCopy={codeContent} title="复制代码" />
         </div>
 
         <code
@@ -218,55 +209,67 @@ function MessageItem({
   const itemRef = useRef<HTMLDivElement>(null);
   const role = message.role ?? AiRoleEnum.Assistant;
   const thinking = message.thinking ?? undefined;
-  const { copied, copyToClipboard } = useCopy();
 
-  // 在组件挂载和更新后更新高度
+  // 动态更新项目高度
   useEffect(() => {
     if (itemRef.current) {
-      const height = itemRef.current.getBoundingClientRect().height;
+      // 使用 scrollHeight 获取包含所有内容的实际高度，可能比 getBoundingClientRect 更准确
+      const measuredHeight = itemRef.current.scrollHeight;
+      // 检查是否需要添加额外的 padding/margin，根据 itemRef 内部的 padding 调整
+      // 当前 className="space-y-2 px-3 py-2" 意味着上下各有 8px padding
+      // scrollHeight 应该已经包含了这些，所以可能不需要额外加 16
+      const requiredHeight = measuredHeight; // 直接使用 scrollHeight
 
-      setSize(index, height);
+      // 仅在高度有效且发生变化时更新
+      if (requiredHeight > 0) {
+        // console.log(`[MessageItem ${index}] Measured height: ${measuredHeight}, Setting size to: ${requiredHeight}`);
+        setSize(index, requiredHeight);
+      }
     }
+    // 依赖项：当消息内容或思考内容变化时重新计算
   }, [message.content, thinking, setSize, index]);
-
-  const handleCopy = () => {
-    copyToClipboard(message.content);
-  };
 
   return (
     <div style={style}>
-      <div ref={itemRef} className="space-y-2 p-3">
-        {thinking && <ThinkingBlock content={thinking} />}
-
-        {message.content && (
-          <div
-            className={cn(
-              'group flex',
-              role === AiRoleEnum.User ? 'justify-end' : 'justify-start',
-            )}
-          >
+      {/* 将 padding 应用在内部 div 上，以便 itemRef 能正确测量 */}
+      <div ref={itemRef} className="px-3 py-2">
+        {' '}
+        {/* 应用垂直 padding */}
+        <div className="space-y-2">
+          {' '}
+          {/* 使用 space-y 控制间距 */}
+          {thinking && <ThinkingBlock content={thinking} />}
+          {message.content && (
             <div
               className={cn(
-                'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
-                role === AiRoleEnum.User
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted',
+                'group flex',
+                role === AiRoleEnum.User ? 'justify-end' : 'justify-start',
               )}
             >
-              <MessageContent content={message.content} role={role} />
-
-              {/* 复制按钮 - 根据消息位置显示在左侧或右侧 */}
               <div
                 className={cn(
-                  'absolute top-2 opacity-0 transition-opacity group-hover:opacity-100',
-                  role === AiRoleEnum.User ? '-left-10' : '-right-10',
+                  'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
+                  role === AiRoleEnum.User
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted',
                 )}
               >
-                <CopyButton onClick={handleCopy} copied={copied} />
+                <MessageContent content={message.content} role={role} />
+                {/* 复制按钮 */}
+                <div
+                  className={cn(
+                    'absolute top-1 transition-opacity group-hover:opacity-100',
+                    'opacity-0', // 初始隐藏
+                    role === AiRoleEnum.User ? '-left-10' : '-right-10',
+                    'flex items-center',
+                  )}
+                >
+                  <CopyButton textToCopy={message.content} title="复制消息" />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
@@ -297,7 +300,6 @@ interface MessageListProps {
 interface ItemData {
   messages: (Message | StreamingMessage)[];
   setSize: (index: number, size: number) => void;
-  isGenerating: boolean;
   isRequesting: boolean;
 }
 
@@ -306,38 +308,38 @@ const Row = React.memo(
   ({ data, index, style }: ListChildComponentProps<ItemData>) => {
     const { messages, setSize, isRequesting } = data;
 
-    // 显示加载指示器
+    // 加载指示器行
     if (isRequesting && index === messages.length) {
       return (
-        <div style={{ ...style, height: 'auto', minHeight: 50 }}>
-          <div className="flex justify-start px-1 py-2">
-            <div className="max-w-[85%] rounded-lg bg-muted px-4 py-2 md:max-w-[70%] xl:max-w-[800px]">
-              <div className="flex space-x-1">
-                <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
-                <div
-                  className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-                  style={{ animationDelay: '0.2s' }}
-                />
-                <div
-                  className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-                  style={{ animationDelay: '0.4s' }}
-                />
-              </div>
-            </div>
+        <div
+          style={{
+            ...style,
+            display: 'flex',
+            justifyContent: 'flex-start',
+            padding: '8px 12px', // 保持内边距一致性
+          }}
+        >
+          <div className="rounded-lg bg-muted px-4 py-2">
+            <DotLoading />
           </div>
         </div>
       );
     }
 
-    // 显示消息
-    return (
-      <MessageItem
-        message={messages[index]}
-        style={style}
-        setSize={setSize}
-        index={index}
-      />
-    );
+    // 渲染普通消息项
+    if (index < messages.length) {
+      return (
+        <MessageItem
+          message={messages[index]}
+          style={style}
+          setSize={setSize}
+          index={index}
+        />
+      );
+    }
+
+    // 边界情况处理
+    return <div style={style}></div>;
   },
 );
 
@@ -351,106 +353,304 @@ export function MessageList({
 }: MessageListProps) {
   const listRef = useRef<VariableSizeList>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null); // 外部滚动容器 ref
   const [containerHeight, setContainerHeight] = useState(0);
+  // **状态简化**: 使用一个 ref 来跟踪滚动状态，减少不必要的重渲染
+  const scrollStateRef = useRef({
+    userScrolledUp: false, // 用户是否主动向上滚动
+    isNearBottom: true, // 当前是否接近底部
+    programmaticScroll: false, // 是否是程序化滚动触发的事件
+  });
+  // 仅保留控制按钮显示的 state
+  const [showScrollToBottomButton, setShowScrollToBottomButton] =
+    useState(false);
 
-  // 创建高度缓存系统 - 使用ref而不是state避免渲染中更新状态
   const itemHeightsRef = useRef<Record<number, number>>({});
-  const defaultItemHeight = 80; // 默认高度
+  const defaultItemHeight = 60; // 稍微减小默认高度估计
 
-  // 有内容或思考过程了
   const isGenerating = useMemo(
     () => !!streamingMessage.content || !!streamingMessage.thinking,
     [streamingMessage],
   );
-  // 还处于请求中，没有内容或思考过程，展示加载指示器
+
   const isRequesting = useMemo(
     () => isLoading && !isGenerating,
     [isLoading, isGenerating],
   );
 
-  // 合并所有消息为一个数组
   const allMessages = useMemo(() => {
     const result: (Message | StreamingMessage)[] = [...messages];
-
-    // 只有存在内容或思考过程时才添加流式消息
     if (isGenerating) result.push(streamingMessage);
-
     return result;
   }, [messages, streamingMessage, isGenerating]);
 
-  // 计算列表总项数, 如果还处于请求中，则总项数+1（加上指示器的位置）
+  // 包含加载指示器的总项目数
   const itemCount = allMessages.length + (isRequesting ? 1 : 0);
 
-  // 设置单个项的高度 - 使用useCallback优化性能
+  // 更新项目高度的回调函数
   const setSize = useCallback((index: number, size: number) => {
-    if (itemHeightsRef.current[index] !== size) {
+    const currentHeight = itemHeightsRef.current[index];
+    // 仅当高度实际变化时才更新并重置列表缓存
+    if (currentHeight !== size) {
       itemHeightsRef.current[index] = size;
-      listRef.current?.resetAfterIndex(index);
+      // console.log(`[setSize ${index}] New size: ${size}. Resetting list.`);
+      // 确保 listRef 存在再调用 resetAfterIndex
+      if (listRef.current) {
+        // 标记为程序化更新，避免触发 handleScroll 中的用户滚动逻辑
+        scrollStateRef.current.programmaticScroll = true;
+        listRef.current.resetAfterIndex(index, false); // 第二个参数 false 表示不立即滚动到该项
+        // 短暂延迟后解除标记，允许后续滚动事件正常处理
+        setTimeout(() => {
+          scrollStateRef.current.programmaticScroll = false;
+        }, 50);
+      }
     }
-  }, []);
+  }, []); // 移除 itemCount 依赖，setSize 本身不应依赖于 itemCount
 
-  // 获取项高度的函数
+  // 获取项目高度的回调函数
   const getItemHeight = useCallback(
     (index: number) => {
-      // 加载指示器不处理高度
-      if (isRequesting && index === allMessages.length) return 0;
-
+      // 加载指示器的高度
+      if (isRequesting && index === allMessages.length) return 50; // 调整加载指示器高度估计
       return itemHeightsRef.current[index] || defaultItemHeight;
     },
-    [defaultItemHeight, isRequesting, allMessages.length],
+    [isRequesting, allMessages.length], // 移除 defaultItemHeight
   );
 
-  // 监听容器尺寸变化
+  // 滚动到底部的函数 (简化版)
+  const scrollToBottom = useCallback(
+    (behavior: 'auto' | 'smooth' = 'auto') => {
+      if (itemCount > 0 && listRef.current) {
+        // console.log(`[scrollToBottom] Scrolling to index ${itemCount - 1} with behavior: ${behavior}`);
+        // 标记为程序化滚动
+        scrollStateRef.current.programmaticScroll = true;
+        listRef.current.scrollToItem(itemCount - 1, 'end'); // 直接滚动，使用 'end' 对齐
+
+        // 重置滚动状态标记 (因为我们强制滚动到底部了)
+        scrollStateRef.current.userScrolledUp = false;
+        scrollStateRef.current.isNearBottom = true;
+        setShowScrollToBottomButton(false); // 隐藏按钮
+
+        // 延迟解除标记，允许滚动动画完成（如果是 smooth）
+        const delay = behavior === 'smooth' ? 300 : 50;
+        setTimeout(() => {
+          scrollStateRef.current.programmaticScroll = false;
+          // console.log('[scrollToBottom] Programmatic scroll flag reset.');
+        }, delay);
+      }
+    },
+    [itemCount], // 依赖 itemCount
+  );
+
+  // 容器高度监听
   useEffect(() => {
     if (!containerRef.current) return;
-
     const container = containerRef.current;
-
-    const updateHeight = () => {
-      setContainerHeight(container.clientHeight);
-    };
-
-    updateHeight();
-
-    const resizeObserver = new ResizeObserver(updateHeight);
+    const resizeObserver = new ResizeObserver(() => {
+      const newHeight = container.clientHeight;
+      if (newHeight > 0 && newHeight !== containerHeight) {
+        // console.log(`[ResizeObserver] Container height changed to: ${newHeight}`);
+        setContainerHeight(newHeight);
+      }
+    });
     resizeObserver.observe(container);
+    // 初次设置高度
+    const initialHeight = container.clientHeight;
+    if (initialHeight > 0) setContainerHeight(initialHeight);
 
-    return () => {
-      resizeObserver.unobserve(container);
-    };
-  }, []);
+    return () => resizeObserver.unobserve(container);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 确保只运行一次
 
-  // 重置List组件 - 在对话切换时重置
+  // 对话 ID 变化时的重置逻辑
   useEffect(() => {
-    listRef.current?.resetAfterIndex(0);
-  }, [conversationId]);
+    // console.log('[useEffect conversationId] Resetting state for new conversation.');
+    itemHeightsRef.current = {}; // 清空高度缓存
+    listRef.current?.resetAfterIndex(0, false); // 重置列表状态，不滚动
 
-  // 准备虚拟列表的数据
-  const itemData: ItemData = {
-    messages: allMessages,
-    setSize,
-    isGenerating,
-    isRequesting,
-  };
+    // 重置滚动状态
+    scrollStateRef.current.userScrolledUp = false;
+    scrollStateRef.current.isNearBottom = true;
+    scrollStateRef.current.programmaticScroll = false;
+    setShowScrollToBottomButton(false);
+
+    // 稍微延迟后滚动到底部，确保列表重置完成
+    // 移除 setTimeout, 让自动滚动逻辑处理
+    // const timer = setTimeout(() => {
+    //   console.log('[useEffect conversationId] Scrolling to bottom after reset.');
+    //   scrollToBottom('auto');
+    // }, 50); // 短暂延迟
+
+    // return () => clearTimeout(timer);
+  }, [conversationId]); // 只依赖 conversationId
+
+  // 自动滚动逻辑 - 当消息列表变化且用户在底部时
+  useEffect(() => {
+    // console.log(`[useEffect itemCount] itemCount: ${itemCount}, isNearBottom: ${scrollStateRef.current.isNearBottom}, userScrolledUp: ${scrollStateRef.current.userScrolledUp}`);
+    // 只有当用户接近底部且没有主动向上滚动时才自动滚动
+    if (
+      scrollStateRef.current.isNearBottom &&
+      !scrollStateRef.current.userScrolledUp
+    ) {
+      // console.log('[useEffect itemCount] Auto-scrolling to bottom.');
+      scrollToBottom('auto');
+    }
+    // 当 itemCount 变化时（即消息增删），重新评估是否需要滚动
+  }, [itemCount, scrollToBottom]); // 依赖 itemCount 和 scrollToBottom
+
+  // 滚动事件处理
+  const handleScroll = useCallback(
+    ({
+      scrollOffset, // 当前滚动位置
+      scrollUpdateWasRequested, // 是否由 scrollToItem 等程序化调用触发
+    }: {
+      scrollOffset: number;
+      scrollUpdateWasRequested: boolean;
+    }) => {
+      // 如果是 resetAfterIndex 或 scrollToBottom 触发的滚动，则忽略
+      if (
+        scrollUpdateWasRequested ||
+        scrollStateRef.current.programmaticScroll
+      ) {
+        // console.log(`[handleScroll] Ignored programmatic scroll. requested=${scrollUpdateWasRequested}, flag=${scrollStateRef.current.programmaticScroll}`);
+        // 如果是程序化滚动到底部，确保 isNearBottom 状态正确
+        if (scrollUpdateWasRequested && scrollOffset > 0) {
+          // 简单的检查，确保不是初始 0
+          // Find approximate total height
+          let totalHeight = 0;
+          for (let i = 0; i < itemCount; i++) {
+            totalHeight += getItemHeight(i);
+          }
+          if (
+            outerRef.current &&
+            totalHeight - scrollOffset - outerRef.current.clientHeight < 10
+          ) {
+            scrollStateRef.current.isNearBottom = true;
+            scrollStateRef.current.userScrolledUp = false;
+          }
+        }
+        return;
+      }
+
+      if (!outerRef.current || !listRef.current) return;
+
+      const listElement = outerRef.current;
+      const scrollHeight = listElement.scrollHeight; // 总可滚动高度
+      const clientHeight = listElement.clientHeight; // 可见区域高度
+
+      // 计算距离底部的距离
+      const scrollBottom = scrollHeight - clientHeight - scrollOffset;
+
+      // 判断是否接近底部 (阈值可以调整，例如 10 像素)
+      const currentlyNearBottom = scrollBottom < 10;
+
+      // 更新内部 ref 状态
+      scrollStateRef.current.isNearBottom = currentlyNearBottom;
+
+      // console.log(`[handleScroll] User scroll: offset=${scrollOffset.toFixed(0)}, H=${scrollHeight.toFixed(0)}, clientH=${clientHeight.toFixed(0)}, bottomDist=${scrollBottom.toFixed(0)}, nearBottom=${currentlyNearBottom}`);
+
+      // 判断用户是否主动向上滚动
+      // 如果当前不在底部，并且之前认为在底部 或 之前没有标记为向上滚动
+      if (!currentlyNearBottom && !scrollStateRef.current.userScrolledUp) {
+        // console.log('[handleScroll] User scrolled up.');
+        scrollStateRef.current.userScrolledUp = true;
+      }
+      // 如果当前回到了底部，并且之前标记为向上滚动
+      else if (currentlyNearBottom && scrollStateRef.current.userScrolledUp) {
+        // console.log('[handleScroll] User scrolled back to bottom.');
+        scrollStateRef.current.userScrolledUp = false;
+      }
+
+      // 控制"滚动到底部"按钮的显示
+      // 当用户滚动离开底部超过一定距离时显示 (例如 100 像素)
+      const showButtonThreshold = 100;
+      const shouldShowButton =
+        !currentlyNearBottom && scrollBottom >= showButtonThreshold;
+
+      if (shouldShowButton !== showScrollToBottomButton) {
+        // console.log(`[handleScroll] Setting showScrollToBottomButton to: ${shouldShowButton}`);
+        setShowScrollToBottomButton(shouldShowButton);
+      }
+
+      // 如果用户滚动回底部，隐藏按钮
+      if (currentlyNearBottom && showScrollToBottomButton) {
+        // console.log(`[handleScroll] Hiding scroll to bottom button as user reached bottom.`);
+        setShowScrollToBottomButton(false);
+      }
+    },
+
+    [itemCount, getItemHeight, showScrollToBottomButton], // 依赖项，确保状态和函数引用最新
+  );
+
+  // 传递给 Row 组件的数据
+  const itemData = useMemo(
+    () => ({
+      messages: allMessages,
+      setSize,
+      isRequesting,
+    }),
+    [allMessages, setSize, isRequesting],
+  );
+
+  // 首次渲染或对话切换后，确保滚动到底部
+  useEffect(() => {
+    // console.log('[useEffect initialScroll] Triggering initial scroll to bottom.');
+    // 确保容器有高度后再滚动
+    if (containerHeight > 0) {
+      // 延迟确保 list 渲染完成
+      const timer = setTimeout(() => scrollToBottom('auto'), 50);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, containerHeight]); // 依赖对话 ID 和容器高度
 
   return (
-    <div className="relative h-full" ref={containerRef}>
+    <div className="relative flex h-full flex-col" ref={containerRef}>
       <HighlightTheme />
-      {messages.length === 0 && !isLoading ? (
-        <EmptyState />
-      ) : (
-        <VariableSizeList
-          ref={listRef}
-          height={containerHeight}
-          width="100%"
-          itemCount={itemCount}
-          itemSize={getItemHeight}
-          itemData={itemData}
-          // className="scrollbar-thin scrollbar-thumb-rounded scrollbar-track-transparent scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/30"
-          overscanCount={5}
+
+      {/* 主内容区域 */}
+      <div className="relative flex-1 overflow-hidden">
+        {' '}
+        {/* 确保 flex-1 和 overflow-hidden */}
+        {/* 空状态 */}
+        {!isLoading && messages.length === 0 && !isGenerating ? (
+          <EmptyState />
+        ) : containerHeight > 0 ? ( // 确保容器有高度再渲染列表
+          <VariableSizeList
+            ref={listRef}
+            outerRef={outerRef}
+            height={containerHeight}
+            width="100%"
+            itemCount={itemCount}
+            itemSize={getItemHeight} // 使用回调函数动态获取高度
+            itemData={itemData}
+            onScroll={handleScroll}
+            overscanCount={5} // 增加预渲染数量，可能有助于平滑滚动
+            // layout="vertical" // 默认是 vertical
+          >
+            {Row}
+          </VariableSizeList>
+        ) : (
+          // 可以添加一个加载骨架屏或者简单的提示
+          <div className="flex h-full items-center justify-center">
+            <p className="text-muted-foreground">加载中...</p>
+          </div>
+        )}
+      </div>
+
+      {/* 滚动到底部按钮 */}
+      {showScrollToBottomButton && (
+        <Button
+          type="button"
+          variant="default"
+          size="icon"
+          // 使用平滑滚动
+          onClick={() => scrollToBottom('smooth')}
+          className="absolute bottom-4 left-1/2 z-10 h-10 w-10 -translate-x-1/2 transform rounded-full shadow-lg" // 添加阴影和 transform
+          title="滚动到底部"
         >
-          {Row}
-        </VariableSizeList>
+          <ChevronsDown className="h-5 w-5" /> {/* 调整图标大小 */}
+        </Button>
       )}
     </div>
   );

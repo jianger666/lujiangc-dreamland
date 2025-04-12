@@ -210,6 +210,7 @@ export function Header({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
+                        title="更多导航项"
                         variant="ghost"
                         size="sm"
                         className="h-9 w-9 cursor-pointer p-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -250,6 +251,7 @@ export function Header({
             <>
               {' '}
               <Button
+                title="UI 展示页"
                 variant="ghost"
                 size="icon"
                 className="rounded-full"
@@ -267,7 +269,12 @@ export function Header({
           <div className="lg:hidden">
             <Sheet open={isOpen} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
+                <Button
+                  title="打开菜单"
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                >
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">打开菜单</span>
                 </Button>

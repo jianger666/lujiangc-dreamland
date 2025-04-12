@@ -49,6 +49,7 @@ export function ConversationHeader({
             <Button
               variant="ghost"
               size="icon"
+              title="保存标题"
               className="h-8 w-8"
               onClick={saveEditedTitle}
             >
@@ -56,6 +57,7 @@ export function ConversationHeader({
             </Button>
             <Button
               variant="ghost"
+              title="取消编辑"
               size="icon"
               className="h-8 w-8"
               onClick={() => setIsEditingTitle(false)}
@@ -68,6 +70,7 @@ export function ConversationHeader({
             <span className="font-medium">{conversation.title}</span>
             <Button
               variant="ghost"
+              title="编辑标题"
               size="icon"
               className="h-8 w-8"
               onClick={startEditingTitle}
