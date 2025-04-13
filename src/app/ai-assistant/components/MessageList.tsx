@@ -82,75 +82,6 @@ export function CopyButton({
   );
 }
 
-// Markdown渲染配置
-const MarkdownComponents: Components = {
-  code({ className, children, ...rest }) {
-    const match = /language-(\w+)/.exec(className || '');
-    const language = match?.[1];
-
-    if (!language) {
-      return (
-        <code className={cn(className)} {...rest}>
-          {children}
-        </code>
-      );
-    }
-
-    // 创建代码文本提取函数，处理复杂的React元素树
-    const extractTextContent = (nodes: React.ReactNode): string => {
-      if (!nodes) return '';
-
-      if (typeof nodes === 'string') return nodes;
-
-      if (Array.isArray(nodes)) {
-        return nodes.map(extractTextContent).join('');
-      }
-
-      // 处理React元素 (如span标签等)
-      if (
-        typeof nodes === 'object' &&
-        nodes !== null &&
-        'props' in nodes &&
-        typeof nodes.props === 'object' &&
-        nodes.props !== null &&
-        'children' in nodes.props
-      ) {
-        return extractTextContent(nodes.props.children as React.ReactNode);
-      }
-
-      return '';
-    };
-
-    // 提取代码内容
-    const codeContent = extractTextContent(children);
-
-    return (
-      <div className="relative overflow-hidden rounded-md">
-        <div className="flex items-center justify-between bg-card px-4 py-1.5 text-xs text-muted-foreground">
-          <span>{language}</span>
-          <CopyButton textToCopy={codeContent} title="复制代码" />
-        </div>
-
-        <code
-          className={cn(className, 'block w-full overflow-x-auto p-4 text-xs')}
-          {...rest}
-        >
-          {children}
-        </code>
-      </div>
-    );
-  },
-  pre(props) {
-    const { className, ...rest } = props;
-    return (
-      <pre
-        className={cn(className, 'overflow-hidden bg-transparent p-0 text-xs')}
-        {...rest}
-      />
-    );
-  },
-};
-
 // 思考过程组件
 function ThinkingBlock({ content }: { content: string }) {
   if (!content || content.trim() === '') return null;
@@ -177,12 +108,117 @@ function MessageContent({
   content: string;
   role: AiRoleEnum;
 }) {
-  if (role === AiRoleEnum.User) {
-    return <div className="whitespace-pre-wrap">{content}</div>;
-  }
+  const MarkdownComponents: Components = {
+    table({ className, ...rest }) {
+      return <table className={cn(className, 'border-collapse')} {...rest} />;
+    },
+    th({ className, ...rest }) {
+      return (
+        <th
+          className={cn(
+            className,
+            'border border-foreground bg-muted bg-opacity-50 p-2',
+          )}
+          {...rest}
+        />
+      );
+    },
+    td({ className, ...rest }) {
+      return (
+        <td
+          className={cn(className, 'border border-foreground p-2')}
+          {...rest}
+        />
+      );
+    },
+    code({ className, children, ...rest }) {
+      const match = /language-(\w+)/.exec(className || '');
+      const language = match?.[1];
 
+      if (!language) {
+        return (
+          <code className={cn(className)} {...rest}>
+            {children}
+          </code>
+        );
+      }
+
+      // 创建代码文本提取函数，处理复杂的React元素树
+      const extractTextContent = (nodes: React.ReactNode): string => {
+        if (!nodes) return '';
+
+        if (typeof nodes === 'string') return nodes;
+
+        if (Array.isArray(nodes)) {
+          return nodes.map(extractTextContent).join('');
+        }
+
+        // 处理React元素 (如span标签等)
+        if (
+          typeof nodes === 'object' &&
+          nodes !== null &&
+          'props' in nodes &&
+          typeof nodes.props === 'object' &&
+          nodes.props !== null &&
+          'children' in nodes.props
+        ) {
+          return extractTextContent(nodes.props.children as React.ReactNode);
+        }
+
+        return '';
+      };
+
+      // 提取代码内容
+      const codeContent = extractTextContent(children);
+
+      return (
+        <div className="relative overflow-hidden rounded-md">
+          <div
+            className={cn(
+              role === AiRoleEnum.User ? 'bg-muted' : 'bg-accent',
+              'flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground',
+            )}
+          >
+            <span>{language}</span>
+            <CopyButton textToCopy={codeContent} title="复制代码" />
+          </div>
+
+          <code
+            className={cn(
+              className,
+              'block w-full overflow-x-auto p-4 text-xs',
+            )}
+            {...rest}
+          >
+            {children}
+          </code>
+        </div>
+      );
+    },
+    pre(props) {
+      const { className, ...rest } = props;
+      return (
+        <pre
+          className={cn(
+            className,
+            'overflow-hidden bg-transparent p-0 text-xs',
+          )}
+          {...rest}
+        />
+      );
+    },
+  };
+
+  // 使用相同的Markdown渲染逻辑，但为用户消息设置不同的样式类
   return (
-    <div className="prose prose-sm max-w-none dark:prose-invert">
+    <div
+      className={cn(
+        'prose prose-sm max-w-none',
+        role === AiRoleEnum.User
+          ? 'prose-white dark:prose-invert'
+          : 'dark:prose-invert',
+      )}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
         rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
@@ -233,10 +269,8 @@ function MessageItem({
     <div style={style}>
       {/* 将 padding 应用在内部 div 上，以便 itemRef 能正确测量 */}
       <div ref={itemRef} className="px-3 py-2">
-        {' '}
         {/* 应用垂直 padding */}
         <div className="space-y-2">
-          {' '}
           {/* 使用 space-y 控制间距 */}
           {thinking && <ThinkingBlock content={thinking} />}
           {message.content && (
@@ -249,9 +283,7 @@ function MessageItem({
               <div
                 className={cn(
                   'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
-                  role === AiRoleEnum.User
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted',
+                  role === AiRoleEnum.User ? 'bg-accent' : 'bg-muted',
                 )}
               >
                 <MessageContent content={message.content} role={role} />
@@ -411,10 +443,10 @@ export function MessageList({
   const getItemHeight = useCallback(
     (index: number) => {
       // 加载指示器的高度
-      if (isRequesting && index === allMessages.length) return 50; // 调整加载指示器高度估计
+      if (isRequesting && index === allMessages.length) return 40;
       return itemHeightsRef.current[index] || defaultItemHeight;
     },
-    [isRequesting, allMessages.length], // 移除 defaultItemHeight
+    [isRequesting, allMessages.length],
   );
 
   // 滚动到底部的函数 (简化版)
