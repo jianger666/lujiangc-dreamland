@@ -191,7 +191,9 @@ export function MessageList({
     ) {
       handleScrollToBottom(true);
     }
-  }, [messages.length, handleScrollToBottom]);
+    //不要依赖 handleScrollToBottom，不然会有问题，这个只针对于用户发送消息的情况
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length]);
 
   // 传递给 Row 组件的数据
   const itemData = useMemo<ItemData>(
