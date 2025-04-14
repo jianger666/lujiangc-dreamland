@@ -296,7 +296,6 @@ async function executeStreamRequest({
       },
 
       onmessage: (event) => {
-        console.log('event:', event);
         if (isAborted.value) {
           console.log('请求已中止，忽略后续消息:', conversationId);
           return;
@@ -435,8 +434,6 @@ function handleStreamComplete({
   conversationId: string;
   onComplete?: (conversationId: string) => void;
 }): void {
-  console.log('流处理完成:', conversationId);
-
   // 只有存在内容时才添加消息
   if (accumulatedContent.value || accumulatedThinking.value) {
     const newMessage: Message = {

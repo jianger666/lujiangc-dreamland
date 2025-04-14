@@ -60,6 +60,7 @@ specifiers:
   react-dom: ^19.0.0
   react-hook-form: ^7.54.2
   react-markdown: ^10.1.0
+  react-virtualized-auto-sizer: ^1.0.26
   react-window: ^1.8.11
   rehype-highlight: 7.0.2
   rehype-katex: ^7.0.1
@@ -75,6 +76,7 @@ specifiers:
   tw-animate-css: ^1.2.4
   typescript: ^5
   unified: 11.0.5
+  use-debounce: ^10.0.4
   usehooks-ts: ^3.1.1
   uuid: ^11.1.0
   zod: ^3.24.2
@@ -119,6 +121,7 @@ dependencies:
   react-dom: registry.npmmirror.com/react-dom/19.0.0_react@19.0.0
   react-hook-form: registry.npmmirror.com/react-hook-form/7.54.2_react@19.0.0
   react-markdown: registry.npmmirror.com/react-markdown/10.1.0_iy7m5vzlrcipgqb5ydfduqi32u
+  react-virtualized-auto-sizer: registry.npmmirror.com/react-virtualized-auto-sizer/1.0.26_upmzqgzhjrquwzo2dphtigtdgi
   react-window: registry.npmmirror.com/react-window/1.8.11_upmzqgzhjrquwzo2dphtigtdgi
   rehype-highlight: registry.npmmirror.com/rehype-highlight/7.0.2
   rehype-katex: registry.npmmirror.com/rehype-katex/7.0.1
@@ -131,6 +134,7 @@ dependencies:
   tailwind-merge: registry.npmmirror.com/tailwind-merge/3.0.2
   tw-animate-css: registry.npmmirror.com/tw-animate-css/1.2.4
   unified: registry.npmmirror.com/unified/11.0.5
+  use-debounce: registry.npmmirror.com/use-debounce/10.0.4_react@19.0.0
   usehooks-ts: registry.npmmirror.com/usehooks-ts/3.1.1_react@19.0.0
   uuid: registry.npmmirror.com/uuid/11.1.0
   zod: registry.npmmirror.com/zod/3.24.2
@@ -6385,6 +6389,19 @@ packages:
       tslib: registry.npmmirror.com/tslib/2.8.1
     dev: false
 
+  registry.npmmirror.com/react-virtualized-auto-sizer/1.0.26_upmzqgzhjrquwzo2dphtigtdgi:
+    resolution: {integrity: sha512-CblNyiNVw2o+hsa5/49NH2ogGxZ+t+3aweRvNSq7TVjDIlwk7ir4lencEg5HxHeSzwNarSkNkiu0qJSOXtxm5A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.26.tgz}
+    id: registry.npmmirror.com/react-virtualized-auto-sizer/1.0.26
+    name: react-virtualized-auto-sizer
+    version: 1.0.26
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0 || ^19.0.0
+    dependencies:
+      react: registry.npmmirror.com/react/19.0.0
+      react-dom: registry.npmmirror.com/react-dom/19.0.0_react@19.0.0
+    dev: false
+
   registry.npmmirror.com/react-window/1.8.11_upmzqgzhjrquwzo2dphtigtdgi:
     resolution: {integrity: sha512-+SRbUVT2scadgFSWx+R1P754xHPEqvcfSfVX10QYg6POOz+WNgkN48pS+BtZNIMGiL1HYrSEiCkwsMS15QogEQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/react-window/-/react-window-1.8.11.tgz}
     id: registry.npmmirror.com/react-window/1.8.11
@@ -7521,6 +7538,18 @@ packages:
       '@types/react': registry.npmmirror.com/@types/react/19.0.12
       react: registry.npmmirror.com/react/19.0.0
       tslib: registry.npmmirror.com/tslib/2.8.1
+    dev: false
+
+  registry.npmmirror.com/use-debounce/10.0.4_react@19.0.0:
+    resolution: {integrity: sha512-6Cf7Yr7Wk7Kdv77nnJMf6de4HuDE4dTxKij+RqE9rufDsI6zsbjyAxcH5y2ueJCQAnfgKbzXbZHYlkFwmBlWkw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/use-debounce/-/use-debounce-10.0.4.tgz}
+    id: registry.npmmirror.com/use-debounce/10.0.4
+    name: use-debounce
+    version: 10.0.4
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: registry.npmmirror.com/react/19.0.0
     dev: false
 
   registry.npmmirror.com/use-sidecar/1.1.3_iy7m5vzlrcipgqb5ydfduqi32u:

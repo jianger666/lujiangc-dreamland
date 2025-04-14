@@ -30,6 +30,7 @@ export interface StreamingMessage {
   content: string;
   thinking: string;
   role?: never;
+  id?: never;
 }
 
 // 单个对话的流式状态
@@ -76,6 +77,9 @@ export enum AIModelEnum {
   Gemini15ProLatest = 'gemini-1.5-pro-latest',
   DeepSeekChatV30324Free = 'deepseek/deepseek-chat-v3-0324:free',
   OpenRouterGemini25ProExp0325 = 'google/gemini-2.5-pro-exp-03-25:free',
+  OpenRouterGemini20FlashThinkingExp = 'google/gemini-2.0-flash-thinking-exp:free',
+  XFYunLite = 'lite',
+  XFYun4Ultra = '4.0Ultra',
 }
 
 /**

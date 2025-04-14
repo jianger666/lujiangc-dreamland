@@ -38,6 +38,24 @@ export const API_PROVIDERS: Record<string, APIProviderConfig> = {
         id: AIModelEnum.OpenRouterGemini25ProExp0325,
         name: 'google/gemini-2.5-pro-exp-03-25:free',
       },
+      {
+        id: AIModelEnum.OpenRouterGemini20FlashThinkingExp,
+        name: 'google/gemini-2.0-flash-thinking-exp:free',
+      },
+    ],
+  },
+  XFYUN: {
+    baseURL: 'https://spark-api-open.xf-yun.com/v1',
+    apiKey: process.env.XFYUN_API_KEY,
+    models: [
+      {
+        id: AIModelEnum.XFYunLite,
+        name: 'xfyun/lite',
+      },
+      {
+        id: AIModelEnum.XFYun4Ultra,
+        name: 'xfyun/4-ultra',
+      },
     ],
   },
 };

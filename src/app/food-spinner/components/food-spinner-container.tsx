@@ -182,7 +182,7 @@ export function FoodSpinnerContainer() {
   // 渲染地图初始化中的骨架屏
   const renderMapInitializingSkeleton = () => (
     <>
-      <Loading fullPage text="地图插件加载中..." />
+      <Loading overlay text="地图插件加载中..." />
       {/* 位置信息骨架屏 */}
       <div className="col-span-1 lg:col-span-2">
         <Card className="p-4">
