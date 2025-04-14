@@ -10,7 +10,7 @@ import { useAIAssistant } from '../hooks';
 import { Loading } from '@/components/ui/loading';
 import { ConversationSidebar } from './ConversationSidebar';
 import { ConversationHeader } from './ConversationHeader';
-import { MessageList } from './MessageList';
+import { MessageList } from './message-list';
 import { ChatInput } from './ChatInput';
 import { useEffect } from 'react';
 
