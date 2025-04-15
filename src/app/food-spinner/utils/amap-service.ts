@@ -4,8 +4,8 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 import { WeatherInfo } from '../types';
 
 // 从环境变量获取高德地图API密钥
-const API_KEY = process.env.NEXT_PUBLIC_AMAP_KEY || '';
-const SECURITY_KEY = process.env.NEXT_PUBLIC_AMAP_SECRET || '';
+const API_KEY = process.env._AMAP_KEY || '';
+const SECURITY_KEY = process.env.AMAP_SECRET || '';
 
 // 为Window添加高德地图安全配置接口
 declare global {
