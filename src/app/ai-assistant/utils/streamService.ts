@@ -273,26 +273,25 @@ async function executeStreamRequest({
       signal: abortController.signal,
       openWhenHidden: true,
 
-      // fetchEventSource默认会重试，我们通过以下方式禁用重试
-      // 方式1: 当发生错误时立即抛出
       onerror: (error) => {
-        console.log('error:', error);
+        console.log('onerror triggered:', error);
         if (isAborted.value) {
           console.log('请求已中止，忽略错误:', conversationId);
-          throw error; // 终止连接
+          throw error;
         }
 
-        // 直接处理错误并停止连接
-        handleStreamError({
-          error,
-          setStreamingState,
-          setConversations,
-          conversationId,
-          onComplete,
-        });
-
-        // 抛出错误以终止连接
-        throw error;
+        try {
+          handleStreamError({
+            error,
+            setStreamingState,
+            setConversations,
+            conversationId,
+            onComplete,
+          });
+        } catch (fatalError) {
+          console.log('Caught FatalStreamError, rethrowing to stop retries.');
+          throw fatalError;
+        }
       },
 
       onmessage: (event) => {
@@ -345,15 +344,17 @@ async function executeStreamRequest({
       },
     });
   } catch (error) {
-    // 只处理非中止导致的错误
-    if (!isAborted.value) {
-      handleStreamError({
-        error: error as Error,
-        setStreamingState,
-        setConversations,
-        conversationId,
-        onComplete,
-      });
+    if (
+      !isAborted.value &&
+      !(error instanceof Error && error.message === 'FatalStreamError')
+    ) {
+      console.error('Unhandled error during stream execution:', error);
+    } else if (error instanceof Error && error.message === 'FatalStreamError') {
+      console.log(
+        'FatalStreamError caught outside fetchEventSource, stopping.',
+      );
+    } else {
+      console.log('Stream aborted or error already handled.');
     }
   }
 }
@@ -521,4 +522,6 @@ function handleStreamError({
     console.log('因错误调用流完成回调:', conversationId);
     onComplete(conversationId);
   }
+
+  throw new Error('FatalStreamError');
 }

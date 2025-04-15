@@ -60,7 +60,27 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     return createStreamResponse(stream);
   } catch (error) {
     console.error('AI API调用错误:', error);
-    throw error;
+
+    // Extract status and message from OpenAI error if possible
+    let status = 500;
+    let message = '调用 AI 服务时发生未知错误。';
+
+    if (error instanceof OpenAI.APIError) {
+      status = error.status || 500;
+      message = error.message; // Use the specific message from OpenAI
+      // You might want to log error.type or error.code as well
+      console.error(
+        `OpenAI API Error: Status ${status}, Message: ${message}, Type: ${error.type}, Code: ${error.code}`,
+      );
+    } else if (error instanceof Error) {
+      message = error.message; // Use generic error message
+    }
+
+    // 使用 createErrorResponse 返回结构化错误
+    return createErrorResponse({
+      message: message,
+      statusCode: status,
+    });
   }
 });
 
