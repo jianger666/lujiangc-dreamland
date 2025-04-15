@@ -34,6 +34,7 @@ const eslintConfig = [
       'arrow-body-style': 0,
       'prefer-arrow-callback': 0,
       'import/no-anonymous-default-export': 0,
+      '@typescript-eslint/no-explicit-any': 0,
     },
   },
   // 添加API Handler检查规则

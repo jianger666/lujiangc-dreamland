@@ -6,10 +6,10 @@ import {
 } from './response';
 import { HttpStatus } from './httpStatus';
 
-export type ApiHandler<T = unknown> = (
-  req: NextRequest,
-  params?: { params: Record<string, string> },
-) => Promise<Response | T | ApiResponse<T>>;
+// Next.js 15 的路由处理函数类型
+type NextRequestContext = {
+  params: Record<string, string | string[]>;
+};
 
 /**
  * API路由处理包装器
@@ -25,13 +25,15 @@ export type ApiHandler<T = unknown> = (
  *   return createSuccessResponse(data);
  * });
  */
-export function apiHandler<T>(handler: ApiHandler<T>) {
-  return async (
+export function apiHandler<T>(
+  handler: (
     req: NextRequest,
-    params?: { params: Record<string, string> },
-  ) => {
+    ctx?: NextRequestContext,
+  ) => Promise<Response | T | ApiResponse<T>>,
+) {
+  return async function routeHandler(req: NextRequest, ctx: any) {
     try {
-      const result = await handler(req, params);
+      const result = await handler(req, ctx);
 
       // 如果处理函数已经返回了Response对象，则直接返回
       if (result instanceof Response) {
