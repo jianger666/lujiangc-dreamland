@@ -6,36 +6,64 @@ import type {
 } from 'openai/resources';
 
 import { getClientConfigForModel } from './_config';
-import { handleStreamResponse, performWebSearch } from './_utils';
+import {
+  handleStreamResponse,
+  performWebSearch,
+  createStreamErrorResponse,
+} from './_utils';
 import { apiHandler } from '@/lib/api/handler';
-import { createErrorResponse, createStreamResponse } from '@/lib/api/response';
+import { createStreamResponse } from '@/lib/api/response';
 import { AiRoleEnum, Message } from '@/types/ai-assistant';
 
 export const runtime = 'edge';
 
 /**
+ * 统一处理错误并返回流式错误响应
+ * @param error 错误对象或错误消息
+ * @param context 错误上下文描述
+ */
+function handleStreamError(error: unknown, context: string): Response {
+  console.error(`${context}:`, error);
+
+  let errorMessage: string;
+
+  if (error instanceof Error) errorMessage = error.message;
+  else if (typeof error === 'string') errorMessage = error;
+  else errorMessage = `${context}时出错`;
+
+  return createStreamErrorResponse(errorMessage);
+}
+
+/**
  * 处理AI模型请求并返回流式响应
  */
-
 const handleAiRequest = apiHandler(async (req: NextRequest) => {
   const { messages, model, isWebSearchEnabled } = await req.json();
-  // const origin = req.nextUrl.origin; // 不再需要获取 origin
 
+  // 验证输入参数
   if (!model) {
-    return createErrorResponse({
-      message: '没有提供有效的模型',
-    });
+    return handleStreamError('没有提供有效的模型', '参数验证');
   }
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    return createErrorResponse({
-      message: '没有提供有效的消息',
-    });
+    return handleStreamError('没有提供有效的消息', '参数验证');
   }
 
   // 获取客户端配置
-  const clientConfig = getClientConfigForModel(model);
-  const aiClient = new OpenAI(clientConfig);
+  let clientConfig;
+  try {
+    clientConfig = getClientConfigForModel(model);
+  } catch (error) {
+    return handleStreamError(error, '获取AI客户端配置');
+  }
+
+  // 初始化OpenAI客户端
+  let aiClient;
+  try {
+    aiClient = new OpenAI(clientConfig);
+  } catch (error) {
+    return handleStreamError(error, '初始化AI客户端');
+  }
 
   // 准备发送给 AI 的消息数组
   const messagesForAI: Message[] = [...messages];
@@ -45,7 +73,6 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     const userQuery = messages[messages.length - 1]?.content;
     if (typeof userQuery === 'string' && userQuery.trim()) {
       try {
-        // 调用 performWebSearch 时不再传递 origin
         const searchResults = await performWebSearch(userQuery);
         if (searchResults && searchResults.length > 0) {
           // 格式化搜索结果为文本
@@ -69,8 +96,17 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
           console.log('[API Route] Web search returned no usable results.');
         }
       } catch (searchError) {
+        // 捕获搜索错误但不中断整个请求流程
         console.error('[API Route] Web search failed:', searchError);
-        // 搜索失败时，选择性忽略，让 AI 继续处理原始消息
+
+        // 可选：通知用户搜索失败，但继续处理请求
+        const searchErrorMessage =
+          'Web search failed, proceeding with AI response using available context.';
+        messagesForAI.splice(messagesForAI.length - 1, 0, {
+          id: 'system-search-error-' + Date.now(),
+          role: AiRoleEnum.System,
+          content: searchErrorMessage,
+        });
       }
     }
   }
@@ -99,28 +135,7 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     // 返回流式响应
     return createStreamResponse(stream);
   } catch (error) {
-    console.error('AI API调用错误:', error);
-
-    // Extract status and message from OpenAI error if possible
-    let status = 500;
-    let message = '调用 AI 服务时发生未知错误。';
-
-    if (error instanceof OpenAI.APIError) {
-      status = error.status || 500;
-      message = error.message; // Use the specific message from OpenAI
-      // You might want to log error.type or error.code as well
-      console.error(
-        `OpenAI API Error: Status ${status}, Message: ${message}, Type: ${error.type}, Code: ${error.code}`,
-      );
-    } else if (error instanceof Error) {
-      message = error.message; // Use generic error message
-    }
-
-    // 使用 createErrorResponse 返回结构化错误
-    return createErrorResponse({
-      message: message,
-      statusCode: status,
-    });
+    return handleStreamError(error, '调用AI服务');
   }
 });
 

@@ -462,6 +462,19 @@ function handleStreamComplete({
   // 重置状态
   resetStreamingState(setStreamingState, conversationId);
 
+  // 如果当前对话启用了联网搜索，在回答完成后自动关闭它
+  setConversations((currentConversations) =>
+    currentConversations.map((conv) =>
+      conv.id === conversationId && conv.isWebSearchEnabled
+        ? {
+            ...conv,
+            isWebSearchEnabled: false, // 自动关闭联网搜索
+            updatedAt: new Date().toISOString(),
+          }
+        : conv,
+    ),
+  );
+
   // 调用完成回调
   if (onComplete) {
     onComplete(conversationId);
@@ -484,34 +497,12 @@ function handleStreamError({
   conversationId: string;
   onComplete?: (conversationId: string) => void;
 }): void {
-  // 获取用户友好的错误消息
-  let errorMessage = '抱歉，我暂时无法回答您的问题。请稍后再试。';
-
-  // 根据错误类型分类
-  if (
-    error.message.includes('Failed to fetch') ||
-    error.message.includes('network')
-  ) {
-    errorMessage = '网络连接中断。请检查您的网络连接后重试。';
-  } else if (error.message.includes('timeout')) {
-    errorMessage = '连接超时。服务器响应时间过长，请稍后再试。';
-  } else if (error.message.includes('500')) {
-    errorMessage = '服务器内部错误。我们的服务器遇到了问题，技术团队正在处理。';
-  } else if (error.message.includes('429')) {
-    errorMessage = '请求过于频繁。请稍等片刻再发送新的消息。';
-  }
-
-  // 添加错误消息到对话
+  // 直接使用原始错误消息
   const errorContent: Message = {
     id: generateUUID(),
     role: AiRoleEnum.Assistant,
-    content: errorMessage,
+    content: error.message,
   };
-
-  // 在非生产环境添加调试信息
-  if (process.env.NODE_ENV !== 'production') {
-    errorContent.content += `\n\n[调试信息: ${error.message}]`;
-  }
 
   // 添加到对话
   addMessageToConversation({

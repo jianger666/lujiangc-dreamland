@@ -51,7 +51,7 @@ export const API_PROVIDERS: Record<string, APIProviderConfig> = {
   },
   GOOGLE: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    apiKey: process.env.GEMINI_API_KEY,
+    apiKey: process.env.GOOGLE_STUDIO_API_KEY,
     models: [
       { id: AIModelEnum.Gemini25ProExp0325, name: 'gemini-2.5-pro-exp-03-25' },
       { id: AIModelEnum.Gemini20Flash, name: 'gemini-2.0-flash' },

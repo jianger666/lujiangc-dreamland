@@ -39,7 +39,6 @@ async function searchGoogle(query: string): Promise<SearchResult[] | null> {
       console.log(
         `[WebSearch Route] Google search found ${res.data.items.length} results.`,
       );
-      console.log('res.data.items', res.data.items);
       return res.data.items
         .map((item) => ({
           title: item.title || '',
