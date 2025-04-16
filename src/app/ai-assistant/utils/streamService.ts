@@ -366,7 +366,7 @@ async function executeStreamRequest({
 }
 
 /**
- * 中止流式响应
+ * 停止流式响应
  */
 export function stopStreamResponse({
   abortControllerRef,
@@ -383,40 +383,42 @@ export function stopStreamResponse({
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   streamingState: StreamingState;
 }): void {
-  console.log('开始中止流式响应:', conversationId);
-
-  // 立即更新UI状态，避免闪烁
-  updateStreamState({
-    setStreamingState,
-    conversationId,
-    updates: { isLoading: false },
-  });
-
-  try {
-    // 中止请求
-    const controller = abortControllerRef.current[conversationId];
-    if (controller && typeof controller.abort === 'function') {
-      console.log('中止控制器存在，开始中止:', conversationId);
-      controller.abort();
-      abortControllerRef.current[conversationId] = null;
-    } else {
-      console.log('中止控制器不存在或无效，跳过中止:', conversationId);
-    }
-  } catch (e) {
-    console.error('中止请求失败:', e);
-    abortControllerRef.current[conversationId] = null;
+  // 1. 获取并调用AbortController
+  const controller = abortControllerRef.current[conversationId];
+  if (controller) {
+    controller.abort();
+    abortControllerRef.current[conversationId] = null; // 清理引用
   }
 
-  // 将已有的内容添加为中断消息
-  const currentStreamState = streamingState[conversationId];
-  if (currentStreamState?.content) {
-    addInterruptedMessageToConversation({
-      setConversations,
-      conversationId,
-      content: currentStreamState.content,
-      thinking: currentStreamState.thinking,
-    });
+  // 2. 获取当前流状态
+  const currentStream = streamingState[conversationId];
 
+  // 3. 处理中断消息
+  if (currentStream) {
+    if (currentStream.isLoading && !currentStream.content) {
+      // 如果在加载中（无内容）时停止，添加特定中断消息
+      addMessageToConversation({
+        setConversations,
+        conversationId,
+        message: {
+          id: generateUUID(),
+          role: AiRoleEnum.Assistant,
+          content: '[[回答已被中断]]', // 加载时中断的消息
+        },
+      });
+    } else if (currentStream.content) {
+      // 如果在有内容流出时停止，添加包含部分内容的中断消息
+      addInterruptedMessageToConversation({
+        setConversations,
+        conversationId,
+        content: currentStream.content,
+        thinking: currentStream.thinking,
+      });
+    }
+    // 在处理完中断消息后重置状态
+    resetStreamingState(setStreamingState, conversationId);
+  } else {
+    // 如果没有当前流状态（例如，请求从未开始或已完成），也尝试重置以确保清理
     resetStreamingState(setStreamingState, conversationId);
   }
 }

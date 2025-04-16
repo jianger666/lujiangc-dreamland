@@ -151,7 +151,20 @@ export function MessageList() {
     const currentMessages = activeConversation?.messages ?? [];
     setMessages(() => currentMessages);
 
-    if (!activeConversation?.messages.length) {
+    if (currentMessages.length > 0) {
+      const lastMessage = currentMessages[currentMessages.length - 1];
+      // 如果最后一条消息是用户的，则无条件滚动到底部（平滑）
+      if (lastMessage.role === AiRoleEnum.User) {
+        handleScrollToBottom(true);
+      }
+      // 如果最后一条消息是助手的，并且用户没有向上滚动，则滚动到底部（立即）
+      else if (!isUserScrolledUpRef.current) {
+        handleScrollToBottom(false);
+      }
+    }
+
+    // 处理空消息列表的情况
+    if (currentMessages.length === 0) {
       setIsFirstScrollToBottom(true);
       isUserScrolledUpRef.current = false;
       setShowScrollToBottomButton(false);
@@ -160,17 +173,9 @@ export function MessageList() {
     activeConversation?.id,
     activeConversation?.messages,
     activeConversationId,
-    isGenerating,
+    isGenerating, // 保持 isGenerating 作为依赖，以确保流式消息更新时能触发检查
+    handleScrollToBottom,
   ]);
-
-  useEffect(() => {
-    if (
-      messages.length > 0 &&
-      messages[messages.length - 1].role === AiRoleEnum.User
-    ) {
-      handleScrollToBottom(true);
-    }
-  }, [messages.length]);
 
   const itemData = useMemo<ItemData>(
     () => ({
