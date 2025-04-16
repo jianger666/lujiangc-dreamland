@@ -29,16 +29,19 @@ export const useStreamResponse = () => {
       conversationId,
       setConversations,
       onComplete,
+      isWebSearchEnabled,
     }: {
       messages: Message[];
       modelId: string;
       conversationId: string;
       setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
       onComplete: (conversationId: string) => void;
+      isWebSearchEnabled: boolean;
     }) => {
       return startStreamResponseUtil({
         messages,
         modelId,
+        isWebSearchEnabled,
         abortControllerRef: abortControllersRef,
         setStreamingState,
         conversationId,

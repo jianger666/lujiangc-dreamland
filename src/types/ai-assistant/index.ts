@@ -19,6 +19,7 @@ export interface Conversation {
   createdAt: string;
   updatedAt: string;
   hasGeneratedTitle: boolean;
+  isWebSearchEnabled: boolean;
 }
 
 export interface AIModel {

@@ -137,8 +137,8 @@ export function ToggleGroupField<T extends ValueType = string>({
                 // 选中状态样式
                 isPressed &&
                   (isSolidStyle
-                    ? 'border-2 border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
-                    : 'border-2 border-primary bg-primary/10 text-primary hover:bg-primary/20 shadow-sm'),
+                    ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm'
+                    : 'border-primary bg-primary/10 text-primary hover:bg-primary/20 shadow-sm'),
                 // 未选中状态样式
                 !isPressed &&
                   'border border-input bg-background hover:bg-muted hover:text-foreground',

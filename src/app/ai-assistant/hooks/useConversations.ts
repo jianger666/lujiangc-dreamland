@@ -20,6 +20,7 @@ interface UseConversationsProps {
   startStreamResponse: (params: {
     messages: Message[];
     modelId: string;
+    isWebSearchEnabled: boolean;
     abortControllerRef: RefObject<Record<string, AbortController | null>>;
     setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
     conversationId: string;
@@ -221,6 +222,23 @@ export const useConversations = ({
     ],
   );
 
+  // 切换指定对话的联网搜索状态
+  const toggleWebSearch = useCallback((conversationId: string) => {
+    setConversations((currentConversations) =>
+      currentConversations.map((conv) =>
+        conv.id === conversationId
+          ? {
+              ...conv,
+              isWebSearchEnabled: !conv.isWebSearchEnabled, // 状态取反
+              updatedAt: new Date().toISOString(),
+            }
+          : conv,
+      ),
+    );
+    // 注意：这里没有调用 saveConversation，如果需要持久化此状态，
+    // 需要在 conversations 状态变化时（useEffect in Provider）统一保存
+  }, []);
+
   // 发送用户消息并处理AI响应
   const sendMessage = useCallback(
     async (userInput: string, activeConversation?: Conversation) => {
@@ -265,6 +283,7 @@ export const useConversations = ({
         await startStreamResponse({
           messages: optimizedMessages,
           modelId: activeConversation.modelId,
+          isWebSearchEnabled: activeConversation.isWebSearchEnabled,
           abortControllerRef: abortControllersRef,
           setStreamingState,
           conversationId: activeConversationId,
@@ -297,6 +316,7 @@ export const useConversations = ({
     changeModel,
     clearMessages,
     sendMessage,
+    toggleWebSearch,
     cleanupAbortController,
   };
 };

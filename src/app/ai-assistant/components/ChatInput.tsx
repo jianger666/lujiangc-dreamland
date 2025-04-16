@@ -10,31 +10,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Send, StopCircle } from 'lucide-react';
-import { AIModel } from '@/types/ai-assistant';
+import { Send, StopCircle, Wifi } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
+import { useAIAssistant } from '../hooks';
 
 // 定义文本框行数的常量
 const MIN_TEXTAREA_ROWS = 2;
 const MAX_TEXTAREA_ROWS = 10;
 
-interface ChatInputProps {
-  isLoading: boolean;
-  modelId: string;
-  availableModels: AIModel[];
-  onSendMessage: (message: string) => void;
-  onStopResponding: () => void;
-  onChangeModel: (modelId: string) => void;
-}
+export function ChatInput() {
+  const {
+    activeConversation,
+    availableModels,
+    sendMessage,
+    stopResponding,
+    changeModel,
+    toggleWebSearch,
+    currentStreamingState,
+  } = useAIAssistant();
 
-export function ChatInput({
-  isLoading,
-  modelId,
-  availableModels,
-  onSendMessage,
-  onStopResponding,
-  onChangeModel,
-}: ChatInputProps) {
+  const { modelId = '', isWebSearchEnabled = false } = activeConversation || {};
+
+  const isLoading = currentStreamingState.isLoading;
+
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -79,9 +78,9 @@ export function ChatInput({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !activeConversation) return;
 
-    onSendMessage(input);
+    sendMessage(input);
     setInput('');
     // 重置高度
     if (textareaRef.current) {
@@ -137,25 +136,45 @@ export function ChatInput({
           />
 
           <div className="flex items-center justify-between border-border p-2">
-            <Select value={modelId} onValueChange={onChangeModel}>
-              <SelectTrigger className="h-8 w-auto shadow-none focus:ring-0 focus:ring-offset-0">
-                <SelectValue placeholder="选择模型" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableModels.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2">
+              <Select
+                value={modelId}
+                onValueChange={changeModel}
+                disabled={isLoading}
+              >
+                <SelectTrigger className="h-8 w-48 text-xs shadow-none focus:ring-0 focus:ring-offset-0">
+                  <SelectValue placeholder="选择模型" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableModels.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Toggle
+                size="sm"
+                pressed={isWebSearchEnabled}
+                onPressedChange={() =>
+                  activeConversation && toggleWebSearch(activeConversation.id)
+                }
+                disabled={isLoading}
+                className="flex h-8 items-center gap-1 text-xs"
+                variant="outline"
+              >
+                <Wifi />
+                <span>联网搜索</span>
+              </Toggle>
+            </div>
 
             <div className="flex items-center gap-2">
-              {isLoading && onStopResponding && (
+              {isLoading && (
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={onStopResponding}
+                  onClick={stopResponding}
                   className="h-8 w-8 rounded-full p-0"
                   title="停止响应"
                 >

@@ -4,28 +4,28 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Edit, Send, X, Trash2 } from 'lucide-react';
-import { Conversation } from '@/types/ai-assistant';
+import { useAIAssistant } from '../hooks';
 
-interface ConversationHeaderProps {
-  conversation: Conversation;
-  onSaveTitle: (title: string) => void;
-  onClearMessages: () => void;
-}
+export function ConversationHeader() {
+  const {
+    activeConversation,
+    saveEditedTitle: onSaveTitle,
+    clearMessages: onClearMessages,
+  } = useAIAssistant();
 
-export function ConversationHeader({
-  conversation,
-  onSaveTitle,
-  onClearMessages,
-}: ConversationHeaderProps) {
   const [editingTitle, setEditingTitle] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
+  if (!activeConversation) {
+    return null;
+  }
+
   const startEditingTitle = () => {
-    setEditingTitle(conversation.title);
+    setEditingTitle(activeConversation.title);
     setIsEditingTitle(true);
   };
 
-  const saveEditedTitle = () => {
+  const handleSaveEditedTitle = () => {
     if (!editingTitle.trim()) return;
     onSaveTitle(editingTitle);
     setIsEditingTitle(false);
@@ -43,7 +43,7 @@ export function ConversationHeader({
               autoFocus
               maxLength={10}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') saveEditedTitle();
+                if (e.key === 'Enter') handleSaveEditedTitle();
               }}
             />
             <Button
@@ -51,7 +51,7 @@ export function ConversationHeader({
               size="icon"
               title="保存标题"
               className="h-8 w-8"
-              onClick={saveEditedTitle}
+              onClick={handleSaveEditedTitle}
             >
               <Send className="h-4 w-4" />
             </Button>
@@ -67,7 +67,7 @@ export function ConversationHeader({
           </div>
         ) : (
           <>
-            <span className="font-medium">{conversation.title}</span>
+            <span className="font-medium">{activeConversation.title}</span>
             <Button
               variant="ghost"
               title="编辑标题"

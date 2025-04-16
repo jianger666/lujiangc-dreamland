@@ -54,6 +54,7 @@ interface AIAssistantContextType {
   clearMessages: () => void;
   sendMessage: (userInput: string) => Promise<void>;
   stopResponding: () => void;
+  toggleWebSearch: (conversationId: string) => void;
 }
 
 // 创建上下文
@@ -113,6 +114,7 @@ export function AIAssistantProvider({
     changeModel: changeModelBase,
     clearMessages: clearMessagesBase,
     sendMessage: sendMessageBase,
+    toggleWebSearch,
   } = useConversations({
     abortControllersRef,
     removePendingTitleGeneration,
@@ -319,6 +321,7 @@ export function AIAssistantProvider({
       clearMessages,
       sendMessage,
       stopResponding,
+      toggleWebSearch,
     }),
     [
       conversations,
@@ -338,6 +341,7 @@ export function AIAssistantProvider({
       clearMessages,
       sendMessage,
       stopResponding,
+      toggleWebSearch,
     ],
   );
 

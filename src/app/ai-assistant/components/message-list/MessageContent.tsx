@@ -44,6 +44,9 @@ export function MessageContent({
   }, []);
 
   const MarkdownComponents: Components = {
+    a(props) {
+      return <a target="_blank" {...props} />;
+    },
     table({ className, ...rest }) {
       return <table className={cn(className, 'border-collapse')} {...rest} />;
     },

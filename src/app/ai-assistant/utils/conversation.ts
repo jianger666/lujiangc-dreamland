@@ -29,6 +29,7 @@ export function createNewConversation({
     createdAt: now,
     updatedAt: now,
     hasGeneratedTitle: false,
+    isWebSearchEnabled: false,
   };
 }
 

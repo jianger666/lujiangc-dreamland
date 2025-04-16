@@ -9,23 +9,6 @@ import { AIModelEnum, APIProviderConfig, AIModel } from '@/types/ai-assistant';
  * AI 服务提供商配置
  */
 export const API_PROVIDERS: Record<string, APIProviderConfig> = {
-  DEEPSEEK: {
-    baseURL: 'https://a.henhuoai.com/v1',
-    apiKey: process.env.HENHUO_API_KEY,
-    models: [
-      { id: AIModelEnum.DeepSeekV30324, name: 'DeepSeek-V3-0324' },
-      { id: AIModelEnum.DeepSeekR1, name: 'DeepSeek-R1' },
-    ],
-  },
-  GOOGLE: {
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    apiKey: process.env.GEMINI_API_KEY,
-    models: [
-      { id: AIModelEnum.Gemini25ProExp0325, name: 'gemini-2.5-pro-exp-03-25' },
-      { id: AIModelEnum.Gemini20Flash, name: 'gemini-2.0-flash' },
-      { id: AIModelEnum.Gemini15ProLatest, name: 'gemini-1.5-pro-latest' },
-    ],
-  },
   OPENROUTER: {
     baseURL: 'https://openrouter.ai/api/v1',
     apiKey: process.env.OPENROUTER_API_KEY,
@@ -56,6 +39,23 @@ export const API_PROVIDERS: Record<string, APIProviderConfig> = {
         id: AIModelEnum.XFYun4Ultra,
         name: 'xfyun/4-ultra',
       },
+    ],
+  },
+  DEEPSEEK: {
+    baseURL: 'https://a.henhuoai.com/v1',
+    apiKey: process.env.HENHUO_API_KEY,
+    models: [
+      { id: AIModelEnum.DeepSeekV30324, name: 'DeepSeek-V3-0324' },
+      { id: AIModelEnum.DeepSeekR1, name: 'DeepSeek-R1' },
+    ],
+  },
+  GOOGLE: {
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: process.env.GEMINI_API_KEY,
+    models: [
+      { id: AIModelEnum.Gemini25ProExp0325, name: 'gemini-2.5-pro-exp-03-25' },
+      { id: AIModelEnum.Gemini20Flash, name: 'gemini-2.0-flash' },
+      { id: AIModelEnum.Gemini15ProLatest, name: 'gemini-1.5-pro-latest' },
     ],
   },
 };

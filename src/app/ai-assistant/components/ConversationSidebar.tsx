@@ -4,17 +4,9 @@ import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, LoaderCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Conversation, StreamingState } from '@/types/ai-assistant';
+import { Conversation } from '@/types/ai-assistant';
 import dayjs from 'dayjs';
-
-interface ConversationSidebarProps {
-  conversations: Conversation[];
-  activeConversationId: string;
-  streamingState: StreamingState;
-  onAddConversation: () => void;
-  onDeleteConversation: (id: string) => void;
-  onSelectConversation: (id: string) => void;
-}
+import { useAIAssistant } from '../hooks';
 
 // 会话项组件
 const ConversationItem = memo(
@@ -72,59 +64,59 @@ const ConversationItem = memo(
 
 ConversationItem.displayName = 'ConversationItem';
 
-export const ConversationSidebar = memo(
-  ({
+export const ConversationSidebar = memo(() => {
+  const {
     conversations,
     activeConversationId,
     streamingState,
-    onAddConversation,
-    onDeleteConversation,
-    onSelectConversation,
-  }: ConversationSidebarProps) => {
-    return (
-      <div className="flex h-full w-full flex-shrink-0 flex-col border-r border-border md:w-64">
-        <div className="flex flex-shrink-0 items-center border-b border-border p-3">
-          <div className="flex w-full items-center justify-between">
-            <h3 className="font-medium">对话列表</h3>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onAddConversation}
-              title="新建对话"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+    addNewConversation,
+    deleteConversation,
+    setActiveConversationId,
+  } = useAIAssistant();
 
-        <div className="h-0 flex-1 overflow-y-auto p-3">
-          <div className="space-y-2">
-            {conversations.map((conversation) => {
-              const isLoading = Boolean(
-                streamingState[conversation.id]?.isLoading,
-              );
-              const isActive = activeConversationId === conversation.id;
-
-              return (
-                <ConversationItem
-                  key={conversation.id}
-                  conversation={conversation}
-                  isActive={isActive}
-                  isLoading={isLoading}
-                  onSelect={() => onSelectConversation(conversation.id)}
-                  onDelete={(e) => {
-                    e.stopPropagation();
-                    onDeleteConversation(conversation.id);
-                  }}
-                />
-              );
-            })}
-          </div>
+  return (
+    <div className="flex h-full w-full flex-shrink-0 flex-col border-r border-border md:w-64">
+      <div className="flex flex-shrink-0 items-center border-b border-border p-3">
+        <div className="flex w-full items-center justify-between">
+          <h3 className="font-medium">对话列表</h3>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={addNewConversation}
+            title="新建对话"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
       </div>
-    );
-  },
-);
+
+      <div className="h-0 flex-1 overflow-y-auto p-3">
+        <div className="space-y-2">
+          {conversations.map((conversation) => {
+            const isLoading = Boolean(
+              streamingState[conversation.id]?.isLoading,
+            );
+            const isActive = activeConversationId === conversation.id;
+
+            return (
+              <ConversationItem
+                key={conversation.id}
+                conversation={conversation}
+                isActive={isActive}
+                isLoading={isLoading}
+                onSelect={() => setActiveConversationId(conversation.id)}
+                onDelete={(e) => {
+                  e.stopPropagation();
+                  deleteConversation(conversation.id);
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+});
 
 ConversationSidebar.displayName = 'ConversationSidebar';
