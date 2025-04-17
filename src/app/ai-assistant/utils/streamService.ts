@@ -18,6 +18,9 @@ import {
  * - 流完成后的回调
  */
 
+// 统一的中断标记后缀
+export const INTERRUPTED_SUFFIX = '[回答已被中断]';
+
 // ===== 状态更新相关函数 =====
 
 /**
@@ -164,7 +167,7 @@ export function addInterruptedMessageToConversation({
   const newMessage: Message = {
     id: generateUUID(),
     role: AiRoleEnum.Assistant,
-    content: content + '\n\n[回答已被中断]',
+    content: (content || '') + '\n\n' + INTERRUPTED_SUFFIX, // 保证即使 content 为空也能正确添加后缀
     ...(thinking ? { thinking } : {}),
   };
 
@@ -393,34 +396,19 @@ export function stopStreamResponse({
   // 2. 获取当前流状态
   const currentStream = streamingState[conversationId];
 
-  // 3. 处理中断消息
-  if (currentStream) {
-    if (currentStream.isLoading && !currentStream.content) {
-      // 如果在加载中（无内容）时停止，添加特定中断消息
-      addMessageToConversation({
-        setConversations,
-        conversationId,
-        message: {
-          id: generateUUID(),
-          role: AiRoleEnum.Assistant,
-          content: '[[回答已被中断]]', // 加载时中断的消息
-        },
-      });
-    } else if (currentStream.content) {
-      // 如果在有内容流出时停止，添加包含部分内容的中断消息
-      addInterruptedMessageToConversation({
-        setConversations,
-        conversationId,
-        content: currentStream.content,
-        thinking: currentStream.thinking,
-      });
-    }
-    // 在处理完中断消息后重置状态
-    resetStreamingState(setStreamingState, conversationId);
-  } else {
-    // 如果没有当前流状态（例如，请求从未开始或已完成），也尝试重置以确保清理
-    resetStreamingState(setStreamingState, conversationId);
+  // 3. 处理中断消息 - 统一调用 addInterruptedMessageToConversation
+  if (currentStream && currentStream.isLoading) {
+    // 只有在确实处于加载状态时才添加中断消息
+    addInterruptedMessageToConversation({
+      setConversations,
+      conversationId,
+      content: currentStream.content || '', // 传递当前内容，如果为空则传递空字符串
+      thinking: currentStream.thinking,
+    });
   }
+
+  // 4. 无论如何都重置流状态以确保清理
+  resetStreamingState(setStreamingState, conversationId);
 }
 
 // ===== 辅助函数 =====
@@ -523,4 +511,39 @@ function handleStreamError({
   }
 
   throw new Error('FatalStreamError');
+}
+
+/**
+ * 同步生成包含中断标记的新对话数组 (用于 beforeunload)
+ * 注意：此函数不修改原始数组，也不执行 React 状态更新
+ */
+export function generateInterruptedConversations(
+  conversations: Conversation[],
+  streamingState: StreamingState,
+): Conversation[] {
+  // 使用 map 创建新数组，避免直接修改状态
+  return conversations.map((conv) => {
+    const currentStream = streamingState[conv.id];
+    if (currentStream && currentStream.isLoading) {
+      // 如果该对话正在加载中，添加中断消息
+      const currentStreamContent = currentStream.content || '';
+      const currentStreamThinking = currentStream.thinking || '';
+
+      const newMessage: Message = {
+        id: generateUUID(),
+        role: AiRoleEnum.Assistant,
+        content: currentStreamContent + INTERRUPTED_SUFFIX,
+        ...(currentStreamThinking ? { thinking: currentStreamThinking } : {}),
+      };
+
+      // 返回修改后的对话副本
+      return {
+        ...conv,
+        messages: [...conv.messages, newMessage],
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    // 如果没有在加载，返回原始对话
+    return conv;
+  });
 }

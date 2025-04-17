@@ -33,10 +33,13 @@ export function MessageList() {
   const { currentStreamingState, activeConversation, activeConversationId } =
     useAIAssistant();
 
-  const streamingMessage: StreamingMessage = {
-    content: currentStreamingState.content,
-    thinking: currentStreamingState.thinking,
-  };
+  const streamingMessage: StreamingMessage = useMemo(
+    () => ({
+      content: currentStreamingState.content,
+      thinking: currentStreamingState.thinking,
+    }),
+    [currentStreamingState],
+  );
   const isLoading = currentStreamingState.isLoading;
 
   const listRef = useRef<VariableSizeList>(null);
@@ -47,6 +50,11 @@ export function MessageList() {
   const isUserScrolledUpRef = useRef(false);
   const [showScrollToBottomButton, setShowScrollToBottomButton] =
     useState(false);
+
+  const debouncedSetShowScrollToBottomButton = useDebouncedCallback(
+    setShowScrollToBottomButton,
+    50,
+  );
 
   const isGenerating = useMemo(
     () => !!streamingMessage.content || !!streamingMessage.thinking,
@@ -132,12 +140,12 @@ export function MessageList() {
         const isNearBottomForButton =
           scrollHeight - scrollTop - clientHeight < BUTTON_SHOW_THRESHOLD;
 
-        setShowScrollToBottomButton(!isNearBottomForButton);
+        debouncedSetShowScrollToBottomButton(!isNearBottomForButton);
 
         isUserScrolledUpRef.current = !isNearBottomForAutoScroll;
       }
     },
-    [],
+    [debouncedSetShowScrollToBottomButton],
   );
 
   useEffect(() => {

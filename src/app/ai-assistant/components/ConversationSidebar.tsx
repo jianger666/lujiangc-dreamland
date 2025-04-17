@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, LoaderCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -74,6 +74,15 @@ export const ConversationSidebar = memo(() => {
     setActiveConversationId,
   } = useAIAssistant();
 
+  // 按创建时间降序（最新在前）排序对话列表
+  const sortedConversations = useMemo(() => {
+    return [...conversations].sort((a, b) => {
+      const dateA = a.createdAt ? dayjs(a.createdAt).unix() : 0;
+      const dateB = b.createdAt ? dayjs(b.createdAt).unix() : 0;
+      return dateB - dateA; // 降序排序
+    });
+  }, [conversations]);
+
   return (
     <div className="flex h-full w-full flex-shrink-0 flex-col border-r border-border md:w-64">
       <div className="flex flex-shrink-0 items-center border-b border-border p-3">
@@ -93,7 +102,7 @@ export const ConversationSidebar = memo(() => {
 
       <div className="h-0 flex-1 overflow-y-auto p-3">
         <div className="space-y-2">
-          {conversations.map((conversation) => {
+          {sortedConversations.map((conversation) => {
             const isLoading = Boolean(
               streamingState[conversation.id]?.isLoading,
             );
