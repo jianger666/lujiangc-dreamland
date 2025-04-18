@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Send, StopCircle, Wifi } from 'lucide-react';
+import { Send, StopCircle, Globe } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
 import { useAIAssistant } from '../hooks';
@@ -164,7 +164,7 @@ export function ChatInput() {
                 className="flex h-7 items-center gap-1 text-xs md:h-8"
                 variant="outline"
               >
-                <Wifi className="h-4 w-4" />
+                <Globe className="h-4 w-4" />
                 <span className="hidden md:inline-block">联网搜索</span>
               </Toggle>
             </div>

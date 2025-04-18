@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Edit, Send, X, Trash2, Menu } from 'lucide-react';
+import { Edit, Send, X, Menu, Paintbrush } from 'lucide-react';
 import { useAIAssistant } from '../hooks';
 
 export function ConversationHeader() {
@@ -98,7 +98,7 @@ export function ConversationHeader() {
         onClick={clearMessages}
         title="清空对话"
       >
-        <Trash2 className="h-4 w-4" />
+        <Paintbrush className="h-4 w-4" />
         <span className="ml-1 hidden md:inline-block">清空对话</span>
       </Button>
     </div>
