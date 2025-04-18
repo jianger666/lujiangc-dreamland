@@ -38,7 +38,6 @@ export const ConversationSidebar = memo(() => {
       onSelect={handleSelectConversation}
       onDelete={deleteConversation}
       onAddNew={addNewConversation}
-      onClose={() => changeSidebarOpen(false)}
     />
   );
 
@@ -57,7 +56,7 @@ export const ConversationSidebar = memo(() => {
         >
           <SheetContent
             side="left"
-            className="w-[80%] max-w-[300px] p-0 sm:max-w-xs [&>button]:hidden"
+            className="w-[80%] max-w-[300px] p-0 sm:max-w-xs"
           >
             <div className="flex h-full flex-col">
               <SheetHeader className="px-0">

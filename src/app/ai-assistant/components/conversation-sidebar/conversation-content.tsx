@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+import { Plus, MessageSquarePlus, MessageCirclePlus } from 'lucide-react';
 import { Conversation } from '@/types/ai-assistant';
 import dayjs from 'dayjs';
 import { ConversationItem } from './conversation-item';
@@ -17,7 +17,6 @@ export const ConversationContent = memo(
     onSelect,
     onDelete,
     onAddNew,
-    onClose,
   }: {
     conversations: Conversation[];
     activeConversationId: string | null;
@@ -25,7 +24,6 @@ export const ConversationContent = memo(
     onSelect: (id: string) => void;
     onDelete: (id: string) => void;
     onAddNew: () => void;
-    onClose?: () => void;
   }) => {
     // 按创建时间降序（最新在前）排序对话列表
     const sortedConversations = useMemo(() => {
@@ -79,30 +77,10 @@ export const ConversationContent = memo(
     return (
       <>
         <div className="flex flex-shrink-0 items-center justify-between border-b border-border p-3">
-          <h3 className="font-medium">对话列表</h3>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onAddNew}
-              title="新建对话"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            {/* 移动端关闭按钮 - 仅在Sheet中的静态侧边栏显示 */}
-            {onClose && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 md:hidden"
-                onClick={onClose}
-                title="关闭菜单"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <Button variant="ghost" onClick={onAddNew} title="新建对话">
+            <MessageCirclePlus />
+            <span>新建对话</span>
+          </Button>
         </div>
 
         <div className="flex-1 p-3">
