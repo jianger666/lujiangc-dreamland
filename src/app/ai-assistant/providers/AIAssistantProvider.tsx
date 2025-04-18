@@ -105,6 +105,7 @@ interface AIAssistantContextType {
   availableModels: AIModel[];
   isInitialized: boolean; // 标记初始化是否完成
   streamingState: StreamingState; // 各对话的流式响应状态
+  sidebarOpen: boolean; // 侧边栏是否打开状态
 
   // 计算属性
   activeConversation: Conversation | undefined; // 当前激活的对话对象
@@ -134,6 +135,7 @@ interface AIAssistantContextType {
   sendMessage: (userInput: string) => Promise<void>; // 发送消息
   stopResponding: () => void; // 停止当前对话的响应生成
   toggleWebSearch: (conversationId: string) => void; // 切换联网搜索状态
+  changeSidebarOpen: (e: boolean) => void; // 切换侧边栏打开/关闭状态
 }
 
 // 创建上下文
@@ -153,6 +155,10 @@ export function AIAssistantProvider({
 }) {
   // 页面初始化状态标记
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // 添加侧边栏控制状态
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const changeSidebarOpen = useCallback((e: boolean) => setSidebarOpen(e), []);
 
   // 使用自定义hooks管理流式响应
   const {
@@ -435,6 +441,7 @@ export function AIAssistantProvider({
       availableModels,
       isInitialized,
       streamingState,
+      sidebarOpen,
 
       // 计算属性
       activeConversation,
@@ -452,6 +459,7 @@ export function AIAssistantProvider({
       sendMessage,
       stopResponding,
       toggleWebSearch,
+      changeSidebarOpen,
     }),
     [
       // 依赖列表包含了所有上下文值中使用的变量和函数
@@ -460,6 +468,7 @@ export function AIAssistantProvider({
       availableModels,
       isInitialized,
       streamingState,
+      sidebarOpen,
       activeConversation,
       currentStreamingState,
       hasModels,
@@ -473,6 +482,7 @@ export function AIAssistantProvider({
       sendMessage,
       stopResponding,
       toggleWebSearch,
+      changeSidebarOpen,
     ],
   );
 
@@ -506,6 +516,18 @@ export function AIAssistantProvider({
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []); // 空依赖数组确保只在挂载和卸载时运行
+
+  // 如果没有活跃对话，自动创建一个新对话
+  useEffect(() => {
+    if (isInitialized && !activeConversation && conversations.length === 0) {
+      addNewConversation();
+    }
+  }, [
+    isInitialized,
+    activeConversation,
+    conversations.length,
+    addNewConversation,
+  ]);
 
   // 渲染上下文提供者，包裹子组件
   return (

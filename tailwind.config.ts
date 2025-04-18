@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import typography from '@tailwindcss/typography';
+import { SCREEN_BREAKPOINTS } from './src/consts/breakpoints';
 
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
@@ -9,14 +10,7 @@ const config: Config = {
     container: {
       center: true,
       padding: '2rem',
-      screens: {
-        xs: '480px',
-        sm: '640px',
-        md: '768px',
-        lg: '1024px',
-        xl: '1280px',
-        '2xl': '1400px',
-      },
+      screens: SCREEN_BREAKPOINTS,
     },
     extend: {
       // 重置一下行高，noto sans sc在正常行高下，展示不全

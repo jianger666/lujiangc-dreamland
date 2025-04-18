@@ -104,7 +104,7 @@ export function ChatInput() {
   };
 
   return (
-    <div className="border-t border-border p-4">
+    <div className="border-t border-border p-3 md:p-4">
       <form onSubmit={handleSubmit}>
         <div
           className={cn(
@@ -136,13 +136,13 @@ export function ChatInput() {
           />
 
           <div className="flex items-center justify-between border-border p-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1 md:gap-2">
               <Select
                 value={modelId}
                 onValueChange={changeModel}
                 disabled={isLoading}
               >
-                <SelectTrigger className="h-8 w-48 text-xs shadow-none focus:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="h-7 w-32 text-xs shadow-none focus:ring-0 focus:ring-offset-0 md:h-8 md:w-36">
                   <SelectValue placeholder="选择模型" />
                 </SelectTrigger>
                 <SelectContent>
@@ -161,33 +161,33 @@ export function ChatInput() {
                   activeConversation && toggleWebSearch(activeConversation.id)
                 }
                 disabled={isLoading}
-                className="flex h-8 items-center gap-1 text-xs"
+                className="flex h-7 items-center gap-1 text-xs md:h-8"
                 variant="outline"
               >
-                <Wifi />
-                <span>联网搜索</span>
+                <Wifi className="h-4 w-4" />
+                <span className="hidden md:inline-block">联网搜索</span>
               </Toggle>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
               {isLoading && (
                 <Button
                   type="button"
                   variant="destructive"
                   onClick={stopResponding}
-                  className="h-8 w-8 rounded-full p-0"
+                  className="h-7 w-7 rounded-full p-0 md:h-8 md:w-8"
                   title="停止响应"
                 >
-                  <StopCircle className="h-4 w-4" />
+                  <StopCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 </Button>
               )}
               <Button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="h-8 w-8 rounded-full p-0"
+                className="h-7 w-7 rounded-full p-0 md:h-8 md:w-8"
                 title="发送消息"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </Button>
             </div>
           </div>

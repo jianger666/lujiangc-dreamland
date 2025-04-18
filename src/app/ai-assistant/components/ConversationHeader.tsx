@@ -3,14 +3,15 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Edit, Send, X, Trash2 } from 'lucide-react';
+import { Edit, Send, X, Trash2, Menu } from 'lucide-react';
 import { useAIAssistant } from '../hooks';
 
 export function ConversationHeader() {
   const {
     activeConversation,
-    saveEditedTitle: onSaveTitle,
-    clearMessages: onClearMessages,
+    saveEditedTitle,
+    clearMessages,
+    changeSidebarOpen,
   } = useAIAssistant();
 
   const [editingTitle, setEditingTitle] = useState('');
@@ -27,19 +28,29 @@ export function ConversationHeader() {
 
   const handleSaveEditedTitle = () => {
     if (!editingTitle.trim()) return;
-    onSaveTitle(editingTitle);
+    saveEditedTitle(editingTitle);
     setIsEditingTitle(false);
   };
 
   return (
     <div className="flex items-center justify-between border-b border-border p-3">
       <div className="flex items-center space-x-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="mr-2 h-8 w-8 md:hidden"
+          onClick={() => changeSidebarOpen(true)}
+          title="菜单"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+
         {isEditingTitle ? (
           <div className="flex items-center space-x-2">
             <Input
               value={editingTitle}
               onChange={(e) => setEditingTitle(e.target.value)}
-              className="h-8 w-48"
+              className="h-8 w-32 md:w-48"
               autoFocus
               maxLength={10}
               onKeyDown={(e) => {
@@ -84,11 +95,11 @@ export function ConversationHeader() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={onClearMessages}
+        onClick={clearMessages}
         title="清空对话"
       >
         <Trash2 className="h-4 w-4" />
-        清空对话
+        <span className="ml-1 hidden md:inline-block">清空对话</span>
       </Button>
     </div>
   );

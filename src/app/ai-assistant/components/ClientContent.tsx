@@ -8,34 +8,13 @@
 
 import { useAIAssistant } from '../hooks';
 import { Loading } from '@/components/ui/loading';
-import { ConversationSidebar } from './ConversationSidebar';
+import { ConversationSidebar } from './conversation-sidebar';
 import { ConversationHeader } from './ConversationHeader';
 import { MessageList } from './message-list';
 import { ChatInput } from './ChatInput';
-import { useEffect } from 'react';
 
 export function ClientContent() {
-  const {
-    // 状态
-    conversations,
-    activeConversation,
-    isInitialized,
-
-    // 方法
-    addNewConversation,
-  } = useAIAssistant();
-
-  // 如果没有活跃对话，自动创建一个新对话
-  useEffect(() => {
-    if (isInitialized && !activeConversation && conversations.length === 0) {
-      addNewConversation();
-    }
-  }, [
-    isInitialized,
-    activeConversation,
-    conversations.length,
-    addNewConversation,
-  ]);
+  const { activeConversation, isInitialized } = useAIAssistant();
 
   // ==== 页面渲染 ====
   return (

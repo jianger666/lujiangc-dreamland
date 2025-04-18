@@ -17,7 +17,7 @@ export default function AIAssistantLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex h-full flex-col overflow-hidden">
+    <section className="flex h-full w-full flex-col overflow-hidden">
       {children}
     </section>
   );
