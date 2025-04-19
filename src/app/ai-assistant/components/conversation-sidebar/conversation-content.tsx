@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, MessageSquarePlus, MessageCirclePlus } from 'lucide-react';
+import { MessageCirclePlus } from 'lucide-react';
 import { Conversation } from '@/types/ai-assistant';
 import dayjs from 'dayjs';
 import { ConversationItem } from './conversation-item';
