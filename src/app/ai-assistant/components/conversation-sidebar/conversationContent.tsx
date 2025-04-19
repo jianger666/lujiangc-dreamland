@@ -3,11 +3,13 @@
 import React, { memo, useMemo, CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCirclePlus } from 'lucide-react';
+import { PanelLeftClose } from 'lucide-react';
 import { Conversation } from '@/types/ai-assistant';
 import dayjs from 'dayjs';
-import { ConversationItem } from './conversation-item';
+import { ConversationItem } from './conversationItem';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { cn } from '@/lib';
 
 // Define types for itemData
 interface ConversationRowData {
@@ -66,6 +68,9 @@ export const ConversationContent = memo(
     onSelect,
     onDelete,
     onAddNew,
+    desktopSidebarOpen,
+    changeDesktopSidebarOpen,
+    isDesktop,
   }: {
     conversations: Conversation[];
     activeConversationId: string | null;
@@ -73,6 +78,9 @@ export const ConversationContent = memo(
     onSelect: (id: string) => void;
     onDelete: (id: string) => void;
     onAddNew: () => void;
+    desktopSidebarOpen: boolean;
+    changeDesktopSidebarOpen: (open: boolean) => void;
+    isDesktop: boolean;
   }) => {
     // 按创建时间降序（最新在前）排序对话列表
     const sortedConversations = useMemo(() => {
@@ -109,12 +117,24 @@ export const ConversationContent = memo(
     );
 
     return (
-      <>
+      <div className="flex h-full flex-col">
         <div className="flex flex-shrink-0 items-center justify-between border-b border-border p-3">
           <Button variant="ghost" onClick={onAddNew} title="新建对话">
             <MessageCirclePlus />
             <span>新建对话</span>
           </Button>
+
+          {isDesktop && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => changeDesktopSidebarOpen(!desktopSidebarOpen)}
+              title="收起侧边栏"
+              className={cn(desktopSidebarOpen ? 'flex' : 'hidden')}
+            >
+              <PanelLeftClose />
+            </Button>
+          )}
         </div>
 
         <div className="flex-1 p-3">
@@ -143,7 +163,7 @@ export const ConversationContent = memo(
             </div>
           )}
         </div>
-      </>
+      </div>
     );
   },
 );

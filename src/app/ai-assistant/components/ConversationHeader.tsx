@@ -3,19 +3,24 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Edit, Send, X, Menu, Paintbrush } from 'lucide-react';
+import { Edit, Send, X, Menu, Paintbrush, PanelLeftOpen } from 'lucide-react';
 import { useAIAssistant } from '../hooks';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { cn } from '@/lib';
 
 export function ConversationHeader() {
   const {
     activeConversation,
     saveEditedTitle,
     clearMessages,
-    changeSidebarOpen,
+    changeMobileSidebarOpen,
+    changeDesktopSidebarOpen,
+    desktopSidebarOpen,
   } = useAIAssistant();
 
   const [editingTitle, setEditingTitle] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const isDesktop = useBreakpoint('md');
 
   if (!activeConversation) {
     return null;
@@ -35,15 +40,28 @@ export function ConversationHeader() {
   return (
     <div className="flex items-center justify-between border-b border-border p-3">
       <div className="flex items-center space-x-2">
+        {/* 移动端打开侧边栏按钮 */}
         <Button
           variant="ghost"
           size="icon"
-          className="mr-2 h-8 w-8 md:hidden"
-          onClick={() => changeSidebarOpen(true)}
-          title="菜单"
+          className="md:hidden"
+          onClick={() => changeMobileSidebarOpen(true)}
+          title="展开侧边栏"
         >
-          <Menu className="h-4 w-4" />
+          <Menu />
         </Button>
+        {/* 桌面端打开侧边栏按钮 */}
+        {isDesktop && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(desktopSidebarOpen ? 'hidden' : 'flex')}
+            onClick={() => changeDesktopSidebarOpen(true)}
+            title="展开侧边栏"
+          >
+            <PanelLeftOpen />
+          </Button>
+        )}
 
         {isEditingTitle ? (
           <div className="flex items-center space-x-2">

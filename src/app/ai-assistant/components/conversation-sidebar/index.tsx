@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { ConversationContent } from './conversation-content';
+import { ConversationContent } from './conversationContent';
 
 export const ConversationSidebar = memo(() => {
   const {
@@ -19,8 +19,10 @@ export const ConversationSidebar = memo(() => {
     addNewConversation,
     deleteConversation,
     setActiveConversationId,
-    changeSidebarOpen,
-    sidebarOpen,
+    changeMobileSidebarOpen,
+    mobileSidebarOpen,
+    desktopSidebarOpen,
+    changeDesktopSidebarOpen,
   } = useAIAssistant();
 
   const isDesktop = useBreakpoint('md');
@@ -28,9 +30,9 @@ export const ConversationSidebar = memo(() => {
   const handleSelectConversation = useCallback(
     (conversationId: string) => {
       setActiveConversationId(conversationId);
-      if (!isDesktop) changeSidebarOpen(false);
+      if (!isDesktop) changeMobileSidebarOpen(false);
     },
-    [isDesktop, setActiveConversationId, changeSidebarOpen],
+    [isDesktop, setActiveConversationId, changeMobileSidebarOpen],
   );
 
   const handleDeleteConversation = useCallback(
@@ -52,21 +54,26 @@ export const ConversationSidebar = memo(() => {
       onSelect={handleSelectConversation}
       onDelete={handleDeleteConversation}
       onAddNew={handleAddNewConversation}
+      desktopSidebarOpen={desktopSidebarOpen}
+      changeDesktopSidebarOpen={changeDesktopSidebarOpen}
+      isDesktop={isDesktop}
     />
   );
 
   return (
     <>
       {isDesktop ? (
-        // 桌面端静态侧边栏
-        <div className="flex h-full w-64 flex-shrink-0 flex-col border-r border-border bg-background">
-          {Content}
+        <div
+          className={`flex h-full flex-shrink-0 flex-col border-r border-border bg-background transition-all duration-300 ease-in-out ${
+            desktopSidebarOpen ? 'w-64' : 'w-0'
+          }`}
+        >
+          <div className="flex-1 overflow-hidden">{Content}</div>
         </div>
       ) : (
-        // 移动端使用Sheet组件
         <Sheet
-          open={sidebarOpen}
-          onOpenChange={(open) => changeSidebarOpen(open)}
+          open={mobileSidebarOpen}
+          onOpenChange={(open) => changeMobileSidebarOpen(open)}
         >
           <SheetContent
             side="left"

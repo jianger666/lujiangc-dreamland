@@ -35,6 +35,7 @@ import {
   useStreamResponse,
   useTitleGeneration,
 } from '../hooks';
+import { useLocalStorage } from 'usehooks-ts';
 
 // ==== 辅助函数 ====
 
@@ -106,7 +107,8 @@ interface AIAssistantContextType {
   availableModels: AIModel[];
   isInitialized: boolean; // 标记初始化是否完成
   streamingState: StreamingState; // 各对话的流式响应状态
-  sidebarOpen: boolean; // 侧边栏是否打开状态
+  mobileSidebarOpen: boolean; // 移动端侧边栏是否打开状态
+  desktopSidebarOpen: boolean; // 桌面端侧边栏是否打开状态
 
   // 计算属性
   activeConversation: Conversation | undefined; // 当前激活的对话对象
@@ -136,7 +138,8 @@ interface AIAssistantContextType {
   sendMessage: (userInput: string) => Promise<void>; // 发送消息
   stopResponding: () => void; // 停止当前对话的响应生成
   toggleWebSearch: (conversationId: string) => void; // 切换联网搜索状态
-  changeSidebarOpen: (e: boolean) => void; // 切换侧边栏打开/关闭状态
+  changeMobileSidebarOpen: (e: boolean) => void; // 切换移动端侧边栏打开/关闭状态
+  changeDesktopSidebarOpen: (e: boolean) => void; // 切换桌面端侧边栏打开/关闭状态
 }
 
 // 创建上下文
@@ -157,9 +160,22 @@ export function AIAssistantProvider({
   // 页面初始化状态标记
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // 添加侧边栏控制状态
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const changeSidebarOpen = useCallback((e: boolean) => setSidebarOpen(e), []);
+  // 移动端的侧边栏状态
+  const [mobileSidebarOpen, setSidebarOpen] = useState(false);
+  const changeMobileSidebarOpen = useCallback(
+    (e: boolean) => setSidebarOpen(e),
+    [],
+  );
+
+  // 桌面端的侧边栏状态
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useLocalStorage(
+    'ai-assistant-desktop-sidebar-open',
+    true,
+  );
+  const changeDesktopSidebarOpen = useCallback(
+    (e: boolean) => setDesktopSidebarOpen(e),
+    [setDesktopSidebarOpen],
+  );
 
   // 使用自定义hooks管理流式响应
   const {
@@ -442,8 +458,8 @@ export function AIAssistantProvider({
       availableModels,
       isInitialized,
       streamingState,
-      sidebarOpen,
-
+      mobileSidebarOpen,
+      desktopSidebarOpen,
       // 计算属性
       activeConversation,
       currentStreamingState,
@@ -460,7 +476,8 @@ export function AIAssistantProvider({
       sendMessage,
       stopResponding,
       toggleWebSearch,
-      changeSidebarOpen,
+      changeMobileSidebarOpen,
+      changeDesktopSidebarOpen,
     }),
     [
       // 依赖列表包含了所有上下文值中使用的变量和函数
@@ -469,7 +486,8 @@ export function AIAssistantProvider({
       availableModels,
       isInitialized,
       streamingState,
-      sidebarOpen,
+      mobileSidebarOpen,
+      desktopSidebarOpen,
       activeConversation,
       currentStreamingState,
       hasModels,
@@ -483,7 +501,8 @@ export function AIAssistantProvider({
       sendMessage,
       stopResponding,
       toggleWebSearch,
-      changeSidebarOpen,
+      changeMobileSidebarOpen,
+      changeDesktopSidebarOpen,
     ],
   );
 
