@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCirclePlus } from 'lucide-react';
 import { Conversation } from '@/types/ai-assistant';
@@ -8,6 +8,55 @@ import dayjs from 'dayjs';
 import { ConversationItem } from './conversation-item';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+
+// Define types for itemData
+interface ConversationRowData {
+  sortedConversations: Conversation[];
+  streamingState: Record<string, { isLoading: boolean }>;
+  activeConversationId: string | null;
+  onSelect: (id: string) => void;
+  onDelete: (id: string) => void;
+}
+
+// Create the memoized Row component
+const ConversationRow = memo(
+  ({
+    index,
+    style,
+    data,
+  }: {
+    index: number;
+    style: CSSProperties;
+    data: ConversationRowData;
+  }) => {
+    const {
+      sortedConversations,
+      streamingState,
+      activeConversationId,
+      onSelect,
+      onDelete,
+    } = data;
+    const conversation = sortedConversations[index];
+    const isLoading = Boolean(streamingState[conversation.id]?.isLoading);
+    const isActive = activeConversationId === conversation.id;
+
+    return (
+      <div style={style} className="py-1">
+        <ConversationItem
+          conversation={conversation}
+          isActive={isActive}
+          isLoading={isLoading}
+          onSelect={() => onSelect(conversation.id)}
+          onDelete={(e) => {
+            e.stopPropagation();
+            onDelete(conversation.id);
+          }}
+        />
+      </div>
+    );
+  },
+);
+ConversationRow.displayName = 'ConversationRow';
 
 export const ConversationContent = memo(
   ({
@@ -41,38 +90,23 @@ export const ConversationContent = memo(
     // 每个对话项的高度
     const ITEM_HEIGHT = 68;
 
-    // 渲染列表项的函数
-    const renderRow = ({
-      index,
-      style,
-    }: {
-      index: number;
-      style: React.CSSProperties;
-    }) => {
-      const conversation = sortedConversations[index];
-      const isLoading = Boolean(streamingState[conversation.id]?.isLoading);
-      const isActive = activeConversationId === conversation.id;
-
-      return (
-        <div
-          style={{
-            ...style,
-          }}
-          className="py-1"
-        >
-          <ConversationItem
-            conversation={conversation}
-            isActive={isActive}
-            isLoading={isLoading}
-            onSelect={() => onSelect(conversation.id)}
-            onDelete={(e) => {
-              e.stopPropagation();
-              onDelete(conversation.id);
-            }}
-          />
-        </div>
-      );
-    };
+    // Create itemData object
+    const itemData = useMemo(
+      () => ({
+        sortedConversations,
+        streamingState,
+        activeConversationId,
+        onSelect,
+        onDelete,
+      }),
+      [
+        sortedConversations,
+        streamingState,
+        activeConversationId,
+        onSelect,
+        onDelete,
+      ],
+    );
 
     return (
       <>
@@ -95,8 +129,10 @@ export const ConversationContent = memo(
                     itemSize={ITEM_HEIGHT}
                     overscanCount={3}
                     className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted-foreground/30 hover:scrollbar-thumb-muted-foreground/50"
+                    itemKey={(index) => sortedConversations[index].id}
+                    itemData={itemData}
                   >
-                    {renderRow}
+                    {ConversationRow}
                   </List>
                 )}
               </AutoSizer>

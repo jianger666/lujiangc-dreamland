@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useAIAssistant } from '../../hooks';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
 import {
@@ -25,10 +25,24 @@ export const ConversationSidebar = memo(() => {
 
   const isDesktop = useBreakpoint('md');
 
-  const handleSelectConversation = (conversationId: string) => {
-    setActiveConversationId(conversationId);
-    if (!isDesktop) changeSidebarOpen(false);
-  };
+  const handleSelectConversation = useCallback(
+    (conversationId: string) => {
+      setActiveConversationId(conversationId);
+      if (!isDesktop) changeSidebarOpen(false);
+    },
+    [isDesktop, setActiveConversationId, changeSidebarOpen],
+  );
+
+  const handleDeleteConversation = useCallback(
+    (id: string) => {
+      deleteConversation(id);
+    },
+    [deleteConversation],
+  );
+
+  const handleAddNewConversation = useCallback(() => {
+    addNewConversation();
+  }, [addNewConversation]);
 
   const Content = (
     <ConversationContent
@@ -36,8 +50,8 @@ export const ConversationSidebar = memo(() => {
       activeConversationId={activeConversationId}
       streamingState={streamingState}
       onSelect={handleSelectConversation}
-      onDelete={deleteConversation}
-      onAddNew={addNewConversation}
+      onDelete={handleDeleteConversation}
+      onAddNew={handleAddNewConversation}
     />
   );
 
