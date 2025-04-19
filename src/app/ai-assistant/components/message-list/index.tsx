@@ -163,7 +163,6 @@ export function MessageList() {
       const lastMessage = currentMessages[currentMessages.length - 1];
       // 如果最后一条消息是用户的，则无条件滚动到底部（平滑），用于用户不在底部，但是发了消息后，我会自动滚动到底部
       if (lastMessage.role === AiRoleEnum.User && !isGenerating) {
-        console.log('用户发的 滚动到底部');
         handleScrollToBottom(true);
       }
       // 如果最后一条消息是助手的，并且用户没有向上滚动，则滚动到底部（立即）,用于切换窗口直接展示底部

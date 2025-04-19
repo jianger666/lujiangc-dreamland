@@ -6,7 +6,11 @@ import httpClient from '@/lib/api/http';
  * @returns 生成的标题
  */
 export const generateTitle = async (userMessage: string) => {
-  return httpClient.post<string>('/api/ai-assistant/generate-title', {
-    userMessage,
-  });
+  return httpClient.post<string>(
+    '/api/ai-assistant/generate-title',
+    {
+      userMessage,
+    },
+    { skipErrorHandler: true },
+  );
 };

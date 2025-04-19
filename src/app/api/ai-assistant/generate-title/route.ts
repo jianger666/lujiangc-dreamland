@@ -6,7 +6,7 @@ import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
 import type { ChatCompletion } from 'openai/resources';
 
 // 标题生成使用的模型ID
-const TITLE_GENERATOR_MODEL = AIModelEnum.DeepSeekV30324;
+const TITLE_GENERATOR_MODEL = AIModelEnum.TitleGenerator;
 
 /**
  * POST处理器 - 根据对话内容生成标题

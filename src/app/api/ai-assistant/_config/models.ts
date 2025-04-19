@@ -27,6 +27,10 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
     apiKey: process.env.GOOGLE_STUDIO_API_KEY!,
   },
+  [AIProviderEnum.ZHIPU]: {
+    baseURL: 'https://open.bigmodel.cn/api/paas/v4',
+    apiKey: process.env.ZHIPU_API_KEY!,
+  },
 };
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
@@ -82,16 +86,37 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       },
     ],
   },
+  // 专门用于对话内容生成标题的模型一类,不给用户展示，只用于生成标题
+  [AIModelEnum.TitleGenerator]: {
+    displayName: 'Title Generator',
+    hideInUI: true,
+    instances: [
+      {
+        provider: AIProviderEnum.GOOGLE,
+        modelId: 'models/gemini-2.0-flash-lite',
+      },
+      {
+        provider: AIProviderEnum.ZHIPU,
+        modelId: 'glm-4-flash',
+      },
+      {
+        provider: AIProviderEnum.ZHIPU,
+        modelId: 'glm-4-flash-250414',
+      },
+    ],
+  },
 };
 
 /**
  * 获取所有可用模型列表
  */
 export function getAllModels(): AIModel[] {
-  return Object.entries(MODELS_CONFIG).map(([key, value]) => ({
-    id: key as AIModelEnum,
-    name: value.displayName,
-  }));
+  return Object.entries(MODELS_CONFIG)
+    .filter(([, value]) => !value.hideInUI)
+    .map(([key, value]) => ({
+      id: key as AIModelEnum,
+      name: value.displayName,
+    }));
 }
 
 /**

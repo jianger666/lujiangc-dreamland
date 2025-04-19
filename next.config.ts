@@ -3,15 +3,39 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: [
-      'images.unsplash.com',
-      'source.unsplash.com',
-      'store.is.autonavi.com',
-      'webapi.amap.com',
-      'restapi.amap.com',
-      'a.amap.com',
-      'lbs.amap.com',
-      'aos-comment.amap.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'source.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'store.is.autonavi.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'webapi.amap.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'restapi.amap.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'a.amap.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lbs.amap.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'aos-comment.amap.com',
+      },
     ],
   },
 };
