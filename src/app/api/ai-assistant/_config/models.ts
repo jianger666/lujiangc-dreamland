@@ -17,15 +17,15 @@ import {
 export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
   [AIProviderEnum.OPENROUTER]: {
     baseURL: 'https://openrouter.ai/api/v1',
-    apiKey: process.env.OPENROUTER_API_KEY,
+    apiKey: process.env.OPENROUTER_API_KEY!,
   },
   [AIProviderEnum.HENHUO]: {
     baseURL: 'https://a.henhuoai.com/v1',
-    apiKey: process.env.HENHUO_API_KEY,
+    apiKey: process.env.HENHUO_API_KEY!,
   },
   [AIProviderEnum.GOOGLE]: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    apiKey: process.env.GOOGLE_STUDIO_API_KEY,
+    apiKey: process.env.GOOGLE_STUDIO_API_KEY!,
   },
 };
 
@@ -87,21 +87,29 @@ export function getAllModels(): AIModel[] {
 }
 
 /**
- * 根据模型ID获取适当的API配置
+ * 获取指定AI模型的客户端配置列表
+ * @param selectedModel 选择的AI模型枚举值
+ * @returns 返回一个包含该模型所有可用实例配置的对象数组
+ * @throws 如果模型配置不存在则抛出错误
  */
 export function getClientConfigForModel(selectedModel: AIModelEnum) {
   const modelConfig = MODELS_CONFIG[selectedModel];
   if (!modelConfig) {
     throw new Error(`模型配置不存在: ${selectedModel}`);
   }
-  // 暂时先默认只使用第一个实例
-  const { provider, modelId } = modelConfig.instances[0];
 
-  const { baseURL, apiKey } = PROVIDERS_CONFIG[provider];
+  // 遍历所有实例，为每个实例生成完整的配置
+  const configurations = modelConfig.instances.map((instance) => {
+    const { provider, modelId } = instance;
+    const providerConfig = PROVIDERS_CONFIG[provider];
+    const { baseURL, apiKey } = providerConfig;
 
-  return {
-    baseURL,
-    apiKey,
-    modelId,
-  };
+    return {
+      baseURL,
+      apiKey,
+      modelId,
+      provider,
+    };
+  });
+  return configurations;
 }

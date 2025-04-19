@@ -1,16 +1,16 @@
 import { NextRequest } from 'next/server';
-import OpenAI from 'openai';
+// OpenAI import removed as it's no longer directly used here
 import type {
   ChatCompletionChunk,
   ChatCompletionCreateParams,
 } from 'openai/resources';
 
-import { getClientConfigForModel } from './_config';
 import {
   handleStreamResponse,
   performWebSearch,
   createStreamErrorResponse,
 } from './_utils';
+import { tryChatCompletionWithFailover } from './_utils/requestWithFailover';
 import { apiHandler } from '@/lib/api/handler';
 import { createStreamResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum, Message } from '@/types/ai-assistant';
@@ -47,16 +47,6 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return handleStreamError('没有提供有效的消息', '参数验证');
-  }
-
-  const { modelId, ...providerConfig } = getClientConfigForModel(selectedModel);
-
-  // 初始化OpenAI客户端
-  let aiClient;
-  try {
-    aiClient = new OpenAI(providerConfig);
-  } catch (error) {
-    return handleStreamError(error, '初始化AI客户端');
   }
 
   // 准备发送给 AI 的消息数组
@@ -105,22 +95,27 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     }
   }
 
-  // 构建请求参数，使用可能被修改过的 messagesForAI
-  const requestOptions = {
-    model: modelId,
-    messages: messagesForAI as ChatCompletionCreateParams['messages'],
-    stream: true,
-  };
-
   try {
-    // 调用AI API获取流式响应
-    const response = await aiClient.chat.completions.create(requestOptions);
+    // 1. 获取所有可用配置 - Removed by user
+    // const configurations = getClientConfigForModel(selectedModel);
+
+    // 2. 准备基础请求选项
+    const baseRequestOptions = {
+      messages: messagesForAI as ChatCompletionCreateParams['messages'],
+      stream: true,
+    };
+
+    // 3. 调用带故障转移的请求函数，传递 selectedModel
+    const response = (await tryChatCompletionWithFailover(
+      selectedModel, // Pass model enum instead of configurations
+      baseRequestOptions,
+    )) as AsyncIterable<ChatCompletionChunk>; // 明确类型为流式
 
     // 创建流处理管道
     const stream = new ReadableStream({
       async start(controller) {
         await handleStreamResponse({
-          response: response as AsyncIterable<ChatCompletionChunk>,
+          response: response,
           controller,
         });
       },
@@ -129,7 +124,8 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     // 返回流式响应
     return createStreamResponse(stream);
   } catch (error) {
-    return handleStreamError(error, '调用AI服务');
+    // 如果 tryChatCompletionWithFailover 抛出错误（所有尝试均失败）
+    return handleStreamError(error, '调用AI服务（所有实例均失败）');
   }
 });
 

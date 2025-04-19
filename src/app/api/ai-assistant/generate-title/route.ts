@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
-import OpenAI from 'openai';
-import { getClientConfigForModel } from '../_config';
+import { tryChatCompletionWithFailover } from '../_utils/requestWithFailover';
 import { apiHandler } from '@/lib/api/handler';
 import { createErrorResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
+import type { ChatCompletion } from 'openai/resources';
 
 // 标题生成使用的模型ID
 const TITLE_GENERATOR_MODEL = AIModelEnum.DeepSeekV30324;
@@ -21,15 +21,8 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
       });
     }
 
-    // 获取模型配置
-    const { modelId, ...providerConfig } = getClientConfigForModel(
-      TITLE_GENERATOR_MODEL,
-    );
-    const aiClient = new OpenAI(providerConfig);
-
-    // 发送请求到AI模型获取标题
-    const response = await aiClient.chat.completions.create({
-      model: modelId,
+    // 2. 准备基础请求选项 (非流式)
+    const baseRequestOptions = {
       messages: [
         {
           role: AiRoleEnum.System,
@@ -40,15 +33,26 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
       ],
       max_tokens: 13,
       temperature: 0.3,
-    });
+      stream: false, // 明确指定为非流式
+    };
 
-    // 提取生成的标题
+    // 3. 调用带故障转移的请求函数，传递模型ID
+    const response = (await tryChatCompletionWithFailover(
+      TITLE_GENERATOR_MODEL,
+      baseRequestOptions,
+    )) as ChatCompletion; // 明确类型为非流式响应
+
+    // 提取生成的标题 (逻辑不变)
     const title = response.choices[0]?.message?.content?.trim() ?? '';
 
-    return title;
+    // 直接返回标题字符串，符合原apiHandler期望
+    return new Response(title, { status: 200 });
   } catch (error) {
-    console.error('生成标题错误:', error);
-    throw error;
+    console.error('生成标题错误（所有实例均失败）:', error);
+    // 返回更通用的错误给客户端
+    return createErrorResponse({
+      message: '生成标题时出错，请稍后重试。',
+    });
   }
 });
 

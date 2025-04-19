@@ -61,7 +61,7 @@ export enum AIProviderEnum {
 }
 export interface ProviderConfig {
   baseURL: string;
-  apiKey?: string;
+  apiKey: string;
 }
 
 export enum AIModelEnum {
