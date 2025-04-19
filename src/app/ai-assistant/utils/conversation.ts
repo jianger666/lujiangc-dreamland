@@ -1,5 +1,6 @@
 import {
   AIModel,
+  AIModelEnum,
   AiRoleEnum,
   Conversation,
   Message,
@@ -8,15 +9,15 @@ import { generateUUID } from '@/lib';
 
 /**
  * 创建新对话
- * @param modelId 模型ID
+ * @param selectedModel 模型ID
  * @param availableModels 可用模型列表
  * @returns 新创建的对话
  */
 export function createNewConversation({
-  modelId,
+  selectedModel,
   availableModels,
 }: {
-  modelId: string;
+  selectedModel: AIModelEnum;
   availableModels: AIModel[];
 }): Conversation {
   const now = new Date().toISOString();
@@ -24,7 +25,7 @@ export function createNewConversation({
     id: generateUUID(),
     title: `新对话`,
     messages: [],
-    modelId: modelId || availableModels[0]?.id || 'gemini-2.5-pro-exp-03-25',
+    selectedModel: selectedModel ?? availableModels[0]?.id,
     createdAt: now,
     updatedAt: now,
     hasGeneratedTitle: false,

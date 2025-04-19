@@ -31,7 +31,7 @@ export async function performWebSearch(
     }
 
     // 使用 baseUrl 构建完整的 URL
-    const apiUrl = `${baseUrl}/api/web-search?query=${encodeURIComponent(query)}`;
+    const apiUrl = `${baseUrl}/api/ai-assistant/web-search?query=${encodeURIComponent(query)}`;
 
     console.log(
       `[AI Assistant Utils] Fetching web search results from: ${apiUrl}`,

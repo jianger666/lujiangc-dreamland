@@ -19,7 +19,7 @@ interface UseConversationsProps {
   removePendingTitleGeneration: (conversationId: string) => void;
   startStreamResponse: (params: {
     messages: Message[];
-    modelId: string;
+    selectedModel: string;
     isWebSearchEnabled: boolean;
     abortControllerRef: RefObject<Record<string, AbortController | null>>;
     setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
@@ -90,7 +90,7 @@ export const useConversations = ({
       if (!availableModels.length) return;
 
       const newConversation = createNewConversation({
-        modelId: availableModels[0].id,
+        selectedModel: availableModels[0].id,
         availableModels,
       });
 
@@ -136,7 +136,7 @@ export const useConversations = ({
             setActiveConversationId(newConversations[0].id);
           } else if (availableModels.length > 0) {
             const newConversation = createNewConversation({
-              modelId: availableModels[0].id,
+              selectedModel: availableModels[0].id,
               availableModels,
             });
 
@@ -185,7 +185,7 @@ export const useConversations = ({
       if (!activeConversation) return;
       updateConversation({
         id: activeConversationId,
-        updates: { modelId: model },
+        updates: { selectedModel: model },
       });
     },
     [activeConversationId, updateConversation],
@@ -282,7 +282,7 @@ export const useConversations = ({
 
         await startStreamResponse({
           messages: optimizedMessages,
-          modelId: activeConversation.modelId,
+          selectedModel: activeConversation.selectedModel,
           isWebSearchEnabled: activeConversation.isWebSearchEnabled,
           abortControllerRef: abortControllersRef,
           setStreamingState,

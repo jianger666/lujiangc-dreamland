@@ -25,14 +25,14 @@ export const useStreamResponse = () => {
   const startStreamResponse = useCallback(
     async ({
       messages,
-      modelId,
+      selectedModel,
       conversationId,
       setConversations,
       onComplete,
       isWebSearchEnabled,
     }: {
       messages: Message[];
-      modelId: string;
+      selectedModel: string;
       conversationId: string;
       setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
       onComplete: (conversationId: string) => void;
@@ -40,7 +40,7 @@ export const useStreamResponse = () => {
     }) => {
       return startStreamResponseUtil({
         messages,
-        modelId,
+        selectedModel,
         isWebSearchEnabled,
         abortControllerRef: abortControllersRef,
         setStreamingState,

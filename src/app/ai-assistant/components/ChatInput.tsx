@@ -30,7 +30,8 @@ export function ChatInput() {
     currentStreamingState,
   } = useAIAssistant();
 
-  const { modelId = '', isWebSearchEnabled = false } = activeConversation || {};
+  const { selectedModel = '', isWebSearchEnabled = false } =
+    activeConversation || {};
 
   const isLoading = currentStreamingState.isLoading;
 
@@ -138,7 +139,7 @@ export function ChatInput() {
           <div className="flex items-center justify-between border-border p-2">
             <div className="flex flex-wrap items-center gap-1 md:gap-2">
               <Select
-                value={modelId}
+                value={selectedModel}
                 onValueChange={changeModel}
                 disabled={isLoading}
               >

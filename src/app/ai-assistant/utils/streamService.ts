@@ -185,7 +185,7 @@ export function addInterruptedMessageToConversation({
  */
 export async function startStreamResponse({
   messages,
-  modelId,
+  selectedModel,
   isWebSearchEnabled,
   abortControllerRef,
   setStreamingState,
@@ -194,7 +194,7 @@ export async function startStreamResponse({
   onComplete,
 }: {
   messages: Message[];
-  modelId: string;
+  selectedModel: string;
   isWebSearchEnabled: boolean;
   abortControllerRef: React.MutableRefObject<
     Record<string, AbortController | null>
@@ -215,7 +215,7 @@ export async function startStreamResponse({
   try {
     await executeStreamRequest({
       messages,
-      modelId,
+      selectedModel,
       isWebSearchEnabled,
       abortController,
       setStreamingState,
@@ -237,7 +237,7 @@ export async function startStreamResponse({
  */
 async function executeStreamRequest({
   messages,
-  modelId,
+  selectedModel,
   isWebSearchEnabled,
   abortController,
   setStreamingState,
@@ -246,7 +246,7 @@ async function executeStreamRequest({
   onComplete,
 }: {
   messages: Message[];
-  modelId: string;
+  selectedModel: string;
   isWebSearchEnabled: boolean;
   abortController: AbortController;
   setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
@@ -276,7 +276,7 @@ async function executeStreamRequest({
       },
       body: JSON.stringify({
         messages,
-        model: modelId,
+        selectedModel: selectedModel,
         isWebSearchEnabled,
       }),
       signal: abortController.signal,

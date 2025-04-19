@@ -6,7 +6,7 @@ import { createErrorResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
 
 // 标题生成使用的模型ID
-const TITLE_GENERATOR_MODEL = AIModelEnum.XFYunLite;
+const TITLE_GENERATOR_MODEL = AIModelEnum.DeepSeekV30324;
 
 /**
  * POST处理器 - 根据对话内容生成标题
@@ -22,12 +22,14 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
     }
 
     // 获取模型配置
-    const clientConfig = getClientConfigForModel(TITLE_GENERATOR_MODEL);
-    const aiClient = new OpenAI(clientConfig);
+    const { modelId, ...providerConfig } = getClientConfigForModel(
+      TITLE_GENERATOR_MODEL,
+    );
+    const aiClient = new OpenAI(providerConfig);
 
     // 发送请求到AI模型获取标题
     const response = await aiClient.chat.completions.create({
-      model: TITLE_GENERATOR_MODEL,
+      model: modelId,
       messages: [
         {
           role: AiRoleEnum.System,

@@ -15,16 +15,11 @@ export interface Conversation {
   id: string;
   title: string;
   messages: Message[];
-  modelId: string;
+  selectedModel: AIModelEnum;
   createdAt: string;
   updatedAt: string;
   hasGeneratedTitle: boolean;
   isWebSearchEnabled: boolean;
-}
-
-export interface AIModel {
-  id: AIModelEnum;
-  name: string;
 }
 
 export interface StreamingMessage {
@@ -59,27 +54,32 @@ export enum AiStreamChunkTypeEnum {
   Think = 'think',
 }
 
-/**
- * 目前支持的所有AI模型
- */
-export enum AIModelEnum {
-  DeepSeekV30324 = 'DeepSeek-V3-0324',
-  DeepSeekR1 = 'deepseek-ai/DeepSeek-R1',
-  Gemini25ProExp0325 = 'gemini-2.5-pro-exp-03-25',
-  Gemini20Flash = 'gemini-2.0-flash',
-  Gemini15ProLatest = 'gemini-1.5-pro-latest',
-  DeepSeekChatV30324Free = 'deepseek/deepseek-chat-v3-0324:free',
-  OpenRouterGemini25ProExp0325 = 'google/gemini-2.5-pro-exp-03-25:free',
-  OpenRouterGemini20FlashThinkingExp = 'google/gemini-2.0-flash-thinking-exp:free',
-  XFYunLite = 'lite',
-  XFYun4Ultra = '4.0Ultra',
+export enum AIProviderEnum {
+  OPENROUTER = 'OPENROUTER',
+  HENHUO = 'HENHUO',
+  GOOGLE = 'GOOGLE',
+}
+export interface ProviderConfig {
+  baseURL: string;
+  apiKey?: string;
 }
 
-/**
- * API提供商配置类型
- */
-export interface APIProviderConfig {
-  baseURL: string;
-  apiKey: string | undefined;
-  models: AIModel[];
+export enum AIModelEnum {
+  DeepSeekV30324 = 'DeepSeekV30324',
+  DeepSeekR1 = 'DeepSeekR1',
+  Gemini25ProExp0325 = 'Gemini25ProExp0325',
+  Gemini20Flash = 'Gemini20Flash',
+}
+
+export interface ModelConfig {
+  displayName: string;
+  instances: {
+    provider: AIProviderEnum;
+    modelId: string;
+  }[];
+}
+
+export interface AIModel {
+  id: string;
+  name: string;
 }

@@ -13,7 +13,7 @@ import {
 } from './_utils';
 import { apiHandler } from '@/lib/api/handler';
 import { createStreamResponse } from '@/lib/api/response';
-import { AiRoleEnum, Message } from '@/types/ai-assistant';
+import { AIModelEnum, AiRoleEnum, Message } from '@/types/ai-assistant';
 
 export const runtime = 'edge';
 
@@ -38,10 +38,10 @@ function handleStreamError(error: unknown, context: string): Response {
  * 处理AI模型请求并返回流式响应
  */
 const handleAiRequest = apiHandler(async (req: NextRequest) => {
-  const { messages, model, isWebSearchEnabled } = await req.json();
+  const { messages, selectedModel, isWebSearchEnabled } = await req.json();
 
-  // 验证输入参数
-  if (!model) {
+  // 没有selectedModel或者selectedModel不是AIModelEnum的成员
+  if (!selectedModel || !Object.values(AIModelEnum).includes(selectedModel)) {
     return handleStreamError('没有提供有效的模型', '参数验证');
   }
 
@@ -49,18 +49,12 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     return handleStreamError('没有提供有效的消息', '参数验证');
   }
 
-  // 获取客户端配置
-  let clientConfig;
-  try {
-    clientConfig = getClientConfigForModel(model);
-  } catch (error) {
-    return handleStreamError(error, '获取AI客户端配置');
-  }
+  const { modelId, ...providerConfig } = getClientConfigForModel(selectedModel);
 
   // 初始化OpenAI客户端
   let aiClient;
   try {
-    aiClient = new OpenAI(clientConfig);
+    aiClient = new OpenAI(providerConfig);
   } catch (error) {
     return handleStreamError(error, '初始化AI客户端');
   }
@@ -113,7 +107,7 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
 
   // 构建请求参数，使用可能被修改过的 messagesForAI
   const requestOptions = {
-    model: model,
+    model: modelId,
     messages: messagesForAI as ChatCompletionCreateParams['messages'],
     stream: true,
   };
