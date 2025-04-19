@@ -28,6 +28,7 @@ import {
   AIModel,
   StreamingState,
   AiRoleEnum,
+  AIModelEnum,
 } from '@/types/ai-assistant';
 import {
   useConversations,
@@ -130,7 +131,7 @@ interface AIAssistantContextType {
   addNewConversation: () => Promise<Conversation | undefined>; // 添加新对话
   deleteConversation: (id: string) => Promise<void>; // 删除对话
   saveEditedTitle: (title: string) => void; // 保存编辑后的标题
-  changeModel: (model: string) => void; // 更改当前对话的模型
+  changeModel: (model: AIModelEnum) => void; // 更改当前对话的模型
   clearMessages: () => void; // 清空当前对话的消息
   sendMessage: (userInput: string) => Promise<void>; // 发送消息
   stopResponding: () => void; // 停止当前对话的响应生成
@@ -403,7 +404,7 @@ export function AIAssistantProvider({
 
   // 更改模型 (针对当前激活对话)
   const changeModel = useCallback(
-    (model: string) => {
+    (model: AIModelEnum) => {
       changeModelBase(model, activeConversation);
     },
     [changeModelBase, activeConversation],

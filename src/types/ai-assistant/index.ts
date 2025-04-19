@@ -55,7 +55,7 @@ export enum AiStreamChunkTypeEnum {
 }
 
 export enum AIProviderEnum {
-  OPENROUTER = 'OPENROUTER',
+  OPEN_ROUTER = 'OPEN_ROUTER',
   HENHUO = 'HENHUO',
   GOOGLE = 'GOOGLE',
 }
@@ -80,6 +80,6 @@ export interface ModelConfig {
 }
 
 export interface AIModel {
-  id: string;
+  id: AIModelEnum;
   name: string;
 }

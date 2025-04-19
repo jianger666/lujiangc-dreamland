@@ -5,6 +5,7 @@ import {
   Message,
   AiRoleEnum,
   StreamingState,
+  AIModelEnum,
 } from '@/types/ai-assistant';
 import {
   createNewConversation,
@@ -181,7 +182,7 @@ export const useConversations = ({
 
   // 更改当前对话使用的AI模型
   const changeModel = useCallback(
-    (model: string, activeConversation?: Conversation) => {
+    (model: AIModelEnum, activeConversation?: Conversation) => {
       if (!activeConversation) return;
       updateConversation({
         id: activeConversationId,

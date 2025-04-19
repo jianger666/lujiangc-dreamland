@@ -15,9 +15,9 @@ import {
  * AI 服务提供商配置
  */
 export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
-  [AIProviderEnum.OPENROUTER]: {
+  [AIProviderEnum.OPEN_ROUTER]: {
     baseURL: 'https://openrouter.ai/api/v1',
-    apiKey: process.env.OPENROUTER_API_KEY!,
+    apiKey: process.env.OPEN_ROUTER_API_KEY!,
   },
   [AIProviderEnum.HENHUO]: {
     baseURL: 'https://a.henhuoai.com/v1',
@@ -38,7 +38,7 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         modelId: 'DeepSeek-V3-0324',
       },
       {
-        provider: AIProviderEnum.OPENROUTER,
+        provider: AIProviderEnum.OPEN_ROUTER,
         modelId: 'deepseek/deepseek-chat-v3-0324:free',
       },
     ],
@@ -60,7 +60,7 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         modelId: 'gemini-2.5-pro-exp-03-25',
       },
       {
-        provider: AIProviderEnum.OPENROUTER,
+        provider: AIProviderEnum.OPEN_ROUTER,
         modelId: 'google/gemini-2.5-pro-exp-03-25:free',
       },
     ],
@@ -81,7 +81,7 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
  */
 export function getAllModels(): AIModel[] {
   return Object.entries(MODELS_CONFIG).map(([key, value]) => ({
-    id: key,
+    id: key as AIModelEnum,
     name: value.displayName,
   }));
 }
