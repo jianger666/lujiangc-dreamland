@@ -78,7 +78,9 @@ export function ConversationHeader() {
           </div>
         ) : (
           <>
-            <span className="font-medium">{activeConversation.title}</span>
+            <span className="max-w-40 truncate font-medium">
+              {activeConversation.title}
+            </span>
             <Button
               variant="ghost"
               title="编辑标题"

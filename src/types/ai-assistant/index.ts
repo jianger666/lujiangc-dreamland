@@ -46,14 +46,6 @@ export interface StreamingState {
   [conversationId: string]: ConversationStreamState;
 }
 
-// API请求类型
-export interface GenerateTitleRequest {
-  messages: {
-    role: AiRoleEnum;
-    content: string;
-  }[];
-}
-
 export interface ChatCompletionRequest {
   messages: Message[];
   model: string;
