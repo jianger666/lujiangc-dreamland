@@ -41,7 +41,7 @@ export const API_PROVIDERS: Record<string, APIProviderConfig> = {
       },
     ],
   },
-  DEEPSEEK: {
+  HENHUO: {
     baseURL: 'https://a.henhuoai.com/v1',
     apiKey: process.env.HENHUO_API_KEY,
     models: [
