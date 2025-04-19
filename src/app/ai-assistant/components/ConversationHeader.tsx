@@ -94,12 +94,7 @@ export function ConversationHeader() {
         )}
       </div>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={clearMessages}
-        title="清空对话"
-      >
+      <Button variant="ghost" onClick={clearMessages} title="清空对话">
         <Paintbrush className="h-4 w-4" />
         <span className="ml-1 hidden md:inline-block">清空对话</span>
       </Button>

@@ -124,6 +124,7 @@ export function ChatInput() {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className="resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+            enterKeyHint="send"
             onKeyDown={(e) => {
               if (
                 e.key === 'Enter' &&

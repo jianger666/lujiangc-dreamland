@@ -31,7 +31,7 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
         },
         { role: AiRoleEnum.User, content: userMessage },
       ],
-      max_tokens: 13,
+      max_tokens: 15,
       temperature: 0.3,
       stream: false, // 明确指定为非流式
     };
