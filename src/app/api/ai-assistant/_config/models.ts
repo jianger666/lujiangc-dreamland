@@ -31,11 +31,11 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
   [AIModelEnum.DeepSeekV30324]: {
-    displayName: 'DeepSeek-V3-0324',
+    displayName: 'DeepSeek-V3',
     instances: [
       {
         provider: AIProviderEnum.HENHUO,
-        modelId: 'DeepSeek-V3-0324',
+        modelId: 'deepseek-ai/DeepSeek-V3',
       },
       {
         provider: AIProviderEnum.OPEN_ROUTER,
@@ -48,7 +48,11 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
     instances: [
       {
         provider: AIProviderEnum.HENHUO,
-        modelId: 'DeepSeek-R1',
+        modelId: 'deepseek-ai/DeepSeek-R1',
+      },
+      {
+        provider: AIProviderEnum.OPEN_ROUTER,
+        modelId: 'deepseek/deepseek-r1:free',
       },
     ],
   },
@@ -71,6 +75,10 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       {
         provider: AIProviderEnum.GOOGLE,
         modelId: 'gemini-2.0-flash',
+      },
+      {
+        provider: AIProviderEnum.OPEN_ROUTER,
+        modelId: 'google/gemini-2.0-flash-exp:free',
       },
     ],
   },
