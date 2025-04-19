@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -14,10 +14,7 @@ import { Send, StopCircle, Globe } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
 import { useAIAssistant } from '../hooks';
-
-// 定义文本框行数的常量
-const MIN_TEXTAREA_ROWS = 2;
-const MAX_TEXTAREA_ROWS = 10;
+import { useBreakpoint } from '@/hooks/use-breakpoint';
 
 export function ChatInput() {
   const {
@@ -29,6 +26,12 @@ export function ChatInput() {
     toggleWebSearch,
     currentStreamingState,
   } = useAIAssistant();
+
+  const isDesktop = useBreakpoint('md');
+
+  // 定义文本框行数
+  const MIN_TEXTAREA_ROWS = useMemo(() => (isDesktop ? 2 : 1), [isDesktop]);
+  const MAX_TEXTAREA_ROWS = useMemo(() => (isDesktop ? 10 : 5), [isDesktop]);
 
   const { selectedModel = '', isWebSearchEnabled = false } =
     activeConversation || {};

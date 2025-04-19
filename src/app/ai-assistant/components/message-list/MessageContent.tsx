@@ -10,6 +10,23 @@ import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import { CopyButton } from './CopyButton';
 
+// 定义核心语言子集
+// const highlightSubset = [
+//   'javascript',
+//   'typescript',
+//   'tsx',
+//   'jsx',
+//   'python',
+//   'html',
+//   'css',
+//   'json',
+//   'bash',
+//   'markdown',
+//   'yaml',
+//   'sql',
+//   'diff',
+// ];
+
 // 消息内容组件
 export function MessageContent({
   content,

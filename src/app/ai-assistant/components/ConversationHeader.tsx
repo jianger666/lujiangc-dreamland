@@ -38,7 +38,7 @@ export function ConversationHeader() {
   };
 
   return (
-    <div className="flex items-center justify-between border-b border-border p-3">
+    <div className="flex items-center justify-between border-b border-border p-2">
       <div className="flex items-center space-x-2">
         {/* 移动端打开侧边栏按钮 */}
         <Button

@@ -118,7 +118,7 @@ export const ConversationContent = memo(
 
     return (
       <div className="flex h-full flex-col">
-        <div className="flex flex-shrink-0 items-center justify-between border-b border-border p-3">
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-border p-2">
           <Button variant="ghost" onClick={onAddNew} title="新建对话">
             <MessageCirclePlus />
             <span>新建对话</span>
