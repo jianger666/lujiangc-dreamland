@@ -32,12 +32,12 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
         {
           role: AiRoleEnum.System,
           content:
-            '你是一个标题生成助手。根据用户的提问生成一个简短的标题（10个字以内），标题应该概括对话的主题或目的。只返回标题，不要包含任何其他文字或标点符号。',
+            '你是一个标题生成助手。根据用户的提问生成一个简短的标题（10个汉字以内），标题应该概括对话的主题或目的。只返回标题，不要包含任何其他文字或标点符号。',
         },
         { role: AiRoleEnum.User, content: userMessage },
       ],
-      max_tokens: 10,
-      temperature: 0.1,
+      max_tokens: 13,
+      temperature: 0.3,
     });
 
     // 提取生成的标题

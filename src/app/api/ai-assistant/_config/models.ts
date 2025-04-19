@@ -85,10 +85,4 @@ export function getClientConfigForModel(modelId: AIModelEnum) {
       };
     }
   }
-
-  // 默认返回GOOGLE提供商配置
-  return {
-    apiKey: API_PROVIDERS.GOOGLE.apiKey,
-    baseURL: API_PROVIDERS.GOOGLE.baseURL,
-  };
 }
