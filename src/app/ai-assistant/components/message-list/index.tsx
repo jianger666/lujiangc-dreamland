@@ -100,16 +100,16 @@ export function MessageList() {
         listRef.current?.resetAfterIndex(index, false);
         if (!isFirstScrollToBottom) {
           debounceFirstScrollToBottom();
-        } else if (isLoading && !isUserScrolledUpRef.current) {
+        } else if (isGenerating && !isUserScrolledUpRef.current) {
           handleScrollToBottom(false);
         }
       }
     },
     [
       debounceFirstScrollToBottom,
-      handleScrollToBottom,
       isFirstScrollToBottom,
-      isLoading,
+      isGenerating,
+      handleScrollToBottom,
     ],
   );
 
@@ -161,12 +161,13 @@ export function MessageList() {
 
     if (currentMessages.length > 0) {
       const lastMessage = currentMessages[currentMessages.length - 1];
-      // 如果最后一条消息是用户的，则无条件滚动到底部（平滑）
-      if (lastMessage.role === AiRoleEnum.User) {
+      // 如果最后一条消息是用户的，则无条件滚动到底部（平滑），用于用户不在底部，但是发了消息后，我会自动滚动到底部
+      if (lastMessage.role === AiRoleEnum.User && !isGenerating) {
+        console.log('用户发的 滚动到底部');
         handleScrollToBottom(true);
       }
-      // 如果最后一条消息是助手的，并且用户没有向上滚动，则滚动到底部（立即）
-      else if (!isUserScrolledUpRef.current) {
+      // 如果最后一条消息是助手的，并且用户没有向上滚动，则滚动到底部（立即）,用于切换窗口直接展示底部
+      else if (!isUserScrolledUpRef.current && !isGenerating) {
         handleScrollToBottom(false);
       }
     }
@@ -181,8 +182,8 @@ export function MessageList() {
     activeConversation?.id,
     activeConversation?.messages,
     activeConversationId,
-    isGenerating, // 保持 isGenerating 作为依赖，以确保流式消息更新时能触发检查
     handleScrollToBottom,
+    isGenerating,
   ]);
 
   const itemData = useMemo<ItemData>(
