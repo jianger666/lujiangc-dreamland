@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { AiRoleEnum, Message, StreamingMessage } from '@/types/ai-assistant';
 import { Loading } from '@/components/ui/loading';
@@ -7,7 +7,7 @@ import { MessageContent } from './MessageContent';
 import { CopyButton } from './CopyButton';
 
 // 单个消息组件 - 用于虚拟列表
-export function MessageItem({
+const MessageItemComponent = ({
   message,
   style,
   setSize,
@@ -19,7 +19,7 @@ export function MessageItem({
   setSize: (index: number, size: number) => void;
   index: number;
   loadingMode: boolean;
-}) {
+}) => {
   const itemRef = useRef<HTMLDivElement>(null);
   const role = message?.role ?? AiRoleEnum.Assistant;
   const thinking = message?.thinking ?? undefined;
@@ -85,4 +85,6 @@ export function MessageItem({
       </div>
     </div>
   );
-}
+};
+
+export const MessageItem = memo(MessageItemComponent);
