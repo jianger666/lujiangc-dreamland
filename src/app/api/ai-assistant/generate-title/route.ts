@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
-import { tryChatCompletionWithFailover } from '../_utils/requestWithFailover';
+import {
+  tryChatCompletionWithFailover,
+  TITLE_GENERATION_SYSTEM_PROMPT,
+} from '../_utils';
 import { apiHandler } from '@/lib/api/handler';
 import { createErrorResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
@@ -26,8 +29,7 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
       messages: [
         {
           role: AiRoleEnum.System,
-          content:
-            '你是一个标题生成助手。根据用户的提问生成一个简短的标题（10个汉字以内），标题应该概括对话的主题或目的。只返回标题，不要包含任何其他文字或标点符号。',
+          content: TITLE_GENERATION_SYSTEM_PROMPT,
         },
         { role: AiRoleEnum.User, content: userMessage },
       ],

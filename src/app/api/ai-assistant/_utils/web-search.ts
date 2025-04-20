@@ -21,7 +21,7 @@ export async function performWebSearch(
     if (process.env.NODE_ENV === 'development') {
       baseUrl = 'http://localhost:3939';
     } else {
-      baseUrl = process.env.NEXT_PUBLIC_APP_URL || ''; // 获取生产 URL
+      baseUrl = process.env.NEXT_PUBLIC_APP_URL || '';
       if (!baseUrl) {
         console.error(
           '[AI Assistant Utils] Error: NEXT_PUBLIC_APP_URL is not set in non-development environment. Cannot perform web search.',

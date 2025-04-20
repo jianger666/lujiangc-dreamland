@@ -9,11 +9,13 @@ import {
   handleStreamResponse,
   performWebSearch,
   createStreamErrorResponse,
+  tryChatCompletionWithFailover,
+  createSearchResultsPrompt,
 } from './_utils';
-import { tryChatCompletionWithFailover } from './_utils/requestWithFailover';
 import { apiHandler } from '@/lib/api/handler';
 import { createStreamResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum, Message } from '@/types/ai-assistant';
+import { generateUUID } from '@/lib';
 
 export const runtime = 'edge';
 
@@ -59,20 +61,23 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
       try {
         const searchResults = await performWebSearch(userQuery);
         if (searchResults && searchResults.length > 0) {
-          // 格式化搜索结果为文本
-          const searchResultsText =
-            'Web search results for context:\n' +
-            searchResults
-              .slice(0, 3) // 最多取前 3 条
-              .map(
-                (r, i) =>
-                  `${i + 1}. ${r.title}\n   ${r.snippet}\n   Source: ${r.link}`,
-              )
-              .join('\n\n');
+          // 格式化搜索结果为文本 - 更新提示词并移除数量限制
+          const formattedResults = searchResults
+            // .slice(0, 3) // 移除数量限制
+            .map(
+              (r, i) =>
+                `[RESULT ${i + 1}]\nTitle: ${r.title}\nLink: ${r.link}\nSnippet: ${r.snippet}`,
+            )
+            .join('\n\n');
+
+          // 使用导入的函数生成提示词
+          const searchResultsText = createSearchResultsPrompt({
+            formattedResults,
+          });
 
           // 在用户最新消息之前插入包含搜索结果的系统消息
           messagesForAI.splice(messagesForAI.length - 1, 0, {
-            id: 'system-search-' + Date.now(), // 生成唯一 ID
+            id: generateUUID(),
             role: AiRoleEnum.System,
             content: searchResultsText,
           });
