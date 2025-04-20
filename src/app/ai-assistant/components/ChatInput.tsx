@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -15,6 +21,7 @@ import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
 import { useAIAssistant } from '../hooks';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { useDebounceCallback } from 'usehooks-ts';
 
 export function ChatInput() {
   const {
@@ -30,8 +37,8 @@ export function ChatInput() {
   const isDesktop = useBreakpoint('md');
 
   // 定义文本框行数
-  const MIN_TEXTAREA_ROWS = useMemo(() => (isDesktop ? 2 : 1), [isDesktop]);
-  const MAX_TEXTAREA_ROWS = useMemo(() => (isDesktop ? 10 : 5), [isDesktop]);
+  const minTextareaRows = useMemo(() => (isDesktop ? 2 : 1), [isDesktop]);
+  const maxTextareaRows = useMemo(() => (isDesktop ? 10 : 5), [isDesktop]);
 
   const { selectedModel = '', isWebSearchEnabled = false } =
     activeConversation || {};
@@ -44,33 +51,37 @@ export function ChatInput() {
   const [prevIsLoading, setPrevIsLoading] = useState(isLoading);
 
   // 自动调整文本框高度
-  const adjustTextareaHeight = () => {
+  const adjustTextareaHeight = useCallback(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
     textarea.style.height = 'auto';
     const scrollHeight = textarea.scrollHeight;
     const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
-    const maxHeight = lineHeight * MAX_TEXTAREA_ROWS;
+    const maxHeight = lineHeight * maxTextareaRows;
     const newHeight = Math.min(
-      Math.max(lineHeight * MIN_TEXTAREA_ROWS, scrollHeight),
+      Math.max(lineHeight * minTextareaRows, scrollHeight),
       maxHeight,
     );
 
     textarea.style.height = `${newHeight}px`;
-  };
+  }, [maxTextareaRows, minTextareaRows]);
 
   // 输入变化时更新高度
   useEffect(() => {
     adjustTextareaHeight();
-  }, [input]);
+  }, [input, adjustTextareaHeight]);
 
-  // 聚焦输入框
-  const focusTextarea = () => {
+  // 聚焦输入框,尽量减少不必要的重复调用
+  const focusTextarea = useDebounceCallback(() => {
     if (textareaRef.current && !isLoading) {
-      textareaRef.current.focus();
+      requestAnimationFrame(() => {
+        if (textareaRef.current !== document.activeElement) {
+          textareaRef.current!.focus();
+        }
+      });
     }
-  };
+  }, 50);
 
   // 当isLoading从true变为false时自动聚焦
   useEffect(() => {
@@ -80,6 +91,18 @@ export function ChatInput() {
     setPrevIsLoading(isLoading);
   }, [isLoading, prevIsLoading]);
 
+  // 当对话切换或者初始化时自动聚焦输入框
+  useEffect(() => {
+    focusTextarea();
+  }, [activeConversation?.id]);
+
+  // 监听消息列表变化，当清空对话后自动聚焦输入框（新建对话会触发两次）
+  useEffect(() => {
+    if (activeConversation?.messages?.length === 0) {
+      focusTextarea();
+    }
+  }, [activeConversation?.messages?.length]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading || !activeConversation) return;
@@ -88,7 +111,7 @@ export function ChatInput() {
     setInput('');
     // 重置高度
     if (textareaRef.current) {
-      textareaRef.current.style.height = `${parseInt(window.getComputedStyle(textareaRef.current).lineHeight) * MIN_TEXTAREA_ROWS}px`;
+      textareaRef.current.style.height = `${parseInt(window.getComputedStyle(textareaRef.current).lineHeight) * minTextareaRows}px`;
     }
   };
 
@@ -123,7 +146,7 @@ export function ChatInput() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="shift+enter可换行，enter发送消息..."
             disabled={isLoading}
-            rows={MIN_TEXTAREA_ROWS}
+            rows={minTextareaRows}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className="resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
