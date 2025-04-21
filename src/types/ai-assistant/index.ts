@@ -59,6 +59,7 @@ export enum AIProviderEnum {
   HENHUO = 'HENHUO',
   GOOGLE = 'GOOGLE',
   ZHIPU = 'ZHIPU',
+  FREE_CHAT_GPT = 'FREE_CHAT_GPT',
 }
 export interface ProviderConfig {
   baseURL: string;
@@ -70,6 +71,7 @@ export enum AIModelEnum {
   DeepSeekR1 = 'DeepSeekR1',
   Gemini25ProExp0325 = 'Gemini25ProExp0325',
   Gemini20Flash = 'Gemini20Flash',
+  Gp4oMini = 'Gp4oMini',
   // 不是模型名称，而是专门用于对话内容生成标题的模型一类
   TitleGenerator = 'TitleGenerator',
 }

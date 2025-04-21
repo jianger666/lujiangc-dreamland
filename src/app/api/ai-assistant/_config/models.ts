@@ -27,6 +27,10 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
     apiKey: process.env.GOOGLE_STUDIO_API_KEY!,
   },
+  [AIProviderEnum.FREE_CHAT_GPT]: {
+    baseURL: 'https://free.v36.cm/v1',
+    apiKey: process.env.FREE_CHAT_GPT_API_KEY!,
+  },
   [AIProviderEnum.ZHIPU]: {
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
     apiKey: process.env.ZHIPU_API_KEY!,
@@ -34,6 +38,12 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
 };
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
+  [AIModelEnum.Gp4oMini]: {
+    displayName: 'gpt-4o-mini',
+    instances: [
+      { provider: AIProviderEnum.FREE_CHAT_GPT, modelId: 'gpt-4o-mini' },
+    ],
+  },
   [AIModelEnum.DeepSeekV30324]: {
     displayName: 'DeepSeek-V3',
     instances: [
