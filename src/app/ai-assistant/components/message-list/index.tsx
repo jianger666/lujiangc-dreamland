@@ -45,7 +45,6 @@ export function MessageList() {
   const listRef = useRef<VariableSizeList>(null);
   const outerListRef = useRef<HTMLDivElement>(null);
   const itemHeightsRef = useRef<Record<number, number>>({});
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isFirstScrollToBottom, setIsFirstScrollToBottom] = useState(false);
   const isUserScrolledUpRef = useRef(false);
   const [showScrollToBottomButton, setShowScrollToBottomButton] =
@@ -67,11 +66,18 @@ export function MessageList() {
   );
 
   const allMessages = useMemo(() => {
-    const result: (Message | StreamingMessage | undefined)[] = [...messages];
+    const result: (Message | StreamingMessage | undefined)[] = [
+      ...(activeConversation?.messages ?? []),
+    ];
     if (isRequesting) result.push(undefined);
     else if (isGenerating) result.push(streamingMessage);
     return result;
-  }, [messages, streamingMessage, isRequesting, isGenerating]);
+  }, [
+    activeConversation?.messages,
+    isRequesting,
+    isGenerating,
+    streamingMessage,
+  ]);
 
   const handleScrollToBottom = useCallback(
     (smooth: boolean = false) => {
@@ -86,6 +92,8 @@ export function MessageList() {
   );
 
   const debounceFirstScrollToBottom = useDebouncedCallback(() => {
+    console.log('首次滚动到底部');
+
     handleScrollToBottom(false);
 
     setTimeout(() => {
@@ -101,6 +109,8 @@ export function MessageList() {
         if (!isFirstScrollToBottom) {
           debounceFirstScrollToBottom();
         } else if (isGenerating && !isUserScrolledUpRef.current) {
+          console.log('生成滚动到底部');
+
           handleScrollToBottom(false);
         }
       }
@@ -156,11 +166,10 @@ export function MessageList() {
   }, [activeConversationId]);
 
   useEffect(() => {
-    const currentMessages = activeConversation?.messages ?? [];
-    setMessages(() => currentMessages);
+    const { messages = [] } = activeConversation ?? {};
 
-    if (currentMessages.length > 0) {
-      const lastMessage = currentMessages[currentMessages.length - 1];
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
       // 如果最后一条消息是用户的，则无条件滚动到底部（平滑），用于用户不在底部，但是发了消息后，我会自动滚动到底部
       if (lastMessage.role === AiRoleEnum.User && !isGenerating) {
         handleScrollToBottom(true);
@@ -172,18 +181,12 @@ export function MessageList() {
     }
 
     // 处理空消息列表的情况
-    if (currentMessages.length === 0) {
+    if (messages.length === 0) {
       setIsFirstScrollToBottom(true);
       isUserScrolledUpRef.current = false;
       setShowScrollToBottomButton(false);
     }
-  }, [
-    activeConversation?.id,
-    activeConversation?.messages,
-    activeConversationId,
-    handleScrollToBottom,
-    isGenerating,
-  ]);
+  }, [activeConversation, handleScrollToBottom, isGenerating]);
 
   const itemData = useMemo<ItemData>(
     () => ({
@@ -202,7 +205,7 @@ export function MessageList() {
       <div className="flex-1 overflow-hidden">
         <AutoSizer>
           {({ width, height }) => {
-            return !isLoading && messages.length === 0 ? (
+            return !isLoading && activeConversation?.messages?.length === 0 ? (
               <div style={{ height, width }}>
                 <EmptyState />
               </div>
