@@ -91,14 +91,15 @@ export function MessageList() {
     [allMessages.length],
   );
 
+  // 切换窗口时或者首次加载时，滚动到底部
+  // 由于状态更新会导致触发多次，所以使用防抖
   const debounceFirstScrollToBottom = useDebouncedCallback(() => {
-    console.log('首次滚动到底部');
-
     handleScrollToBottom(false);
 
+    // 加个定时器，确保虚拟列表加载以及滚动到底部的动作完成了
     setTimeout(() => {
       setIsFirstScrollToBottom(() => true);
-    }, 500);
+    }, 300);
   }, 100);
 
   const setSize = useCallback(
@@ -158,6 +159,7 @@ export function MessageList() {
     [debouncedSetShowScrollToBottomButton],
   );
 
+  // 当切换窗口时，重置状态
   useEffect(() => {
     setIsFirstScrollToBottom(false);
     isUserScrolledUpRef.current = false;
