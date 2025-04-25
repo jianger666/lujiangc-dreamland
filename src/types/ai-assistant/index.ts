@@ -58,13 +58,12 @@ export enum AIProviderEnum {
   OPEN_ROUTER = 'OPEN_ROUTER',
   HENHUO = 'HENHUO',
   GOOGLE = 'GOOGLE',
-  GOOGLE2 = 'GOOGLE2',
   ZHIPU = 'ZHIPU',
   FREE_CHAT_GPT = 'FREE_CHAT_GPT',
 }
 export interface ProviderConfig {
   baseURL: string;
-  apiKey: string;
+  apiKeys: string[];
 }
 
 export enum AIModelEnum {

@@ -17,28 +17,26 @@ import {
 export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
   [AIProviderEnum.OPEN_ROUTER]: {
     baseURL: 'https://openrouter.ai/api/v1',
-    apiKey: process.env.OPEN_ROUTER_API_KEY!,
+    apiKeys: [process.env.OPEN_ROUTER_API_KEY!],
   },
   [AIProviderEnum.HENHUO]: {
     baseURL: 'https://a.henhuoai.com/v1',
-    apiKey: process.env.HENHUO_API_KEY!,
+    apiKeys: [process.env.HENHUO_API_KEY!],
   },
   [AIProviderEnum.GOOGLE]: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    apiKey: process.env.GOOGLE_STUDIO_API_KEY!,
-  },
-  // 谷歌小号
-  [AIProviderEnum.GOOGLE2]: {
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    apiKey: process.env.GOOGLE_STUDIO_API_KEY2!,
+    apiKeys: [
+      process.env.GOOGLE_STUDIO_API_KEY!,
+      process.env.GOOGLE_STUDIO_API_KEY2!,
+    ],
   },
   [AIProviderEnum.FREE_CHAT_GPT]: {
     baseURL: 'https://free.v36.cm/v1',
-    apiKey: process.env.FREE_CHAT_GPT_API_KEY!,
+    apiKeys: [process.env.FREE_CHAT_GPT_API_KEY!],
   },
   [AIProviderEnum.ZHIPU]: {
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
-    apiKey: process.env.ZHIPU_API_KEY!,
+    apiKeys: [process.env.ZHIPU_API_KEY!],
   },
 };
 
@@ -83,7 +81,7 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         modelId: 'gemini-2.5-pro-exp-03-25',
       },
       {
-        provider: AIProviderEnum.GOOGLE2,
+        provider: AIProviderEnum.GOOGLE,
         modelId: 'gemini-2.5-pro-exp-03-25',
       },
       {
@@ -99,10 +97,6 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         provider: AIProviderEnum.GOOGLE,
         modelId: 'models/gemini-2.5-flash-preview-04-17',
       },
-      {
-        provider: AIProviderEnum.GOOGLE2,
-        modelId: 'models/gemini-2.5-flash-preview-04-17',
-      },
     ],
   },
 
@@ -114,7 +108,7 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         modelId: 'gemini-2.0-flash',
       },
       {
-        provider: AIProviderEnum.GOOGLE2,
+        provider: AIProviderEnum.GOOGLE,
         modelId: 'gemini-2.0-flash',
       },
       {
@@ -133,7 +127,7 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         modelId: 'models/gemini-2.0-flash-lite',
       },
       {
-        provider: AIProviderEnum.GOOGLE2,
+        provider: AIProviderEnum.GOOGLE,
         modelId: 'models/gemini-2.0-flash-lite',
       },
       {
@@ -176,11 +170,18 @@ export function getClientConfigForModel(selectedModel: AIModelEnum) {
   const configurations = modelConfig.instances.map((instance) => {
     const { provider, modelId } = instance;
     const providerConfig = PROVIDERS_CONFIG[provider];
-    const { baseURL, apiKey } = providerConfig;
+    const { baseURL, apiKeys } = providerConfig;
+
+    if (!apiKeys || apiKeys.length === 0) {
+      throw new Error(`提供商 ${provider} 没有配置 API Key`);
+    }
+
+    // 从数组中随机选择一个 API Key
+    const selectedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
 
     return {
       baseURL,
-      apiKey,
+      apiKey: selectedApiKey,
       modelId,
       provider,
     };
