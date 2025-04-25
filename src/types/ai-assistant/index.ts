@@ -58,6 +58,7 @@ export enum AIProviderEnum {
   OPEN_ROUTER = 'OPEN_ROUTER',
   HENHUO = 'HENHUO',
   GOOGLE = 'GOOGLE',
+  GOOGLE2 = 'GOOGLE2',
   ZHIPU = 'ZHIPU',
   FREE_CHAT_GPT = 'FREE_CHAT_GPT',
 }
@@ -70,6 +71,7 @@ export enum AIModelEnum {
   DeepSeekV30324 = 'DeepSeekV30324',
   DeepSeekR1 = 'DeepSeekR1',
   Gemini25ProExp0325 = 'Gemini25ProExp0325',
+  Gemini25Flash = 'Gemini25Flash',
   Gemini20Flash = 'Gemini20Flash',
   Gp4oMini = 'Gp4oMini',
   // 不是模型名称，而是专门用于对话内容生成标题的模型一类

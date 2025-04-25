@@ -27,6 +27,11 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
     apiKey: process.env.GOOGLE_STUDIO_API_KEY!,
   },
+  // 谷歌小号
+  [AIProviderEnum.GOOGLE2]: {
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: process.env.GOOGLE_STUDIO_API_KEY2!,
+  },
   [AIProviderEnum.FREE_CHAT_GPT]: {
     baseURL: 'https://free.v36.cm/v1',
     apiKey: process.env.FREE_CHAT_GPT_API_KEY!,
@@ -78,16 +83,38 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
         modelId: 'gemini-2.5-pro-exp-03-25',
       },
       {
+        provider: AIProviderEnum.GOOGLE2,
+        modelId: 'gemini-2.5-pro-exp-03-25',
+      },
+      {
         provider: AIProviderEnum.OPEN_ROUTER,
         modelId: 'google/gemini-2.5-pro-exp-03-25:free',
       },
     ],
   },
+  [AIModelEnum.Gemini25Flash]: {
+    displayName: 'Gemini-2.5-flash',
+    instances: [
+      {
+        provider: AIProviderEnum.GOOGLE,
+        modelId: 'models/gemini-2.5-flash-preview-04-17',
+      },
+      {
+        provider: AIProviderEnum.GOOGLE2,
+        modelId: 'models/gemini-2.5-flash-preview-04-17',
+      },
+    ],
+  },
+
   [AIModelEnum.Gemini20Flash]: {
     displayName: 'Gemini-2.0-Flash',
     instances: [
       {
         provider: AIProviderEnum.GOOGLE,
+        modelId: 'gemini-2.0-flash',
+      },
+      {
+        provider: AIProviderEnum.GOOGLE2,
         modelId: 'gemini-2.0-flash',
       },
       {
@@ -103,6 +130,10 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
     instances: [
       {
         provider: AIProviderEnum.GOOGLE,
+        modelId: 'models/gemini-2.0-flash-lite',
+      },
+      {
+        provider: AIProviderEnum.GOOGLE2,
         modelId: 'models/gemini-2.0-flash-lite',
       },
       {
