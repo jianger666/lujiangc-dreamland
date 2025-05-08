@@ -73,8 +73,10 @@ export enum AIModelEnum {
   Gemini25Flash = 'Gemini25Flash',
   Gemini20Flash = 'Gemini20Flash',
   Gp4oMini = 'Gp4oMini',
-  // 不是模型名称，而是专门用于对话内容生成标题的模型一类
+  // 不是模型名称，专门用于对话内容生成标题的模型一类
   TitleGenerator = 'TitleGenerator',
+  // 不是模型名称，专门用于图像理解的模型一类
+  ImageReader = 'ImageReader',
 }
 
 export interface ModelConfig {

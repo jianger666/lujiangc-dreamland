@@ -140,6 +140,25 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       },
     ],
   },
+  // 专门用于图像理解的模型一类,不给用户展示，只用于图像理解，告诉其他模型，图片内容是什么
+  [AIModelEnum.ImageReader]: {
+    displayName: 'Image Reader',
+    hideInUI: true,
+    instances: [
+      {
+        provider: AIProviderEnum.ZHIPU,
+        modelId: 'glm-4v-flash',
+      },
+      {
+        provider: AIProviderEnum.GOOGLE,
+        modelId: 'models/gemini-2.0-flash-lite',
+      },
+      {
+        provider: AIProviderEnum.GOOGLE,
+        modelId: 'gemini-2.0-flash',
+      },
+    ],
+  },
 };
 
 /**
