@@ -56,7 +56,6 @@ export enum AiStreamChunkTypeEnum {
 
 export enum AIProviderEnum {
   OPEN_ROUTER = 'OPEN_ROUTER',
-  HENHUO = 'HENHUO',
   GOOGLE = 'GOOGLE',
   ZHIPU = 'ZHIPU',
   FREE_CHAT_GPT = 'FREE_CHAT_GPT',

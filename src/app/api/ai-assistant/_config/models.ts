@@ -19,10 +19,6 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     baseURL: 'https://openrouter.ai/api/v1',
     apiKeys: [process.env.OPEN_ROUTER_API_KEY!],
   },
-  [AIProviderEnum.HENHUO]: {
-    baseURL: 'https://a.henhuoai.com/v1',
-    apiKeys: [process.env.HENHUO_API_KEY!],
-  },
   [AIProviderEnum.GOOGLE]: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
     apiKeys: [
@@ -51,10 +47,6 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
     displayName: 'DeepSeek-V3',
     instances: [
       {
-        provider: AIProviderEnum.HENHUO,
-        modelId: 'deepseek-ai/DeepSeek-V3',
-      },
-      {
         provider: AIProviderEnum.OPEN_ROUTER,
         modelId: 'deepseek/deepseek-chat-v3-0324:free',
       },
@@ -63,10 +55,6 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
   [AIModelEnum.DeepSeekR1]: {
     displayName: 'DeepSeek-R1',
     instances: [
-      {
-        provider: AIProviderEnum.HENHUO,
-        modelId: 'deepseek-ai/DeepSeek-R1',
-      },
       {
         provider: AIProviderEnum.OPEN_ROUTER,
         modelId: 'deepseek/deepseek-r1:free',
