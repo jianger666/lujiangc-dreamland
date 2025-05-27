@@ -182,7 +182,6 @@ export function ChatInput() {
             'relative rounded-md border border-border transition-all duration-150',
             isFocused && 'border-primary shadow-sm',
           )}
-          onClick={handleContainerClick}
         >
           {/* 图片预览区域 */}
           {imagePreview && (
@@ -232,7 +231,10 @@ export function ChatInput() {
             }}
           />
 
-          <div className="flex items-center justify-between border-border p-2">
+          <div
+            className="flex items-center justify-between border-border p-2"
+            onClick={handleContainerClick}
+          >
             <div className="flex flex-wrap items-center gap-1 md:gap-2">
               <Select
                 value={selectedModel}

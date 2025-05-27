@@ -48,21 +48,26 @@ export const useFocusTextarea = ({
   // 当isLoading从true变为false时自动聚焦
   useEffect(() => {
     if (!isLoading) {
+      console.log('isLoading触发');
       focusTextarea();
     }
-  }, [isLoading, focusTextarea]);
+  }, [isLoading]);
 
   // 当对话切换时自动聚焦输入框
   useEffect(() => {
+    console.log('conversationId触发');
+
     focusTextarea();
-  }, [conversationId, focusTextarea]);
+  }, [conversationId]);
 
   // 监听消息列表变化，当清空对话后自动聚焦输入框
   useEffect(() => {
     if (messagesLength === 0) {
+      console.log('messagesLength触发');
+
       focusTextarea();
     }
-  }, [messagesLength, focusTextarea]);
+  }, [messagesLength]);
 
   return {
     textareaRef,
