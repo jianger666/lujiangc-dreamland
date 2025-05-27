@@ -10,8 +10,22 @@ import { getClientConfigForModel } from '../_config';
 import { AIModelEnum } from '@/types/ai-assistant';
 
 /**
+ * 检查消息是否包含多模态内容（图片+文本）
+ * @param messages 消息数组
+ * @returns 布尔值，表示是否包含多模态内容
+ */
+function containsMultiModalContent(messages: any[]): boolean {
+  return messages.some((message) => {
+    return (
+      Array.isArray(message.content) &&
+      message.content.some((item: any) => item.type === 'image_url')
+    );
+  });
+}
+
+/**
  * 尝试使用指定模型的可用配置进行 OpenAI Chat Completion 调用，并实现失败重试。
- * 支持流式和非流式请求。
+ * 支持流式和非流式请求，以及多模态内容（图片+文本）。
  *
  * @param selectedModel - 用户选择的 AI 模型。
  * @param requestOptions - OpenAI API 请求的基础选项 (不含 model, baseURL, apiKey)。
@@ -31,7 +45,29 @@ export async function tryChatCompletionWithFailover(
   const shuffledConfigs = shuffle(configurationsRaw);
   const errors: unknown[] = [];
 
-  for (const config of shuffledConfigs) {
+  // 检查是否包含多模态内容
+  const hasMultiModalContent = containsMultiModalContent(
+    requestOptions.messages,
+  );
+
+  // 如果包含多模态内容，过滤出支持多模态的模型实例
+  const configs = hasMultiModalContent
+    ? shuffledConfigs.filter((config) => {
+        // 这里可以根据实际需求添加支持多模态的模型判断
+        // 目前支持图片的模型主要有：
+        // 1. 智谱的glm-4v系列
+        // 2. Google的gemini系列
+        return (
+          config.modelId.includes('glm-4v') || config.modelId.includes('gemini')
+        );
+      })
+    : shuffledConfigs;
+
+  if (hasMultiModalContent && configs.length === 0) {
+    throw new Error('没有找到支持多模态内容（图片）的模型实例');
+  }
+
+  for (const config of configs) {
     try {
       console.log(
         `[Failover] 尝试使用 Provider: ${config.provider}, Model: ${config.modelId}`,

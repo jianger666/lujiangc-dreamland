@@ -6,3 +6,5 @@ export * from './useConversations';
 export * from './useStreamResponse';
 export * from './useTitleGeneration';
 export * from './useChatScroll';
+export * from './useImageUpload';
+export * from './useFocusTextarea';

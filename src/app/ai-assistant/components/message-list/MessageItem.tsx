@@ -23,6 +23,7 @@ const MessageItemComponent = ({
   const itemRef = useRef<HTMLDivElement>(null);
   const role = message?.role ?? AiRoleEnum.Assistant;
   const thinking = message?.thinking ?? undefined;
+  const image = message?.image ?? undefined;
 
   // 动态更新项目高度
   useEffect(() => {
@@ -32,7 +33,7 @@ const MessageItemComponent = ({
       }
     }
     // 依赖项：当消息内容或思考内容变化时重新计算
-  }, [message?.content, thinking, setSize, index]);
+  }, [message?.content, thinking, image, setSize, index]);
 
   return (
     <div style={style}>
@@ -48,37 +49,47 @@ const MessageItemComponent = ({
           <>
             <div className="space-y-2">
               {thinking && <ThinkingBlock content={thinking} />}
-              {message?.content && (
+              <div
+                className={cn(
+                  'group flex',
+                  role === AiRoleEnum.User ? 'justify-end' : 'justify-start',
+                )}
+              >
                 <div
                   className={cn(
-                    'group flex',
-                    role === AiRoleEnum.User ? 'justify-end' : 'justify-start',
+                    'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
+                    role === AiRoleEnum.User ? 'bg-accent' : 'bg-muted',
                   )}
                 >
-                  <div
-                    className={cn(
-                      'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
-                      role === AiRoleEnum.User ? 'bg-accent' : 'bg-muted',
-                    )}
-                  >
-                    <MessageContent content={message.content} role={role} />
-                    {/* 复制按钮 */}
-                    <div
-                      className={cn(
-                        'absolute top-1 transition-opacity group-hover:opacity-100',
-                        'opacity-0', // 初始隐藏
-                        role === AiRoleEnum.User ? '-left-10' : '-right-10',
-                        'flex items-center',
-                      )}
-                    >
-                      <CopyButton
-                        textToCopy={message.content}
-                        title="复制消息"
+                  {/* 显示图片 */}
+                  {image && role === AiRoleEnum.User && (
+                    <div className="mb-2 overflow-hidden rounded-md">
+                      <img
+                        src={image}
+                        alt="用户上传的图片"
+                        className="max-h-48 w-auto object-contain"
                       />
                     </div>
+                  )}
+                  {message?.content && (
+                    <MessageContent content={message.content} role={role} />
+                  )}
+                  {/* 复制按钮 */}
+                  <div
+                    className={cn(
+                      'absolute top-1 transition-opacity group-hover:opacity-100',
+                      'opacity-0', // 初始隐藏
+                      role === AiRoleEnum.User ? '-left-10' : '-right-10',
+                      'flex items-center',
+                    )}
+                  >
+                    <CopyButton
+                      textToCopy={message?.content || ''}
+                      title="复制消息"
+                    />
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </>
         )}

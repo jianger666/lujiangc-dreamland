@@ -16,6 +16,7 @@ import { apiHandler } from '@/lib/api/handler';
 import { createStreamResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum, Message } from '@/types/ai-assistant';
 import { generateUUID } from '@/lib';
+import { getClientConfigForModel } from './_config';
 
 export const runtime = 'edge';
 
@@ -37,10 +38,32 @@ function handleStreamError(error: unknown, context: string): Response {
 }
 
 /**
+ * 检查模型实例是否支持图片处理
+ * @param modelEnum 选择的AI模型枚举值
+ * @returns 布尔值，表示模型是否支持图片处理
+ */
+function doesModelSupportImages(modelEnum: AIModelEnum): boolean {
+  // 获取模型配置
+  const modelConfig = getClientConfigForModel(modelEnum);
+
+  // 检查模型实例中是否有支持图片的模型
+  const imageReaderInstances = getClientConfigForModel(AIModelEnum.ImageReader);
+  const imageReaderModelIds = imageReaderInstances.map(
+    (instance) => instance.modelId,
+  );
+
+  // 检查选定模型的实例是否与ImageReader的实例有重叠
+  return modelConfig.some((config) =>
+    imageReaderModelIds.includes(config.modelId),
+  );
+}
+
+/**
  * 处理AI模型请求并返回流式响应
  */
 const handleAiRequest = apiHandler(async (req: NextRequest) => {
-  const { messages, selectedModel, isWebSearchEnabled } = await req.json();
+  const { messages, selectedModel, isWebSearchEnabled, imageData } =
+    await req.json();
 
   // 没有selectedModel或者selectedModel不是AIModelEnum的成员
   if (!selectedModel || !Object.values(AIModelEnum).includes(selectedModel)) {
@@ -53,6 +76,35 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
 
   // 准备发送给 AI 的消息数组
   const messagesForAI: Message[] = [...messages];
+
+  // 处理图片数据
+  let modelToUse = selectedModel as AIModelEnum;
+
+  if (imageData) {
+    console.log('[API Route] 接收到图片数据');
+
+    // 检查当前选择的模型是否支持图片
+    const modelSupportsImages = doesModelSupportImages(modelToUse);
+
+    // 如果当前模型不支持图片，则切换到ImageReader
+    if (!modelSupportsImages) {
+      console.log('[API Route] 当前模型不支持图片，切换到ImageReader');
+      modelToUse = AIModelEnum.ImageReader;
+    }
+
+    // 确保最后一条消息包含图片数据
+    if (messagesForAI.length > 0) {
+      const lastMessage = messagesForAI[messagesForAI.length - 1];
+      if (lastMessage && lastMessage.role === AiRoleEnum.User) {
+        // 添加系统消息告知AI有图片
+        messagesForAI.splice(messagesForAI.length - 1, 0, {
+          id: generateUUID(),
+          role: AiRoleEnum.System,
+          content: '用户提供了一张图片，请分析图片内容并回答用户问题。',
+        });
+      }
+    }
+  }
 
   // 如果启用了 Web 搜索
   if (isWebSearchEnabled) {
@@ -101,18 +153,32 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
   }
 
   try {
-    // 1. 获取所有可用配置 - Removed by user
-    // const configurations = getClientConfigForModel(selectedModel);
-
-    // 2. 准备基础请求选项
-    const baseRequestOptions = {
+    // 准备基础请求选项
+    const baseRequestOptions: Omit<ChatCompletionCreateParams, 'model'> = {
       messages: messagesForAI as ChatCompletionCreateParams['messages'],
       stream: true,
     };
 
-    // 3. 调用带故障转移的请求函数，传递 selectedModel
+    // 如果有图片数据且是最后一条消息的图片，则添加到请求选项中
+    if (imageData && modelToUse === AIModelEnum.ImageReader) {
+      // 对于支持多模态的API，添加图片到最后一条用户消息中
+      // 注意：这里的实现方式取决于模型的API要求
+      const lastMessageIndex = messagesForAI.length - 1;
+      if (
+        lastMessageIndex >= 0 &&
+        messagesForAI[lastMessageIndex].role === AiRoleEnum.User
+      ) {
+        // 修改传递格式使其符合OpenAI multimodal API的格式
+        (baseRequestOptions.messages as any)[lastMessageIndex].content = [
+          { type: 'text', text: messagesForAI[lastMessageIndex].content },
+          { type: 'image_url', image_url: { url: imageData } },
+        ];
+      }
+    }
+
+    // 调用带故障转移的请求函数，传递 modelToUse
     const response = (await tryChatCompletionWithFailover(
-      selectedModel, // Pass model enum instead of configurations
+      modelToUse, // 使用可能已切换的模型
       baseRequestOptions,
     )) as AsyncIterable<ChatCompletionChunk>; // 明确类型为流式
 

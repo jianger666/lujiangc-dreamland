@@ -27,6 +27,7 @@ interface UseConversationsProps {
     conversationId: string;
     setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
     onComplete: (conversationId: string) => void;
+    imageData?: string | null;
   }) => Promise<void>;
   handleStreamingComplete: (conversationId: string) => void;
   resetStreamingState: (
@@ -242,9 +243,19 @@ export const useConversations = ({
 
   // 发送用户消息并处理AI响应
   const sendMessage = useCallback(
-    async (userInput: string, activeConversation?: Conversation) => {
-      if (!activeConversationId || !userInput.trim() || !activeConversation)
+    async (userInput: string, imageData?: string | null) => {
+      if (
+        !activeConversationId ||
+        (!userInput.trim() && !imageData) ||
+        !conversations.length
+      )
         return;
+
+      const activeConversation = conversations.find(
+        (conv) => conv.id === activeConversationId,
+      );
+
+      if (!activeConversation) return;
 
       try {
         // 创建新的用户消息
@@ -252,6 +263,7 @@ export const useConversations = ({
           id: generateUUID(),
           role: AiRoleEnum.User,
           content: userInput.trim(),
+          ...(imageData ? { image: imageData } : {}),
         };
 
         // 更新对话消息列表
@@ -268,7 +280,7 @@ export const useConversations = ({
           return updatedConversations;
         });
 
-        // 准备请求消息列表（包含历史消息和当前用户输入）
+        // 获取当前实时更新的对话
         const currentConversation = conversations.find(
           (conv) => conv.id === activeConversationId,
         );
@@ -290,6 +302,7 @@ export const useConversations = ({
           conversationId: activeConversationId,
           setConversations,
           onComplete: handleStreamingComplete,
+          imageData: imageData || undefined,
         });
       } catch (error) {
         console.error('发送消息失败:', error);

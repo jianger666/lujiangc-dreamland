@@ -30,6 +30,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^8.28.0
   '@typescript-eslint/parser': ^8.28.0
   autoprefixer: ^10.4.16
+  browser-image-compression: ^2.0.2
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
   dayjs: ^1.11.13
@@ -108,6 +109,7 @@ dependencies:
   '@types/react-syntax-highlighter': registry.npmmirror.com/@types/react-syntax-highlighter/15.5.13
   '@types/react-window': registry.npmmirror.com/@types/react-window/1.8.8
   '@types/uuid': registry.npmmirror.com/@types/uuid/10.0.0
+  browser-image-compression: registry.npmmirror.com/browser-image-compression/2.0.2
   class-variance-authority: registry.npmmirror.com/class-variance-authority/0.7.1
   clsx: registry.npmmirror.com/clsx/2.1.1
   dayjs: registry.npmmirror.com/dayjs/1.11.13
@@ -2597,6 +2599,14 @@ packages:
     dependencies:
       fill-range: registry.npmmirror.com/fill-range/7.1.1
     dev: true
+
+  registry.npmmirror.com/browser-image-compression/2.0.2:
+    resolution: {integrity: sha512-pBLlQyUf6yB8SmmngrcOw3EoS4RpQ1BcylI3T9Yqn7+4nrQTXJD4sJDe5ODnJdrvNMaio5OicFo75rDyJD2Ucw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/browser-image-compression/-/browser-image-compression-2.0.2.tgz}
+    name: browser-image-compression
+    version: 2.0.2
+    dependencies:
+      uzip: registry.npmmirror.com/uzip/0.20201231.0
+    dev: false
 
   registry.npmmirror.com/browserslist/4.24.4:
     resolution: {integrity: sha512-KDi1Ny1gSePi1vm0q4oxSF8b4DR44GF4BbmS2YdhPLOEqd8pDviZOGH/GsmRwoWJ2+5Lr085X7naowMwKHDG1A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/browserslist/-/browserslist-4.24.4.tgz}
@@ -7881,6 +7891,12 @@ packages:
     name: uuid
     version: 9.0.1
     hasBin: true
+    dev: false
+
+  registry.npmmirror.com/uzip/0.20201231.0:
+    resolution: {integrity: sha512-OZeJfZP+R0z9D6TmBgLq2LHzSSptGMGDGigGiEe0pr8UBe/7fdflgHlHBNDASTXB5jnFuxHpNaJywSg8YFeGng==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/uzip/-/uzip-0.20201231.0.tgz}
+    name: uzip
+    version: 0.20201231.0
     dev: false
 
   registry.npmmirror.com/vfile-location/5.0.3:

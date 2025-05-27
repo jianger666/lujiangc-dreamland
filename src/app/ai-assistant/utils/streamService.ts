@@ -192,6 +192,7 @@ export async function startStreamResponse({
   conversationId,
   setConversations,
   onComplete,
+  imageData,
 }: {
   messages: Message[];
   selectedModel: string;
@@ -203,6 +204,7 @@ export async function startStreamResponse({
   conversationId: string;
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   onComplete?: (conversationId: string) => void;
+  imageData?: string;
 }): Promise<void> {
   // 1. 创建新的AbortController实例
   const abortController = new AbortController();
@@ -222,6 +224,7 @@ export async function startStreamResponse({
       conversationId,
       setConversations,
       onComplete,
+      imageData,
     });
   } catch (error) {
     console.error('Stream response error:', error);
@@ -244,6 +247,7 @@ async function executeStreamRequest({
   conversationId,
   setConversations,
   onComplete,
+  imageData,
 }: {
   messages: Message[];
   selectedModel: string;
@@ -253,8 +257,29 @@ async function executeStreamRequest({
   conversationId: string;
   setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
   onComplete?: (conversationId: string) => void;
+  imageData?: string;
 }): Promise<void> {
-  // 1. 初始化累积内容
+  // 去除历史消息中的图片数据，减小请求大小
+  const messagesWithoutImages = messages.map((msg, index) => {
+    // 仅保留最后一条消息的图片（如果有）
+    if (index < messages.length - 1) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { image, ...msgWithoutImage } = msg;
+      return msgWithoutImage;
+    }
+    return msg;
+  });
+
+  // 检查是否是ImageReader模型或者当前选择的模型支持图片
+  const isImageReaderModel =
+    selectedModel === 'ImageReader' ||
+    (imageData && selectedModel.includes('ImageReader'));
+
+  // 如果上传了图片但当前模型不支持，则改用ImageReader处理
+  const modelToUse =
+    imageData && !isImageReaderModel ? 'ImageReader' : selectedModel;
+
+  // 累积的内容
   const accumulatedContent = { value: '' };
   const accumulatedThinking = { value: '' };
 
@@ -275,9 +300,10 @@ async function executeStreamRequest({
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        messages,
-        selectedModel: selectedModel,
+        messages: messagesWithoutImages,
+        selectedModel: modelToUse,
         isWebSearchEnabled,
+        imageData,
       }),
       signal: abortController.signal,
       openWhenHidden: true,
