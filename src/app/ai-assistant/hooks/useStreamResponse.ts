@@ -30,7 +30,7 @@ export const useStreamResponse = () => {
       setConversations,
       onComplete,
       isWebSearchEnabled,
-      imageData,
+      imageDatas,
     }: {
       messages: Message[];
       selectedModel: string;
@@ -38,7 +38,7 @@ export const useStreamResponse = () => {
       setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
       onComplete: (conversationId: string) => void;
       isWebSearchEnabled: boolean;
-      imageData?: string | null;
+      imageDatas?: string[];
     }) => {
       return startStreamResponseUtil({
         messages,
@@ -49,7 +49,7 @@ export const useStreamResponse = () => {
         conversationId,
         setConversations,
         onComplete,
-        imageData: imageData || undefined,
+        imageDatas,
       });
     },
     [],

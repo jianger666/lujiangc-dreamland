@@ -3,22 +3,35 @@ import { useToast } from '@/hooks/use-toast';
 import { compressImage } from '../utils/imageCompression';
 import type { ImageCompressionOptions } from '../utils/imageCompression';
 
+// 定义单个图片的压缩信息
+export interface ImageCompressionInfo {
+  originalSize: number;
+  compressedSize: number;
+  compressionRatio: number;
+}
+
+// 定义图片项
+export interface ImageItem {
+  id: string;
+  preview: string;
+  file: File;
+  compressionInfo: ImageCompressionInfo;
+}
+
 /**
  * useImageUpload hook的返回类型
  */
 export interface UseImageUploadReturn {
-  imagePreview: string | null;
+  images: ImageItem[];
   isProcessingImage: boolean;
-  compressionInfo: {
-    originalSize: number;
-    compressedSize: number;
-    compressionRatio: number;
-  } | null;
   handleImageUpload: (file: File | null) => Promise<void>;
   handleUploadButtonClick: () => void;
-  handleRemoveImage: () => void;
+  handleRemoveImage: (imageId: string) => void;
+  handleRemoveAllImages: () => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   resetFileInput: () => void;
+  canAddMoreImages: boolean;
+  maxImages: number;
 }
 
 /**
@@ -26,9 +39,10 @@ export interface UseImageUploadReturn {
  */
 export interface UseImageUploadOptions {
   compressionOptions?: ImageCompressionOptions;
+  maxImages?: number;
   onCompressionComplete?: (result: {
     success: boolean;
-    file?: File;
+    files?: File[];
     error?: string;
   }) => void;
 }
@@ -38,19 +52,24 @@ export interface UseImageUploadOptions {
  */
 export const useImageUpload = ({
   compressionOptions,
+  maxImages = 9,
   onCompressionComplete,
 }: UseImageUploadOptions = {}): UseImageUploadReturn => {
   const { toast } = useToast();
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [isProcessingImage, setIsProcessingImage] = useState(false);
-  const [compressionInfo, setCompressionInfo] = useState<{
-    originalSize: number;
-    compressedSize: number;
-    compressionRatio: number;
-  } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 计算是否可以添加更多图片
+  const canAddMoreImages = images.length < maxImages;
+
+  /**
+   * 生成唯一ID
+   */
+  const generateId = () =>
+    `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   /**
    * 重置文件输入框
@@ -67,8 +86,16 @@ export const useImageUpload = ({
   const handleImageUpload = useCallback(
     async (file: File | null) => {
       if (!file) {
-        setImagePreview(null);
-        setCompressionInfo(null);
+        return;
+      }
+
+      // 检查是否已达到最大图片数量
+      if (images.length >= maxImages) {
+        toast({
+          variant: 'destructive',
+          title: '图片数量已达上限',
+          description: `最多只能上传 ${maxImages} 张图片`,
+        });
         return;
       }
 
@@ -90,24 +117,29 @@ export const useImageUpload = ({
         if (result.success && result.file) {
           // 创建预览URL
           const previewUrl = URL.createObjectURL(result.file);
-          setImagePreview(previewUrl);
 
-          // 设置压缩信息
-          setCompressionInfo({
-            originalSize: result.originalSize,
-            compressedSize: result.compressedSize,
-            compressionRatio: result.compressionRatio,
-          });
+          // 创建新的图片项
+          const newImageItem: ImageItem = {
+            id: generateId(),
+            preview: previewUrl,
+            file: result.file,
+            compressionInfo: {
+              originalSize: result.originalSize,
+              compressedSize: result.compressedSize,
+              compressionRatio: result.compressionRatio,
+            },
+          };
 
-          // 压缩成功，不显示toast提示
+          // 添加到图片列表
+          setImages((prev) => [...prev, newImageItem]);
 
           // 回调通知压缩完成
-          onCompressionComplete?.({ success: true, file: result.file });
+          onCompressionComplete?.({
+            success: true,
+            files: [...images.map((img) => img.file), result.file],
+          });
         } else {
           // 压缩失败
-          setImagePreview(null);
-          setCompressionInfo(null);
-
           toast({
             variant: 'destructive',
             title: '图片处理失败',
@@ -118,9 +150,6 @@ export const useImageUpload = ({
         }
       } catch (error) {
         console.error('处理图片错误:', error);
-
-        setImagePreview(null);
-        setCompressionInfo(null);
 
         toast({
           variant: 'destructive',
@@ -134,7 +163,14 @@ export const useImageUpload = ({
         resetFileInput();
       }
     },
-    [compressionOptions, onCompressionComplete, toast, resetFileInput],
+    [
+      images,
+      maxImages,
+      compressionOptions,
+      onCompressionComplete,
+      toast,
+      resetFileInput,
+    ],
   );
 
   /**
@@ -145,25 +181,52 @@ export const useImageUpload = ({
   }, []);
 
   /**
-   * 移除图片
+   * 移除单张图片
    */
-  const handleRemoveImage = useCallback(() => {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImagePreview(null);
-    setCompressionInfo(null);
+  const handleRemoveImage = useCallback(
+    (imageId: string) => {
+      setImages((prev) => {
+        const imageToRemove = prev.find((img) => img.id === imageId);
+        if (imageToRemove) {
+          URL.revokeObjectURL(imageToRemove.preview);
+        }
+        const newImages = prev.filter((img) => img.id !== imageId);
+
+        // 通知剩余文件
+        onCompressionComplete?.({
+          success: true,
+          files: newImages.map((img) => img.file),
+        });
+
+        return newImages;
+      });
+      resetFileInput();
+    },
+    [onCompressionComplete, resetFileInput],
+  );
+
+  /**
+   * 移除所有图片
+   */
+  const handleRemoveAllImages = useCallback(() => {
+    images.forEach((img) => {
+      URL.revokeObjectURL(img.preview);
+    });
+    setImages([]);
+    onCompressionComplete?.({ success: true, files: [] });
     resetFileInput();
-  }, [imagePreview, resetFileInput]);
+  }, [images, onCompressionComplete, resetFileInput]);
 
   return {
-    imagePreview,
+    images,
     isProcessingImage,
-    compressionInfo,
     handleImageUpload,
     handleUploadButtonClick,
     handleRemoveImage,
+    handleRemoveAllImages,
     fileInputRef,
     resetFileInput,
+    canAddMoreImages,
+    maxImages,
   };
 };

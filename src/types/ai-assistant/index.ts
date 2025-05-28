@@ -9,7 +9,7 @@ export interface Message {
   role: AiRoleEnum;
   content: string;
   thinking?: string;
-  image?: string;
+  images?: string[];
 }
 
 export interface Conversation {
@@ -28,7 +28,7 @@ export interface StreamingMessage {
   thinking: string;
   role?: never;
   id?: never;
-  image?: string;
+  images?: string[];
 }
 
 // 单个对话的流式状态

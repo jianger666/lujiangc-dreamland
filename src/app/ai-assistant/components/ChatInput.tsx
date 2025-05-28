@@ -44,24 +44,23 @@ export function ChatInput() {
 
   const [input, setInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [compressedImageFile, setCompressedImageFile] = useState<File | null>(
-    null,
-  );
 
   // 使用图片上传hook
   const {
-    imagePreview,
+    images,
     isProcessingImage,
     handleImageUpload,
     handleUploadButtonClick,
     handleRemoveImage,
+    handleRemoveAllImages,
+    canAddMoreImages,
+    maxImages,
     fileInputRef,
   } = useImageUpload({
-    onCompressionComplete: ({ success, file }) => {
-      if (success && file) {
-        setCompressedImageFile(file);
-      } else {
-        setCompressedImageFile(null);
+    maxImages: 9,
+    onCompressionComplete: ({ success, files }) => {
+      if (success && files) {
+        console.log(`当前图片数量: ${files.length}`);
       }
     },
   });
@@ -118,42 +117,53 @@ export function ChatInput() {
   }, [input, adjustTextareaHeight]);
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
-      if ((!input.trim() && !imagePreview) || isLoading || !activeConversation)
+      if (
+        (!input.trim() && images.length === 0) ||
+        isLoading ||
+        !activeConversation
+      )
         return;
 
-      // 如果有压缩后的图片文件，转换为base64发送
-      if (compressedImageFile) {
-        fileToBase64(compressedImageFile).then((base64Data) => {
-          sendMessage(input, base64Data);
-          setInput('');
-          handleRemoveImage();
-          setCompressedImageFile(null);
+      // 先保存要发送的内容
+      const messageToSend = input.trim();
+      const imagesToSend = [...images];
 
-          // 重置高度
-          if (textareaRef.current) {
-            textareaRef.current.style.height = `${parseInt(window.getComputedStyle(textareaRef.current).lineHeight) * minTextareaRows}px`;
-          }
-        });
-      } else {
-        sendMessage(input, undefined);
-        setInput('');
+      // 立即清空输入和图片
+      setInput('');
+      handleRemoveAllImages();
 
-        // 重置高度
-        if (textareaRef.current) {
-          textareaRef.current.style.height = `${parseInt(window.getComputedStyle(textareaRef.current).lineHeight) * minTextareaRows}px`;
+      // 重置高度
+      if (textareaRef.current) {
+        textareaRef.current.style.height = `${parseInt(window.getComputedStyle(textareaRef.current).lineHeight) * minTextareaRows}px`;
+      }
+
+      // 如果有图片，转换为base64发送
+      if (imagesToSend.length > 0) {
+        try {
+          const base64Images = await Promise.all(
+            imagesToSend.map((image) => fileToBase64(image.file)),
+          );
+
+          await sendMessage(messageToSend, base64Images);
+        } catch (error) {
+          console.error('转换图片失败:', error);
+          // 如果发送失败，恢复输入内容
+          setInput(messageToSend);
+          return;
         }
+      } else {
+        await sendMessage(messageToSend, undefined);
       }
     },
     [
       input,
-      imagePreview,
+      images,
       isLoading,
       activeConversation,
-      compressedImageFile,
       sendMessage,
-      handleRemoveImage,
+      handleRemoveAllImages,
       textareaRef,
       minTextareaRows,
     ],
@@ -184,26 +194,30 @@ export function ChatInput() {
           )}
         >
           {/* 图片预览区域 */}
-          {imagePreview && (
-            <div className="relative mx-2 mt-2 inline-block">
-              <div className="group relative h-20 w-20 overflow-hidden rounded-md border border-border">
-                <Image
-                  src={imagePreview}
-                  alt="预览图片"
-                  fill
-                  className="object-cover"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute right-1 top-1 h-5 w-5 rounded-full p-0 opacity-80 transition-opacity hover:opacity-100"
-                  onClick={handleRemoveImage}
-                  title="移除图片"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
+          {images.length > 0 && (
+            <div className="flex flex-wrap gap-2 p-2">
+              {images.map((image) => (
+                <div key={image.id} className="group relative">
+                  <div className="relative h-20 w-20 overflow-hidden rounded-md border border-border">
+                    <Image
+                      src={image.preview}
+                      alt="预览图片"
+                      fill
+                      className="object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute right-1 top-1 h-5 w-5 rounded-full p-0 opacity-80 transition-opacity hover:opacity-100"
+                      onClick={() => handleRemoveImage(image.id)}
+                      title="移除图片"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -273,9 +287,13 @@ export function ChatInput() {
                 size="sm"
                 variant="outline"
                 onClick={handleUploadButtonClick}
-                disabled={isLoading || isProcessingImage}
+                disabled={isLoading || isProcessingImage || !canAddMoreImages}
                 className="h-7 px-2 text-xs md:h-8"
-                title="上传图片"
+                title={
+                  canAddMoreImages
+                    ? `上传图片 (${images.length}/${maxImages})`
+                    : `已达上限 (${maxImages}张)`
+                }
               >
                 <ImageIcon className="mr-1 h-4 w-4" />
                 <span className="hidden md:inline-block">上传图片</span>
@@ -304,7 +322,7 @@ export function ChatInput() {
               )}
               <Button
                 type="submit"
-                disabled={isLoading || (!input.trim() && !imagePreview)}
+                disabled={isLoading || (!input.trim() && images.length === 0)}
                 className="h-7 w-7 rounded-full p-0 md:h-8 md:w-8"
                 title="发送消息"
               >

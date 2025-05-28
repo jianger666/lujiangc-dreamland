@@ -135,7 +135,7 @@ interface AIAssistantContextType {
   saveEditedTitle: (title: string) => void; // 保存编辑后的标题
   changeModel: (model: AIModelEnum) => void; // 更改当前对话的模型
   clearMessages: () => void; // 清空当前对话的消息
-  sendMessage: (userInput: string, imageData?: string | null) => Promise<void>; // 发送消息
+  sendMessage: (userInput: string, imageDatas?: string[]) => Promise<void>; // 发送消息
   stopResponding: () => void; // 停止当前对话的响应生成
   toggleWebSearch: (conversationId: string) => void; // 切换联网搜索状态
   changeMobileSidebarOpen: (e: boolean) => void; // 切换移动端侧边栏打开/关闭状态
@@ -433,9 +433,9 @@ export function AIAssistantProvider({
 
   // 发送消息
   const sendMessage = useCallback(
-    async (userInput: string, imageData?: string | null) => {
+    async (userInput: string, imageDatas?: string[]) => {
       if (!activeConversation) return;
-      await sendMessageBase(userInput, imageData);
+      await sendMessageBase(userInput, imageDatas);
     },
     [activeConversation, sendMessageBase],
   );

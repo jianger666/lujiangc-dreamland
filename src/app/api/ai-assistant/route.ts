@@ -62,7 +62,7 @@ function doesModelSupportImages(modelEnum: AIModelEnum): boolean {
  * 处理AI模型请求并返回流式响应
  */
 const handleAiRequest = apiHandler(async (req: NextRequest) => {
-  const { messages, selectedModel, isWebSearchEnabled, imageData } =
+  const { messages, selectedModel, isWebSearchEnabled, imageDatas } =
     await req.json();
 
   // 没有selectedModel或者selectedModel不是AIModelEnum的成员
@@ -80,8 +80,8 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
   // 处理图片数据
   let modelToUse = selectedModel as AIModelEnum;
 
-  if (imageData) {
-    console.log('[API Route] 接收到图片数据');
+  if (imageDatas && imageDatas.length > 0) {
+    console.log('[API Route] 接收到图片数据，数量:', imageDatas.length);
 
     // 检查当前选择的模型是否支持图片
     const modelSupportsImages = doesModelSupportImages(modelToUse);
@@ -97,10 +97,12 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
       const lastMessage = messagesForAI[messagesForAI.length - 1];
       if (lastMessage && lastMessage.role === AiRoleEnum.User) {
         // 添加系统消息告知AI有图片
+        const imageText =
+          imageDatas.length === 1 ? '一张图片' : `${imageDatas.length}张图片`;
         messagesForAI.splice(messagesForAI.length - 1, 0, {
           id: generateUUID(),
           role: AiRoleEnum.System,
-          content: '用户提供了一张图片，请分析图片内容并回答用户问题。',
+          content: `用户提供了${imageText}，请分析图片内容并回答用户问题。`,
         });
       }
     }
@@ -160,7 +162,11 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     };
 
     // 如果有图片数据且是最后一条消息的图片，则添加到请求选项中
-    if (imageData && modelToUse === AIModelEnum.ImageReader) {
+    if (
+      imageDatas &&
+      imageDatas.length > 0 &&
+      modelToUse === AIModelEnum.ImageReader
+    ) {
       // 对于支持多模态的API，添加图片到最后一条用户消息中
       // 注意：这里的实现方式取决于模型的API要求
       const lastMessageIndex = messagesForAI.length - 1;
@@ -168,11 +174,16 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
         lastMessageIndex >= 0 &&
         messagesForAI[lastMessageIndex].role === AiRoleEnum.User
       ) {
-        // 修改传递格式使其符合OpenAI multimodal API的格式
-        (baseRequestOptions.messages as any)[lastMessageIndex].content = [
+        // 修改传递格式使其符合OpenAI multimodal API的格式，支持多张图片
+        const content = [
           { type: 'text', text: messagesForAI[lastMessageIndex].content },
-          { type: 'image_url', image_url: { url: imageData } },
+          ...imageDatas.map((imageData: string) => ({
+            type: 'image_url',
+            image_url: { url: imageData },
+          })),
         ];
+        (baseRequestOptions.messages as any)[lastMessageIndex].content =
+          content;
       }
     }
 

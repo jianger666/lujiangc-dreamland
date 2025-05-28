@@ -27,7 +27,7 @@ interface UseConversationsProps {
     conversationId: string;
     setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
     onComplete: (conversationId: string) => void;
-    imageData?: string | null;
+    imageDatas?: string[];
   }) => Promise<void>;
   handleStreamingComplete: (conversationId: string) => void;
   resetStreamingState: (
@@ -243,10 +243,10 @@ export const useConversations = ({
 
   // 发送用户消息并处理AI响应
   const sendMessage = useCallback(
-    async (userInput: string, imageData?: string | null) => {
+    async (userInput: string, imageDatas?: string[]) => {
       if (
         !activeConversationId ||
-        (!userInput.trim() && !imageData) ||
+        (!userInput.trim() && (!imageDatas || imageDatas.length === 0)) ||
         !conversations.length
       )
         return;
@@ -263,7 +263,9 @@ export const useConversations = ({
           id: generateUUID(),
           role: AiRoleEnum.User,
           content: userInput.trim(),
-          ...(imageData ? { image: imageData } : {}),
+          ...(imageDatas && imageDatas.length > 0
+            ? { images: imageDatas }
+            : {}),
         };
 
         // 更新对话消息列表
@@ -302,7 +304,7 @@ export const useConversations = ({
           conversationId: activeConversationId,
           setConversations,
           onComplete: handleStreamingComplete,
-          imageData: imageData || undefined,
+          imageDatas: imageDatas,
         });
       } catch (error) {
         console.error('发送消息失败:', error);

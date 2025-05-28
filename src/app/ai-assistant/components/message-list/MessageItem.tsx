@@ -23,7 +23,7 @@ const MessageItemComponent = ({
   const itemRef = useRef<HTMLDivElement>(null);
   const role = message?.role ?? AiRoleEnum.Assistant;
   const thinking = message?.thinking ?? undefined;
-  const image = message?.image ?? undefined;
+  const images = message?.images ?? undefined;
 
   // 动态更新项目高度
   useEffect(() => {
@@ -33,7 +33,7 @@ const MessageItemComponent = ({
       }
     }
     // 依赖项：当消息内容或思考内容变化时重新计算
-  }, [message?.content, thinking, image, setSize, index]);
+  }, [message?.content, thinking, images, setSize, index]);
 
   return (
     <div style={style}>
@@ -62,13 +62,34 @@ const MessageItemComponent = ({
                   )}
                 >
                   {/* 显示图片 */}
-                  {image && role === AiRoleEnum.User && (
-                    <div className="mb-2 overflow-hidden rounded-md">
-                      <img
-                        src={image}
-                        alt="用户上传的图片"
-                        className="max-h-48 w-auto object-contain"
-                      />
+                  {images && images.length > 0 && role === AiRoleEnum.User && (
+                    <div className="mb-2 space-y-2">
+                      {images.length === 1 ? (
+                        // 单张图片显示
+                        <div className="overflow-hidden rounded-md">
+                          <img
+                            src={images[0]}
+                            alt="用户上传的图片"
+                            className="max-h-48 w-auto object-contain"
+                          />
+                        </div>
+                      ) : (
+                        // 多张图片网格显示
+                        <div className="grid grid-cols-2 gap-2">
+                          {images.map((image, index) => (
+                            <div
+                              key={index}
+                              className="overflow-hidden rounded-md"
+                            >
+                              <img
+                                src={image}
+                                alt={`用户上传的图片 ${index + 1}`}
+                                className="h-24 w-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                   {message?.content && (
