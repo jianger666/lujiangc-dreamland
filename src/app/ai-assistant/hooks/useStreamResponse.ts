@@ -38,7 +38,7 @@ export const useStreamResponse = () => {
       setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
       onComplete: (conversationId: string) => void;
       isWebSearchEnabled: boolean;
-      imageData?: string;
+      imageData?: string | null;
     }) => {
       return startStreamResponseUtil({
         messages,
@@ -49,7 +49,7 @@ export const useStreamResponse = () => {
         conversationId,
         setConversations,
         onComplete,
-        imageData,
+        imageData: imageData || undefined,
       });
     },
     [],
