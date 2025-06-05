@@ -25,8 +25,8 @@ export const ConversationItem = memo(
       <div
         key={conversation.id}
         className={cn(
-          'group relative flex cursor-pointer items-center rounded-md px-2 py-2 hover:bg-muted',
-          isActive && 'bg-muted',
+          'group relative flex cursor-pointer items-center rounded-md px-2 py-2 hover:bg-card',
+          isActive && 'bg-card',
         )}
         onClick={onSelect}
       >

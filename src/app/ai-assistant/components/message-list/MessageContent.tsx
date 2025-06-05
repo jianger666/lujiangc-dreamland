@@ -56,7 +56,7 @@ const MessageContentComponent = ({
           <th
             className={cn(
               className,
-              'border border-foreground bg-muted bg-opacity-50 p-2',
+              'border border-foreground bg-card bg-opacity-50 p-2',
             )}
             {...rest}
           />
@@ -89,7 +89,7 @@ const MessageContentComponent = ({
           <div className="relative overflow-hidden rounded-md">
             <div
               className={cn(
-                role === AiRoleEnum.User ? 'bg-muted' : 'bg-accent',
+                role === AiRoleEnum.User ? 'bg-card' : 'bg-accent',
                 'flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground',
               )}
             >

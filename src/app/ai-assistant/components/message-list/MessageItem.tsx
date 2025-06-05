@@ -41,7 +41,7 @@ const MessageItemComponent = ({
       <div ref={itemRef} className="p-3">
         {loadingMode ? (
           <div className="flex justify-start px-3 py-2">
-            <div className="rounded-lg bg-muted px-4 py-2">
+            <div className="rounded-lg bg-card px-4 py-2">
               <Loading dot />
             </div>
           </div>
@@ -58,7 +58,7 @@ const MessageItemComponent = ({
                 <div
                   className={cn(
                     'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
-                    role === AiRoleEnum.User ? 'bg-accent' : 'bg-muted',
+                    role === AiRoleEnum.User ? 'bg-accent' : 'bg-card',
                   )}
                 >
                   {/* 显示图片 */}
