@@ -35,7 +35,8 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     apiKeys: [process.env.ZHIPU_API_KEY!],
   },
   [AIProviderEnum.CURSOR_PROXY]: {
-    baseURL: '/api/cursor2openai/v1',
+    // 当前域名
+    baseURL: window.location.origin + '/api/cursor2openai/v1',
     apiKeys: [process.env.CURSOR_PROXY_API_KEY!],
   },
 };
