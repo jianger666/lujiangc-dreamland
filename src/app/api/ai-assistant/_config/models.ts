@@ -36,7 +36,7 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
   },
   [AIProviderEnum.CURSOR_PROXY]: {
     // 当前域名
-    baseURL: window.location.origin + '/api/cursor2openai/v1',
+    baseURL: process.env.NEXT_PUBLIC_APP_URL + '/api/cursor2openai/v1',
     apiKeys: [process.env.CURSOR_PROXY_API_KEY!],
   },
 };
