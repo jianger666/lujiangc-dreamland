@@ -61,6 +61,7 @@ export enum AIProviderEnum {
   GOOGLE = 'GOOGLE',
   ZHIPU = 'ZHIPU',
   FREE_CHAT_GPT = 'FREE_CHAT_GPT',
+  CURSOR_PROXY = 'CURSOR_PROXY',
 }
 export interface ProviderConfig {
   baseURL: string;
@@ -70,10 +71,11 @@ export interface ProviderConfig {
 export enum AIModelEnum {
   DeepSeekV30324 = 'DeepSeekV30324',
   DeepSeekR1 = 'DeepSeekR1',
-  Gemini25ProExp0325 = 'Gemini25ProExp0325',
-  Gemini25Flash = 'Gemini25Flash',
-  Gemini20Flash = 'Gemini20Flash',
+  Gemini25Pro = 'Gemini25Pro',
   Gp4oMini = 'Gp4oMini',
+  Claude4Sonnet = 'Claude4Sonnet',
+  Claude4SonnetThinking = 'Claude4SonnetThinking',
+  GPT41 = 'GPT41',
   // 不是模型名称，专门用于对话内容生成标题的模型一类
   TitleGenerator = 'TitleGenerator',
   // 不是模型名称，专门用于图像理解的模型一类

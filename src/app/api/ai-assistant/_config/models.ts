@@ -34,9 +34,35 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
     apiKeys: [process.env.ZHIPU_API_KEY!],
   },
+  [AIProviderEnum.CURSOR_PROXY]: {
+    baseURL: '/api/cursor2openai/v1',
+    apiKeys: [process.env.CURSOR_PROXY_API_KEY!],
+  },
 };
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
+  [AIModelEnum.Claude4Sonnet]: {
+    displayName: 'Claude-4-Sonnet',
+    instances: [
+      {
+        provider: AIProviderEnum.CURSOR_PROXY,
+        modelId: 'claude-4-sonnet',
+      },
+    ],
+  },
+  [AIModelEnum.Claude4SonnetThinking]: {
+    displayName: 'Claude-4-Sonnet-Thinking',
+    instances: [
+      {
+        provider: AIProviderEnum.CURSOR_PROXY,
+        modelId: 'claude-4-sonnet-thinking',
+      },
+    ],
+  },
+  [AIModelEnum.GPT41]: {
+    displayName: 'GPT-4.1',
+    instances: [{ provider: AIProviderEnum.CURSOR_PROXY, modelId: 'gpt-4.1' }],
+  },
   [AIModelEnum.Gp4oMini]: {
     displayName: 'gpt-4o-mini',
     instances: [
@@ -61,47 +87,12 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       },
     ],
   },
-  [AIModelEnum.Gemini25ProExp0325]: {
-    displayName: 'Gemini-2.5-Pro-Exp-03-25',
+  [AIModelEnum.Gemini25Pro]: {
+    displayName: 'Gemini-2.5-Pro',
     instances: [
       {
-        provider: AIProviderEnum.GOOGLE,
-        modelId: 'gemini-2.5-pro-exp-03-25',
-      },
-      {
-        provider: AIProviderEnum.GOOGLE,
-        modelId: 'gemini-2.5-pro-exp-03-25',
-      },
-      {
-        provider: AIProviderEnum.OPEN_ROUTER,
-        modelId: 'google/gemini-2.5-pro-exp-03-25:free',
-      },
-    ],
-  },
-  [AIModelEnum.Gemini25Flash]: {
-    displayName: 'Gemini-2.5-flash',
-    instances: [
-      {
-        provider: AIProviderEnum.GOOGLE,
-        modelId: 'models/gemini-2.5-flash-preview-04-17',
-      },
-    ],
-  },
-
-  [AIModelEnum.Gemini20Flash]: {
-    displayName: 'Gemini-2.0-Flash',
-    instances: [
-      {
-        provider: AIProviderEnum.GOOGLE,
-        modelId: 'gemini-2.0-flash',
-      },
-      {
-        provider: AIProviderEnum.GOOGLE,
-        modelId: 'gemini-2.0-flash',
-      },
-      {
-        provider: AIProviderEnum.OPEN_ROUTER,
-        modelId: 'google/gemini-2.0-flash-exp:free',
+        provider: AIProviderEnum.CURSOR_PROXY,
+        modelId: 'gemini-2.5-pro',
       },
     ],
   },
