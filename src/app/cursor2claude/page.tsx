@@ -40,16 +40,17 @@ const markdownContent = `# Cursor to Claude Code 使用指南
 使用刚才获取的 \`WorkosCursorSessionToken\` 调用我们的 API 来获取标准的 OpenAI 格式 token：
 
 \`\`\`bash
-curl --location 'https://lujiangc.com/api/cursor2openai/loginDeepControl' \\
---header 'authorization: Bearer 你的WorkosCursorSessionToken'
+curl --location 'https://token.cursorpro.com.cn/reftoken?token=%E6%82%A8%E7%9A%84WorkosCursorSessionToken'
 \`\`\`
 
 **示例响应：**
 \`\`\`json
 {
-  "accessToken": "sk-cursor-abc123...",
-  "authId": "user_12345",
-  ...
+  "data": {
+    "accessToken": "sk-cursor-abc123...",
+    "authId": "user_12345",
+    ...
+  }
 }
 \`\`\`
 
