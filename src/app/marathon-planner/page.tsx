@@ -125,7 +125,7 @@ export default function MarathonPlannerPage() {
       </div>
 
       {/* 功能说明 - 移动到表单上方，移除条件渲染 */}
-      <div className="mx-auto max-w-4xl">
+      {/* <div className="mx-auto max-w-4xl">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-lg border bg-card p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg lg:p-6">
             <div className="mb-3 text-2xl">🎯</div>
@@ -151,7 +151,7 @@ export default function MarathonPlannerPage() {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* 表单区域 */}
       <div className="w-full">
