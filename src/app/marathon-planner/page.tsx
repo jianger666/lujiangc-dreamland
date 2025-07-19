@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { MarathonForm } from './components/marathon-form';
 import { ScheduleDisplay } from './components/schedule-display';
 import { ScheduleActions } from './components/schedule-actions';
+import { DonationSection } from './components/donation-section';
 import { MarathonPlanFormData } from './types';
 import { CheckCircleIcon, ArrowDownIcon } from 'lucide-react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
@@ -204,6 +205,13 @@ export default function MarathonPlannerPage() {
             formData={formData}
             isRegenerating={isGenerating}
           />
+        </div>
+      )}
+
+      {/* 打赏支持区域 */}
+      {schedule && !isGenerating && !error && (
+        <div className="mt-8">
+          <DonationSection />
         </div>
       )}
     </div>

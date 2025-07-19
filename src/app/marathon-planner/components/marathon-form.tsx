@@ -304,7 +304,7 @@ export function MarathonForm({
                                             : 0;
                                           handleTimeChange(day.value, value);
                                         }}
-                                        placeholder="必填，30+"
+                                        placeholder=""
                                       />
                                       <span className="text-sm text-muted-foreground">
                                         分钟

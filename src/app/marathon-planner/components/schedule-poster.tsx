@@ -88,11 +88,6 @@ export const SchedulePoster = forwardRef<HTMLDivElement, SchedulePosterProps>(
           {/* 头部 */}
           <div className="flex items-center justify-between border-b border-white/20 bg-white/15 px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-center shadow-lg">
-                <span className="flex h-full w-full items-center justify-center text-2xl">
-                  🏃‍♂️
-                </span>
-              </div>
               <div>
                 <h2 className="text-xl font-bold text-white drop-shadow-md sm:text-2xl">
                   {raceName}
@@ -102,7 +97,7 @@ export const SchedulePoster = forwardRef<HTMLDivElement, SchedulePosterProps>(
                 </p>
               </div>
             </div>
-            <div className="rounded-lg bg-white/10 px-3 py-1 text-sm font-medium text-white">
+            <div className="text-sm font-medium text-white">
               {new Date().toLocaleDateString('zh-CN')}
             </div>
           </div>
@@ -126,15 +121,12 @@ export const SchedulePoster = forwardRef<HTMLDivElement, SchedulePosterProps>(
           <div className="flex items-center justify-center gap-6 border-t border-white/20 bg-white/15 px-6 py-4">
             <div className="flex items-center gap-6 text-sm text-white">
               <div className="flex items-center gap-2">
-                <div className="h-2.5 w-2.5 rounded-full bg-blue-400 shadow-sm" />
                 <span className="drop-shadow-sm">专业训练</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-2.5 w-2.5 rounded-full bg-green-400 shadow-sm" />
                 <span className="drop-shadow-sm">科学规划</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-2.5 w-2.5 rounded-full bg-orange-400 shadow-sm" />
                 <span className="drop-shadow-sm">个性定制</span>
               </div>
             </div>
