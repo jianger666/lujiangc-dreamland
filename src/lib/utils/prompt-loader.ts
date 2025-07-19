@@ -3,7 +3,7 @@ import path from 'path';
 
 /**
  * 读取提示词markdown文件并替换变量
- * @param relativePath 相对于项目根目录的提示词文件路径
+ * @param relativePath 相对于public目录的提示词文件路径
  * @param variables 要替换的变量对象
  * @returns 处理后的提示词内容
  */
@@ -12,9 +12,9 @@ export function readPromptMarkdown(
   variables: Record<string, string> = {}
 ): string {
   try {
-    // 获取项目根目录路径
+    // 从public目录读取文件
     const projectRoot = process.cwd();
-    const mdPath = path.resolve(projectRoot, relativePath);
+    const mdPath = path.resolve(projectRoot, 'public', relativePath);
 
     // 读取markdown文件
     let content = fs.readFileSync(mdPath, 'utf-8');
@@ -28,7 +28,7 @@ export function readPromptMarkdown(
     return content;
   } catch (error) {
     console.error('读取提示词文件失败:', error);
-    throw new Error(`无法读取提示词文件: ${relativePath}`);
+    throw new Error(`无法读取提示词文件: public/${relativePath}`);
   }
 }
 

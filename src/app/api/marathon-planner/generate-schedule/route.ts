@@ -81,7 +81,7 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
 
     // 读取并处理提示词模板
     const prompt = readPromptMarkdown(
-      'src/app/api/marathon-planner/_prompts/marathon-schedule.md',
+      'prompts/marathon-schedule.md',
       variables
     );
 
@@ -90,7 +90,6 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
       messages: [{ role: AiRoleEnum.User, content: prompt }],
       stream: true,
       temperature: 0.7,
-      max_tokens: 4000,
     };
 
     // 调用AI生成课表 - 流式响应
