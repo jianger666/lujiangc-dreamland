@@ -14,3 +14,6 @@ export const generateTitle = async (userMessage: string) => {
     { skipErrorHandler: true },
   );
 };
+
+// 导出马拉松计划制定相关服务
+export * from './marathon-planner';

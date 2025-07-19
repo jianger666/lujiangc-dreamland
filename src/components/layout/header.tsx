@@ -78,6 +78,10 @@ export function Header({
       title: '江耳助手',
       href: '/ai-assistant',
     },
+    {
+      title: '马拉松计划',
+      href: '/marathon-planner',
+    },
     // 有子菜单的导航项
     // {
     //   title: '导航',

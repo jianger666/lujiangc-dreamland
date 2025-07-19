@@ -5,3 +5,5 @@ export * from './radio-group-field';
 export * from './checkbox-group-field';
 export * from './toggle-group-field';
 export * from './input-field';
+export * from './date-field';
+export * from './textarea-field';

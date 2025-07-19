@@ -42,27 +42,14 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
 };
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
-  [AIModelEnum.Claude4Sonnet]: {
-    displayName: 'Claude-4-Sonnet',
+  [AIModelEnum.Default]: {
+    displayName: 'default',
     instances: [
       {
         provider: AIProviderEnum.CURSOR_PROXY,
-        modelId: 'claude-4-sonnet',
+        modelId: 'default',
       },
     ],
-  },
-  [AIModelEnum.Claude4SonnetThinking]: {
-    displayName: 'Claude-4-Sonnet-Thinking',
-    instances: [
-      {
-        provider: AIProviderEnum.CURSOR_PROXY,
-        modelId: 'claude-4-sonnet-thinking',
-      },
-    ],
-  },
-  [AIModelEnum.GPT41]: {
-    displayName: 'GPT-4.1',
-    instances: [{ provider: AIProviderEnum.CURSOR_PROXY, modelId: 'gpt-4.1' }],
   },
   [AIModelEnum.Gp4oMini]: {
     displayName: 'gpt-4o-mini',
@@ -85,15 +72,6 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       {
         provider: AIProviderEnum.OPEN_ROUTER,
         modelId: 'deepseek/deepseek-r1:free',
-      },
-    ],
-  },
-  [AIModelEnum.Gemini25Pro]: {
-    displayName: 'Gemini-2.5-Pro',
-    instances: [
-      {
-        provider: AIProviderEnum.CURSOR_PROXY,
-        modelId: 'gemini-2.5-pro',
       },
     ],
   },
