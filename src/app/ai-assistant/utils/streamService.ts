@@ -1,5 +1,5 @@
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { generateUUID } from '@/lib';
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { generateUUID } from "@/lib";
 
 import {
   Conversation,
@@ -7,7 +7,7 @@ import {
   StreamingState,
   ConversationStreamState,
   AiRoleEnum,
-} from '@/types/ai-assistant';
+} from "@/types/ai-assistant";
 
 /**
  * 流式响应服务
@@ -19,7 +19,7 @@ import {
  */
 
 // 统一的中断标记后缀
-export const INTERRUPTED_SUFFIX = '[回答已被中断]';
+export const INTERRUPTED_SUFFIX = "[回答已被中断]";
 
 // ===== 状态更新相关函数 =====
 
@@ -55,8 +55,8 @@ export function initializeStreamingState(
     setStreamingState,
     conversationId,
     updates: {
-      content: '',
-      thinking: '',
+      content: "",
+      thinking: "",
       isLoading: true,
     },
   });
@@ -73,8 +73,8 @@ export function resetStreamingState(
     setStreamingState,
     conversationId,
     updates: {
-      content: '',
-      thinking: '',
+      content: "",
+      thinking: "",
       isLoading: false,
     },
   });
@@ -121,7 +121,7 @@ function processAccumulatedContent(
   updateFn: (content: string) => void,
 ): void {
   accumulator.value += message;
-  accumulator.value = accumulator.value.replace(/\\n/g, '\n');
+  accumulator.value = accumulator.value.replace(/\\n/g, "\n");
   updateFn(accumulator.value);
 }
 
@@ -167,7 +167,7 @@ export function addInterruptedMessageToConversation({
   const newMessage: Message = {
     id: generateUUID(),
     role: AiRoleEnum.Assistant,
-    content: (content || '') + '\n\n' + INTERRUPTED_SUFFIX, // 保证即使 content 为空也能正确添加后缀
+    content: (content || "") + "\n\n" + INTERRUPTED_SUFFIX, // 保证即使 content 为空也能正确添加后缀
     ...(thinking ? { thinking } : {}),
   };
 
@@ -227,7 +227,7 @@ export async function startStreamResponse({
       imageDatas,
     });
   } catch (error) {
-    console.error('Stream response error:', error);
+    console.error("Stream response error:", error);
     resetStreamingState(setStreamingState, conversationId);
   } finally {
     // 清理AbortController引用
@@ -272,36 +272,36 @@ async function executeStreamRequest({
 
   // 检查是否是ImageReader模型或者当前选择的模型支持图片
   const isImageReaderModel =
-    selectedModel === 'ImageReader' ||
+    selectedModel === "ImageReader" ||
     (imageDatas &&
       imageDatas.length > 0 &&
-      selectedModel.includes('ImageReader'));
+      selectedModel.includes("ImageReader"));
 
   // 如果上传了图片但当前模型不支持，则改用ImageReader处理
   const modelToUse =
     imageDatas && imageDatas.length > 0 && !isImageReaderModel
-      ? 'ImageReader'
+      ? "ImageReader"
       : selectedModel;
 
   // 累积的内容
-  const accumulatedContent = { value: '' };
-  const accumulatedThinking = { value: '' };
+  const accumulatedContent = { value: "" };
+  const accumulatedThinking = { value: "" };
 
   // 标记请求是否被中止
   const isAborted = { value: false };
 
   // 监听中止事件
-  abortController.signal.addEventListener('abort', () => {
+  abortController.signal.addEventListener("abort", () => {
     isAborted.value = true;
-    console.log('流式请求被中止:', conversationId);
+    console.log("流式请求被中止:", conversationId);
   });
 
   // 2. 执行流式请求
   try {
-    await fetchEventSource('/api/ai-assistant', {
-      method: 'POST',
+    await fetchEventSource("/api/ai-assistant", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         messages: messagesWithoutImages,
@@ -313,9 +313,9 @@ async function executeStreamRequest({
       openWhenHidden: true,
 
       onerror: (error) => {
-        console.log('onerror triggered:', error);
+        console.log("onerror triggered:", error);
         if (isAborted.value) {
-          console.log('请求已中止，忽略错误:', conversationId);
+          console.log("请求已中止，忽略错误:", conversationId);
           throw error;
         }
 
@@ -328,19 +328,19 @@ async function executeStreamRequest({
             onComplete,
           });
         } catch (fatalError) {
-          console.log('Caught FatalStreamError, rethrowing to stop retries.');
+          console.log("Caught FatalStreamError, rethrowing to stop retries.");
           throw fatalError;
         }
       },
 
       onmessage: (event) => {
         if (isAborted.value) {
-          console.log('请求已中止，忽略后续消息:', conversationId);
+          console.log("请求已中止，忽略后续消息:", conversationId);
           return;
         }
 
         // 处理完成消息
-        if (event.data === '[DONE]') {
+        if (event.data === "[DONE]") {
           handleStreamComplete({
             accumulatedContent,
             accumulatedThinking,
@@ -357,7 +357,7 @@ async function executeStreamRequest({
           const data = JSON.parse(event.data);
           const { type, message } = data;
 
-          if (type === 'text') {
+          if (type === "text") {
             processAccumulatedContent(accumulatedContent, message, (content) =>
               updateStreamingContent(
                 setStreamingState,
@@ -365,7 +365,7 @@ async function executeStreamRequest({
                 content,
               ),
             );
-          } else if (type === 'think') {
+          } else if (type === "think") {
             processAccumulatedContent(
               accumulatedThinking,
               message,
@@ -378,22 +378,22 @@ async function executeStreamRequest({
             );
           }
         } catch (parseError) {
-          console.error('解析事件数据出错:', parseError);
+          console.error("解析事件数据出错:", parseError);
         }
       },
     });
   } catch (error) {
     if (
       !isAborted.value &&
-      !(error instanceof Error && error.message === 'FatalStreamError')
+      !(error instanceof Error && error.message === "FatalStreamError")
     ) {
-      console.error('Unhandled error during stream execution:', error);
-    } else if (error instanceof Error && error.message === 'FatalStreamError') {
+      console.error("Unhandled error during stream execution:", error);
+    } else if (error instanceof Error && error.message === "FatalStreamError") {
       console.log(
-        'FatalStreamError caught outside fetchEventSource, stopping.',
+        "FatalStreamError caught outside fetchEventSource, stopping.",
       );
     } else {
-      console.log('Stream aborted or error already handled.');
+      console.log("Stream aborted or error already handled.");
     }
   }
 }
@@ -432,7 +432,7 @@ export function stopStreamResponse({
     addInterruptedMessageToConversation({
       setConversations,
       conversationId,
-      content: currentStream.content || '', // 传递当前内容，如果为空则传递空字符串
+      content: currentStream.content || "", // 传递当前内容，如果为空则传递空字符串
       thinking: currentStream.thinking,
     });
   }
@@ -536,11 +536,11 @@ function handleStreamError({
 
   // 调用完成回调
   if (onComplete) {
-    console.log('因错误调用流完成回调:', conversationId);
+    console.log("因错误调用流完成回调:", conversationId);
     onComplete(conversationId);
   }
 
-  throw new Error('FatalStreamError');
+  throw new Error("FatalStreamError");
 }
 
 /**
@@ -556,8 +556,8 @@ export function generateInterruptedConversations(
     const currentStream = streamingState[conv.id];
     if (currentStream && currentStream.isLoading) {
       // 如果该对话正在加载中，添加中断消息
-      const currentStreamContent = currentStream.content || '';
-      const currentStreamThinking = currentStream.thinking || '';
+      const currentStreamContent = currentStream.content || "";
+      const currentStreamThinking = currentStream.thinking || "";
 
       const newMessage: Message = {
         id: generateUUID(),

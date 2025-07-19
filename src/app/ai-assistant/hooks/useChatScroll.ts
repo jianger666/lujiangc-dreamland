@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from "react";
 
 /**
  * 聊天自动滚动的自定义Hook
@@ -18,7 +18,7 @@ export function useChatScroll<T extends unknown[]>(
   } = {},
 ) {
   const {
-    scrollBehavior = 'instant',
+    scrollBehavior = "instant",
     threshold = 100,
     onScrollStateChange,
   } = options;
@@ -39,7 +39,7 @@ export function useChatScroll<T extends unknown[]>(
     if (!bottomRef.current) return;
     bottomRef.current.scrollIntoView({
       behavior: scrollBehavior,
-      block: 'end',
+      block: "end",
     });
   }, [scrollBehavior]);
 

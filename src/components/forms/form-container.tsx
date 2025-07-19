@@ -5,13 +5,13 @@ import {
   DefaultValues,
   FieldValues,
   Mode,
-} from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useEffect, useState, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type ValueChangeHandler<T> = (changedValues: Partial<T>, values: T) => void;
 
@@ -28,7 +28,7 @@ interface FormContainerProps<T extends FieldValues> {
   disabled?: boolean;
   autoSubmit?: boolean;
   syncToUrl?: boolean;
-  layout?: 'vertical' | 'horizontal' | 'inline';
+  layout?: "vertical" | "horizontal" | "inline";
   loading?: boolean;
   onValuesChange?: ValueChangeHandler<T>;
   schema?: z.ZodType<T>;
@@ -41,18 +41,18 @@ export function FormContainer<T extends FieldValues>({
   onFinishFailed,
   onReset,
   children,
-  submitText = '提交',
-  resetText = '重置',
+  submitText = "提交",
+  resetText = "重置",
   className,
   showReset = true,
   disabled = false,
   autoSubmit = false,
   syncToUrl = false,
-  layout = 'vertical',
+  layout = "vertical",
   loading: externalLoading,
   onValuesChange,
   schema,
-  mode = 'onChange',
+  mode = "onChange",
 }: FormContainerProps<T>) {
   const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement>(null);
@@ -76,30 +76,30 @@ export function FormContainer<T extends FieldValues>({
         if (!value) continue;
 
         // 处理数组类型（逗号分隔的值）
-        if (value.includes(',')) {
-          urlValues[key] = value.split(',');
+        if (value.includes(",")) {
+          urlValues[key] = value.split(",");
         }
         // 处理单个值但对应字段可能是数组的情况
         else if (
           initialValues &&
-          typeof initialValues === 'object' &&
+          typeof initialValues === "object" &&
           Array.isArray((initialValues as Record<string, unknown>)[key])
         ) {
           urlValues[key] = [value]; // 保持为数组格式
         }
         // 处理布尔值
-        else if (value === 'true') {
+        else if (value === "true") {
           urlValues[key] = true;
-        } else if (value === 'false') {
+        } else if (value === "false") {
           urlValues[key] = false;
         }
         // 处理数字 - 保持字符串格式以确保类型一致性
-        else if (!isNaN(Number(value)) && value.trim() !== '') {
+        else if (!isNaN(Number(value)) && value.trim() !== "") {
           // 与初始值类型保持一致
           if (
             initialValues &&
-            typeof initialValues === 'object' &&
-            typeof (initialValues as Record<string, unknown>)[key] === 'number'
+            typeof initialValues === "object" &&
+            typeof (initialValues as Record<string, unknown>)[key] === "number"
           ) {
             urlValues[key] = Number(value);
           } else {
@@ -109,8 +109,8 @@ export function FormContainer<T extends FieldValues>({
         }
         // 处理JSON
         else if (
-          (value.startsWith('{') && value.endsWith('}')) ||
-          (value.startsWith('[') && value.endsWith(']'))
+          (value.startsWith("{") && value.endsWith("}")) ||
+          (value.startsWith("[") && value.endsWith("]"))
         ) {
           try {
             urlValues[key] = JSON.parse(value);
@@ -130,7 +130,7 @@ export function FormContainer<T extends FieldValues>({
         ...urlValues,
       } as DefaultValues<T>;
     } catch (error) {
-      console.error('解析URL参数失败:', error);
+      console.error("解析URL参数失败:", error);
       return initialValues || ({} as DefaultValues<T>);
     }
   };
@@ -155,7 +155,7 @@ export function FormContainer<T extends FieldValues>({
     if (!onValuesChange && !autoSubmit) return;
 
     const subscription = methods.watch((formValues, { name, type }) => {
-      if (type !== 'change') return;
+      if (type !== "change") return;
 
       const currentValues = methods.getValues();
 
@@ -194,9 +194,9 @@ export function FormContainer<T extends FieldValues>({
     obj: Record<string, unknown>,
     path: string,
   ): unknown => {
-    const keys = path.split('.');
+    const keys = path.split(".");
     return keys.reduce((acc, key) => {
-      if (acc && typeof acc === 'object' && acc !== null) {
+      if (acc && typeof acc === "object" && acc !== null) {
         return (acc as Record<string, unknown>)[key];
       }
       return undefined;
@@ -209,7 +209,7 @@ export function FormContainer<T extends FieldValues>({
     path: string,
     value: unknown,
   ): void => {
-    const keys = path.split('.');
+    const keys = path.split(".");
     const lastKey = keys.pop()!;
 
     const target = keys.reduce((acc, key) => {
@@ -227,7 +227,7 @@ export function FormContainer<T extends FieldValues>({
 
       Object.entries(data as Record<string, unknown>).forEach(
         ([key, value]) => {
-          if (value === undefined || value === null || value === '') {
+          if (value === undefined || value === null || value === "") {
             return;
           }
 
@@ -235,9 +235,9 @@ export function FormContainer<T extends FieldValues>({
           if (Array.isArray(value)) {
             // 数组类型使用逗号分隔
             if (value.length > 0) {
-              params.set(key, value.join(','));
+              params.set(key, value.join(","));
             }
-          } else if (typeof value === 'object' && value !== null) {
+          } else if (typeof value === "object" && value !== null) {
             // 对象类型转为JSON
             params.set(key, JSON.stringify(value));
           } else {
@@ -249,14 +249,14 @@ export function FormContainer<T extends FieldValues>({
 
       // 更新URL，不刷新页面，不使用router.replace避免触发请求
       const query = params.toString();
-      const newPath = window.location.pathname + (query ? `?${query}` : '');
+      const newPath = window.location.pathname + (query ? `?${query}` : "");
 
       // 使用原生history API更新URL而不触发导航事件
-      if (typeof window !== 'undefined') {
-        window.history.replaceState({}, '', newPath);
+      if (typeof window !== "undefined") {
+        window.history.replaceState({}, "", newPath);
       }
     } catch (error) {
-      console.error('同步URL参数失败:', error);
+      console.error("同步URL参数失败:", error);
     }
   };
 
@@ -277,7 +277,7 @@ export function FormContainer<T extends FieldValues>({
           await result;
         }
       } catch (error) {
-        console.error('表单提交失败:', error);
+        console.error("表单提交失败:", error);
       } finally {
         setInternalLoading(false);
       }
@@ -310,21 +310,21 @@ export function FormContainer<T extends FieldValues>({
 
   // 表单样式
   const formClassName = cn(
-    'space-y-4',
+    "space-y-4",
     {
-      'flex flex-col': layout === 'vertical',
-      'flex flex-row items-start gap-4': layout === 'horizontal',
-      'flex items-baseline flex-wrap gap-4': layout === 'inline',
+      "flex flex-col": layout === "vertical",
+      "flex flex-row items-start gap-4": layout === "horizontal",
+      "flex items-baseline flex-wrap gap-4": layout === "inline",
     },
     className,
   );
 
   // 按钮区样式
   const buttonAreaClassName = cn(
-    'flex',
-    showReset ? 'justify-between' : 'justify-end',
-    layout === 'horizontal' ? 'items-end' : '',
-    layout === 'inline' ? 'self-end' : '',
+    "flex",
+    showReset ? "justify-between" : "justify-end",
+    layout === "horizontal" ? "items-end" : "",
+    layout === "inline" ? "self-end" : "",
   );
 
   return (
@@ -340,7 +340,7 @@ export function FormContainer<T extends FieldValues>({
         noValidate // 禁用浏览器默认验证
         className={formClassName}
       >
-        <div className={cn(layout === 'horizontal' ? 'flex-1' : 'w-full')}>
+        <div className={cn(layout === "horizontal" ? "flex-1" : "w-full")}>
           {children}
         </div>
 

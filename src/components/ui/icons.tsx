@@ -11,7 +11,7 @@ import {
   Check,
   Info,
   AlertCircle,
-} from 'lucide-react';
+} from "lucide-react";
 
 export const Icons = {
   utensils: Utensils,

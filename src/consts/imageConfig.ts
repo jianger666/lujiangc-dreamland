@@ -4,11 +4,11 @@
 
 // 支持的图片格式
 export const SUPPORTED_IMAGE_TYPES = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/gif',
-  'image/webp',
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
 ] as const;
 
 // 图片文件大小限制
@@ -44,8 +44,8 @@ export const PREVIEW_CONFIG = {
 
 // 错误消息
 export const ERROR_MESSAGES = {
-  FILE_TOO_LARGE: '图片大小不能超过5MB',
-  UNSUPPORTED_FORMAT: '不支持的图片格式',
-  COMPRESSION_FAILED: '图片压缩失败，请重试',
-  PROCESSING_ERROR: '处理图片时发生错误',
+  FILE_TOO_LARGE: "图片大小不能超过5MB",
+  UNSUPPORTED_FORMAT: "不支持的图片格式",
+  COMPRESSION_FAILED: "图片压缩失败，请重试",
+  PROCESSING_ERROR: "处理图片时发生错误",
 } as const;

@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 /**
  * 读取提示词markdown文件并替换变量
@@ -17,17 +17,17 @@ export function readPromptMarkdown(
     const mdPath = path.resolve(projectRoot, relativePath);
 
     // 读取markdown文件
-    let content = fs.readFileSync(mdPath, 'utf-8');
+    let content = fs.readFileSync(mdPath, "utf-8");
 
     // 替换变量
     for (const [key, value] of Object.entries(variables)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
+      const regex = new RegExp(`{{${key}}}`, "g");
       content = content.replace(regex, value);
     }
 
     return content;
   } catch (error) {
-    console.error('读取提示词文件失败:', error);
+    console.error("读取提示词文件失败:", error);
     throw new Error(`无法读取提示词文件: ${relativePath}`);
   }
 }
@@ -78,10 +78,10 @@ export function formatTargetTime(minutes: number): string {
  * @returns 格式化后的日期字符串
  */
 export function formatDateString(date: Date): string {
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long',
+  return date.toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
   });
 }

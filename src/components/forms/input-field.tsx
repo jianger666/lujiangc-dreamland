@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -7,16 +7,16 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Eye, EyeOff, XCircle } from 'lucide-react';
+} from "@/components/ui/tooltip";
+import { Eye, EyeOff, XCircle } from "lucide-react";
 
 interface InputFieldProps {
   name: string;
@@ -24,12 +24,12 @@ interface InputFieldProps {
   description?: string;
   placeholder?: string;
   className?: string;
-  type?: 'text' | 'password' | 'number' | 'email' | 'tel' | 'url';
+  type?: "text" | "password" | "number" | "email" | "tel" | "url";
   disabled?: boolean;
   readOnly?: boolean;
   allowClear?: boolean;
-  size?: 'small' | 'default' | 'large';
-  status?: 'error' | 'warning';
+  size?: "small" | "default" | "large";
+  status?: "error" | "warning";
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   onChange?: (value: string) => void;
@@ -48,11 +48,11 @@ export function InputField({
   description,
   placeholder,
   className,
-  type = 'text',
+  type = "text",
   disabled = false,
   readOnly = false,
   allowClear = false,
-  size = 'default',
+  size = "default",
   status,
   prefix,
   suffix,
@@ -71,26 +71,26 @@ export function InputField({
 
   // 根据尺寸和状态设置样式
   const inputClassName = cn(
-    'w-full',
+    "w-full",
     // 尺寸样式
     {
-      'h-8 text-sm px-2': size === 'small',
-      'h-10 px-3': size === 'default',
-      'h-12 text-lg px-4': size === 'large',
+      "h-8 text-sm px-2": size === "small",
+      "h-10 px-3": size === "default",
+      "h-12 text-lg px-4": size === "large",
     },
     // 状态样式
-    status === 'error' && 'border-destructive',
-    status === 'warning' && 'border-warning',
+    status === "error" && "border-destructive",
+    status === "warning" && "border-warning",
     // 前后缀样式
-    (prefix || suffix) && 'pl-8',
+    (prefix || suffix) && "pl-8",
     // 带清除按钮样式
-    allowClear && 'pr-8',
+    allowClear && "pr-8",
     // 聚焦样式
-    isFocused && 'ring-2 ring-ring ring-offset-0',
+    isFocused && "ring-2 ring-ring ring-offset-0",
   );
 
   // 获取实际输入类型
-  const inputType = type === 'password' && showPassword ? 'text' : type;
+  const inputType = type === "password" && showPassword ? "text" : type;
 
   // 处理聚焦和失焦
   const handleFocus = () => {
@@ -110,8 +110,8 @@ export function InputField({
       render={({ field }) => {
         // 清除输入值
         const handleClear = () => {
-          field.onChange('');
-          onChange?.('');
+          field.onChange("");
+          onChange?.("");
         };
 
         // 切换密码可见性
@@ -175,7 +175,7 @@ export function InputField({
                   <span className="text-muted-foreground">{suffix}</span>
                 )}
 
-                {type === 'password' && field.value && (
+                {type === "password" && field.value && (
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}

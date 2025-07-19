@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useState } from 'react';
+import { RefObject, useCallback, useState } from "react";
 import {
   Conversation,
   AIModel,
@@ -6,14 +6,14 @@ import {
   AiRoleEnum,
   StreamingState,
   AIModelEnum,
-} from '@/types/ai-assistant';
+} from "@/types/ai-assistant";
 import {
   createNewConversation,
   saveConversation,
   deleteConversation as deleteConversationFromDB,
   optimizeConversationHistory,
-} from '../utils';
-import { generateUUID } from '@/lib';
+} from "../utils";
+import { generateUUID } from "@/lib";
 
 interface UseConversationsProps {
   abortControllersRef: RefObject<Record<string, AbortController | null>>;
@@ -48,7 +48,7 @@ export const useConversations = ({
   // 所有对话列表
   const [conversations, setConversations] = useState<Conversation[]>([]);
   // 当前激活的对话ID
-  const [activeConversationId, setActiveConversationId] = useState<string>('');
+  const [activeConversationId, setActiveConversationId] = useState<string>("");
 
   // 更新指定对话的属性
   const updateConversation = useCallback(
@@ -57,7 +57,7 @@ export const useConversations = ({
       updates,
     }: {
       id: string;
-      updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
+      updates: Partial<Omit<Conversation, "id" | "createdAt">>;
     }) => {
       setConversations((currentConversations) =>
         currentConversations.map((conv) =>
@@ -78,7 +78,7 @@ export const useConversations = ({
   const cleanupAbortController = useCallback(
     (conversationId: string) => {
       if (abortControllersRef.current[conversationId]) {
-        console.log('清理AbortController:', conversationId);
+        console.log("清理AbortController:", conversationId);
         abortControllersRef.current[conversationId]?.abort();
         abortControllersRef.current[conversationId] = null;
       }
@@ -103,7 +103,7 @@ export const useConversations = ({
       try {
         await saveConversation(newConversation);
       } catch (error) {
-        console.error('保存新对话失败:', error);
+        console.error("保存新对话失败:", error);
       }
 
       return newConversation;
@@ -147,11 +147,11 @@ export const useConversations = ({
             await saveConversation(newConversation);
           } else {
             // 没有其他对话也没有可用模型，清空激活ID
-            setActiveConversationId('');
+            setActiveConversationId("");
           }
         }
       } catch (error) {
-        console.error('删除对话失败:', error);
+        console.error("删除对话失败:", error);
       }
     },
     [
@@ -206,7 +206,7 @@ export const useConversations = ({
         id: activeConversationId,
         updates: {
           messages: [],
-          title: '新对话',
+          title: "新对话",
           hasGeneratedTitle: false,
         },
       });
@@ -307,7 +307,7 @@ export const useConversations = ({
           imageDatas: imageDatas,
         });
       } catch (error) {
-        console.error('发送消息失败:', error);
+        console.error("发送消息失败:", error);
       }
     },
     [

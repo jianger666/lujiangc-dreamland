@@ -4,8 +4,8 @@ import {
   AiRoleEnum,
   Conversation,
   Message,
-} from '@/types/ai-assistant';
-import { generateUUID } from '@/lib';
+} from "@/types/ai-assistant";
+import { generateUUID } from "@/lib";
 
 /**
  * 创建新对话
@@ -79,15 +79,15 @@ export function optimizeConversationHistory(
   };
 
   // 步骤1: 找出所有系统消息（优先保留的指令消息）
-  const systemMessages = messages.filter((msg) => msg.role === 'system');
+  const systemMessages = messages.filter((msg) => msg.role === "system");
 
   // 步骤2: 计算非系统消息（用户和助手的对话内容）
-  const nonSystemMessages = messages.filter((msg) => msg.role !== 'system');
+  const nonSystemMessages = messages.filter((msg) => msg.role !== "system");
 
   // 步骤3: 保证用户最新的问题一定会被包含（确保能回答最新问题）
   let userLastQuestion: Message | null = null;
   for (let i = nonSystemMessages.length - 1; i >= 0; i--) {
-    if (nonSystemMessages[i].role === 'user') {
+    if (nonSystemMessages[i].role === "user") {
       userLastQuestion = nonSystemMessages[i];
       break;
     }
@@ -149,7 +149,7 @@ export function optimizeConversationHistory(
     const skippedCount = i + 1;
     if (skippedCount > 0) {
       const summaryMessage: Message = {
-        id: 'history-summary',
+        id: "history-summary",
         role: AiRoleEnum.System,
         content: `[系统提示: 这里省略了 ${skippedCount} 条较早的对话消息，下面是最近的对话内容]`,
       };

@@ -1,10 +1,10 @@
-import { useCallback, useRef, useState } from 'react';
-import { Conversation, Message, StreamingState } from '@/types/ai-assistant';
+import { useCallback, useRef, useState } from "react";
+import { Conversation, Message, StreamingState } from "@/types/ai-assistant";
 import {
   resetStreamingState as resetStreamingStateUtil,
   startStreamResponse as startStreamResponseUtil,
   stopStreamResponse as stopStreamResponseUtil,
-} from '../utils/streamService';
+} from "../utils/streamService";
 
 export const useStreamResponse = () => {
   // 各对话的流式响应状态

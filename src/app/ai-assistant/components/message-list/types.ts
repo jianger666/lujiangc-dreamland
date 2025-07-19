@@ -1,4 +1,4 @@
-import { Message, StreamingMessage } from '@/types/ai-assistant';
+import { Message, StreamingMessage } from "@/types/ai-assistant";
 
 export interface ItemData {
   messages: (Message | StreamingMessage | undefined)[];

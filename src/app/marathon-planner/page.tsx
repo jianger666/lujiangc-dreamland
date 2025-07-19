@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState, useRef } from 'react';
-import { MarathonForm } from './components/marathon-form';
-import { ScheduleDisplay } from './components/schedule-display';
-import { ScheduleActions } from './components/schedule-actions';
-import { MarathonPlanFormData } from './types';
-import { CheckCircleIcon, ArrowDownIcon } from 'lucide-react';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import React, { useState, useRef } from "react";
+import { MarathonForm } from "./components/marathon-form";
+import { ScheduleDisplay } from "./components/schedule-display";
+import { ScheduleActions } from "./components/schedule-actions";
+import { MarathonPlanFormData } from "./types";
+import { CheckCircleIcon, ArrowDownIcon } from "lucide-react";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export default function MarathonPlannerPage() {
   const [formData, setFormData] = useState<MarathonPlanFormData | null>(null);
-  const [schedule, setSchedule] = useState<string>('');
-  const [streamingSchedule, setStreamingSchedule] = useState<string>('');
+  const [schedule, setSchedule] = useState<string>("");
+  const [streamingSchedule, setStreamingSchedule] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [showScrollHint, setShowScrollHint] = useState(false);
 
   const scheduleRef = useRef<HTMLDivElement>(null);
@@ -21,9 +21,9 @@ export default function MarathonPlannerPage() {
 
   const generateSchedule = async (data: MarathonPlanFormData) => {
     setIsGenerating(true);
-    setError('');
-    setSchedule('');
-    setStreamingSchedule('');
+    setError("");
+    setSchedule("");
+    setStreamingSchedule("");
     setFormData(data);
     setShowScrollHint(false);
 
@@ -35,32 +35,32 @@ export default function MarathonPlannerPage() {
     // 创建新的AbortController
     abortControllerRef.current = new AbortController();
 
-    let accumulatedContent = '';
+    let accumulatedContent = "";
 
     try {
-      await fetchEventSource('/api/marathon-planner/generate-schedule', {
-        method: 'POST',
+      await fetchEventSource("/api/marathon-planner/generate-schedule", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
         signal: abortControllerRef.current.signal,
         openWhenHidden: true,
 
         onmessage: (event) => {
-          if (event.data === '[DONE]') {
+          if (event.data === "[DONE]") {
             // 流结束，将累积的内容设置为最终结果
             setSchedule(accumulatedContent);
-            setStreamingSchedule('');
+            setStreamingSchedule("");
             setIsGenerating(false);
             setShowScrollHint(true);
 
             // 延迟滚动，确保内容已渲染
             setTimeout(() => {
               scheduleRef.current?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest',
+                behavior: "smooth",
+                block: "start",
+                inline: "nearest",
               });
               // 3秒后隐藏滚动提示
               setTimeout(() => setShowScrollHint(false), 3000);
@@ -72,26 +72,26 @@ export default function MarathonPlannerPage() {
             const parsedData = JSON.parse(event.data);
             const { type, message } = parsedData;
 
-            if (type === 'text') {
+            if (type === "text") {
               accumulatedContent += message;
               setStreamingSchedule(accumulatedContent);
             }
             // 忽略 'think' 类型的消息，因为对用户来说不重要
           } catch (parseError) {
-            console.error('解析流数据出错:', parseError);
+            console.error("解析流数据出错:", parseError);
           }
         },
 
         onerror: (error) => {
-          console.error('流式请求错误:', error);
-          setError('生成训练计划失败，请检查网络连接后重试');
+          console.error("流式请求错误:", error);
+          setError("生成训练计划失败，请检查网络连接后重试");
           setIsGenerating(false);
         },
       });
     } catch (err) {
-      console.error('生成训练计划错误:', err);
+      console.error("生成训练计划错误:", err);
       if (!abortControllerRef.current?.signal.aborted) {
-        setError('生成训练计划失败，请检查网络连接后重试');
+        setError("生成训练计划失败，请检查网络连接后重试");
       }
       setIsGenerating(false);
     }
@@ -104,14 +104,14 @@ export default function MarathonPlannerPage() {
   };
 
   const getContentElement = () => {
-    const element = document.getElementById('marathon-schedule-content');
+    const element = document.getElementById("marathon-schedule-content");
     return element as HTMLDivElement | null;
   };
 
   return (
     <div
       className="mx-auto space-y-6 px-4 py-6 sm:px-6"
-      style={{ overflowX: 'hidden' }}
+      style={{ overflowX: "hidden" }}
     >
       {/* 页面标题 */}
       <div className="space-y-2 text-center">
@@ -177,12 +177,12 @@ export default function MarathonPlannerPage() {
 
       {/* 生成的课表展示区域 - 修改渲染条件，让骨架屏在生成开始时就显示 */}
       {(schedule || streamingSchedule || isGenerating) && (
-        <div ref={scheduleRef} className="mb-6" style={{ overflowX: 'hidden' }}>
+        <div ref={scheduleRef} className="mb-6" style={{ overflowX: "hidden" }}>
           <ScheduleDisplay
             schedule={schedule || streamingSchedule}
             isLoading={isGenerating}
             error={error}
-            raceName={formData?.raceName || '马拉松训练计划'}
+            raceName={formData?.raceName || "马拉松训练计划"}
           />
           {showScrollHint && (
             <div className="mt-4 flex items-center justify-center rounded-md bg-muted p-3">

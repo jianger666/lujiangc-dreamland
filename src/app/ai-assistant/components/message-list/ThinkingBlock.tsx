@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 // 思考过程组件
 export function ThinkingBlock({ content }: { content: string }) {
-  if (!content || content.trim() === '') return null;
+  if (!content || content.trim() === "") return null;
 
   return (
     <div className="flex justify-start">

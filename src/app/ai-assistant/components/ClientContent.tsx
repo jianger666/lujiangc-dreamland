@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * AI 助手客户端内容组件
@@ -6,12 +6,12 @@
  * 负责呈现AI助手的用户界面，包括消息列表、侧边栏和输入区域
  */
 
-import { useAIAssistant } from '../hooks';
-import { Loading } from '@/components/ui/loading';
-import { ConversationSidebar } from './conversation-sidebar';
-import { ConversationHeader } from './ConversationHeader';
-import { MessageList } from './message-list';
-import { ChatInput } from './ChatInput';
+import { useAIAssistant } from "../hooks";
+import { Loading } from "@/components/ui/loading";
+import { ConversationSidebar } from "./conversation-sidebar";
+import { ConversationHeader } from "./ConversationHeader";
+import { MessageList } from "./message-list";
+import { ChatInput } from "./ChatInput";
 
 export function ClientContent() {
   const { activeConversation, isInitialized } = useAIAssistant();

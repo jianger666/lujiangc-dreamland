@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -7,35 +7,35 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from 'react';
+} from "react";
 import {
   getAllConversations,
   getActiveConversationId,
   saveConversations,
   saveActiveConversationId,
-} from '../utils/db';
+} from "../utils/db";
 import {
   saveConversationsToLocalStorage,
   loadConversationsFromLocalStorage,
   clearConversationsFromLocalStorage,
-} from '../utils/localStorageHelper';
+} from "../utils/localStorageHelper";
 import {
   generateInterruptedConversations,
   INTERRUPTED_SUFFIX,
-} from '../utils/streamService';
+} from "../utils/streamService";
 import {
   Conversation,
   AIModel,
   StreamingState,
   AiRoleEnum,
   AIModelEnum,
-} from '@/types/ai-assistant';
+} from "@/types/ai-assistant";
 import {
   useConversations,
   useStreamResponse,
   useTitleGeneration,
-} from '../hooks';
-import { useLocalStorage } from 'usehooks-ts';
+} from "../hooks";
+import { useLocalStorage } from "usehooks-ts";
 
 // ==== 辅助函数 ====
 
@@ -54,7 +54,7 @@ function mergeConversationsWithInterrupts(
     return dbConversations; // 如果没有中断数据，直接返回 DB 数据
   }
 
-  console.log('发现上次中断的对话，正在合并...', interruptedConversations);
+  console.log("发现上次中断的对话，正在合并...", interruptedConversations);
 
   const dbMap = new Map(dbConversations.map((c) => [c.id, c]));
   const merged = interruptedConversations.map((intConv) => {
@@ -128,7 +128,7 @@ interface AIAssistantContextType {
     updates,
   }: {
     id: string;
-    updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
+    updates: Partial<Omit<Conversation, "id" | "createdAt">>;
   }) => void;
   addNewConversation: () => Promise<Conversation | undefined>; // 添加新对话
   deleteConversation: (id: string) => Promise<void>; // 删除对话
@@ -169,7 +169,7 @@ export function AIAssistantProvider({
 
   // 桌面端的侧边栏状态
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useLocalStorage(
-    'ai-assistant-desktop-sidebar-open',
+    "ai-assistant-desktop-sidebar-open",
     true,
   );
   const changeDesktopSidebarOpen = useCallback(
@@ -255,8 +255,8 @@ export function AIAssistantProvider({
   const currentStreamingState = useMemo(
     () =>
       streamingState[activeConversationId] || {
-        content: '',
-        thinking: '',
+        content: "",
+        thinking: "",
         isLoading: false,
       },
     [streamingState, activeConversationId],
@@ -308,9 +308,9 @@ export function AIAssistantProvider({
           try {
             await saveConversations(mergedConversations); // 异步写回 DB
             clearConversationsFromLocalStorage(); // 同步清理 LocalStorage
-            console.log('中断状态合并完成并已清理。');
+            console.log("中断状态合并完成并已清理。");
           } catch (saveError) {
-            console.error('初始化时保存合并后的对话到DB失败:', saveError);
+            console.error("初始化时保存合并后的对话到DB失败:", saveError);
             // 注意：即使保存失败，也继续执行，因为状态已经在内存和UI中更新
           }
         }
@@ -318,7 +318,7 @@ export function AIAssistantProvider({
         // 7. 标记初始化完成
         setIsInitialized(true);
       } catch (error) {
-        console.error('加载初始化数据失败:', error);
+        console.error("加载初始化数据失败:", error);
         setIsInitialized(true); // 即使加载失败，也标记为已初始化，避免阻塞UI
       }
     };
@@ -352,7 +352,7 @@ export function AIAssistantProvider({
           saveActiveConversationId(activeConversationId),
         ]);
       } catch (error) {
-        console.error('持久化数据到 IndexedDB 失败:', error);
+        console.error("持久化数据到 IndexedDB 失败:", error);
       }
     };
 
@@ -517,7 +517,7 @@ export function AIAssistantProvider({
 
       if (hasActiveStreams) {
         console.log(
-          '页面即将卸载，检测到活动流，正在同步保存中断状态到 LocalStorage...',
+          "页面即将卸载，检测到活动流，正在同步保存中断状态到 LocalStorage...",
         );
         // 基于当前 Ref 中的状态，生成包含中断标记的新对话数组
         const interruptedConversations = generateInterruptedConversations(
@@ -530,11 +530,11 @@ export function AIAssistantProvider({
     };
 
     // 添加事件监听器
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     // 组件卸载时移除监听器
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []); // 空依赖数组确保只在挂载和卸载时运行
 

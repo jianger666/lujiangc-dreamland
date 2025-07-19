@@ -1,4 +1,4 @@
-declare module 'react-wheel-of-fortune' {
+declare module "react-wheel-of-fortune" {
   export interface WheelOfFortuneProps {
     segments: { id: string; text: string; color?: string }[];
     segColors: string[];

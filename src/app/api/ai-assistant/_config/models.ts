@@ -9,111 +9,111 @@ import {
   ProviderConfig,
   ModelConfig,
   AIModel,
-} from '@/types/ai-assistant';
+} from "@/types/ai-assistant";
 
 /**
  * AI 服务提供商配置
  */
 export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
   [AIProviderEnum.OPEN_ROUTER]: {
-    baseURL: 'https://openrouter.ai/api/v1',
+    baseURL: "https://openrouter.ai/api/v1",
     apiKeys: [process.env.OPEN_ROUTER_API_KEY!],
   },
   [AIProviderEnum.GOOGLE]: {
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
     apiKeys: [
       process.env.GOOGLE_STUDIO_API_KEY!,
       process.env.GOOGLE_STUDIO_API_KEY2!,
     ],
   },
   [AIProviderEnum.FREE_CHAT_GPT]: {
-    baseURL: 'https://free.v36.cm/v1',
+    baseURL: "https://free.v36.cm/v1",
     apiKeys: [process.env.FREE_CHAT_GPT_API_KEY!],
   },
   [AIProviderEnum.ZHIPU]: {
-    baseURL: 'https://open.bigmodel.cn/api/paas/v4',
+    baseURL: "https://open.bigmodel.cn/api/paas/v4",
     apiKeys: [process.env.ZHIPU_API_KEY!],
   },
   [AIProviderEnum.CURSOR_PROXY]: {
     // 当前域名
-    baseURL: process.env.NEXT_PUBLIC_APP_URL + '/api/cursor2openai/v1',
+    baseURL: process.env.NEXT_PUBLIC_APP_URL + "/api/cursor2openai/v1",
     apiKeys: [process.env.CURSOR_PROXY_API_KEY!],
   },
 };
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
   [AIModelEnum.Default]: {
-    displayName: 'default',
+    displayName: "default",
     instances: [
       {
         provider: AIProviderEnum.CURSOR_PROXY,
-        modelId: 'default',
+        modelId: "default",
       },
     ],
   },
   [AIModelEnum.Gp4oMini]: {
-    displayName: 'gpt-4o-mini',
+    displayName: "gpt-4o-mini",
     instances: [
-      { provider: AIProviderEnum.FREE_CHAT_GPT, modelId: 'gpt-4o-mini' },
+      { provider: AIProviderEnum.FREE_CHAT_GPT, modelId: "gpt-4o-mini" },
     ],
   },
   [AIModelEnum.DeepSeekV30324]: {
-    displayName: 'DeepSeek-V3',
+    displayName: "DeepSeek-V3",
     instances: [
       {
         provider: AIProviderEnum.OPEN_ROUTER,
-        modelId: 'deepseek/deepseek-chat-v3-0324:free',
+        modelId: "deepseek/deepseek-chat-v3-0324:free",
       },
     ],
   },
   [AIModelEnum.DeepSeekR1]: {
-    displayName: 'DeepSeek-R1',
+    displayName: "DeepSeek-R1",
     instances: [
       {
         provider: AIProviderEnum.OPEN_ROUTER,
-        modelId: 'deepseek/deepseek-r1:free',
+        modelId: "deepseek/deepseek-r1:free",
       },
     ],
   },
   // 专门用于对话内容生成标题的模型一类,不给用户展示，只用于生成标题
   [AIModelEnum.TitleGenerator]: {
-    displayName: 'Title Generator',
+    displayName: "Title Generator",
     hideInUI: true,
     instances: [
       {
         provider: AIProviderEnum.GOOGLE,
-        modelId: 'models/gemini-2.0-flash-lite',
+        modelId: "models/gemini-2.0-flash-lite",
       },
       {
         provider: AIProviderEnum.GOOGLE,
-        modelId: 'models/gemini-2.0-flash-lite',
+        modelId: "models/gemini-2.0-flash-lite",
       },
       {
         provider: AIProviderEnum.ZHIPU,
-        modelId: 'glm-4-flash',
+        modelId: "glm-4-flash",
       },
       {
         provider: AIProviderEnum.ZHIPU,
-        modelId: 'glm-4-flash-250414',
+        modelId: "glm-4-flash-250414",
       },
     ],
   },
   // 专门用于图像理解的模型一类,不给用户展示，只用于图像理解，告诉其他模型，图片内容是什么
   [AIModelEnum.ImageReader]: {
-    displayName: 'Image Reader',
+    displayName: "Image Reader",
     hideInUI: true,
     instances: [
       {
         provider: AIProviderEnum.ZHIPU,
-        modelId: 'glm-4v-flash',
+        modelId: "glm-4v-flash",
       },
       {
         provider: AIProviderEnum.GOOGLE,
-        modelId: 'models/gemini-2.0-flash-lite',
+        modelId: "models/gemini-2.0-flash-lite",
       },
       {
         provider: AIProviderEnum.GOOGLE,
-        modelId: 'gemini-2.0-flash',
+        modelId: "gemini-2.0-flash",
       },
     ],
   },

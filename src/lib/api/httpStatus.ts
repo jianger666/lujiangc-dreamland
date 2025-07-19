@@ -52,51 +52,51 @@ export function getStatusMessage(statusCode: HttpStatus): string {
   switch (statusCode) {
     // 0
     case HttpStatus.UNKNOWN:
-      return '未知错误';
+      return "未知错误";
 
     // 2xx
     case HttpStatus.OK:
-      return '请求成功';
+      return "请求成功";
     case HttpStatus.CREATED:
-      return '资源创建成功';
+      return "资源创建成功";
     case HttpStatus.ACCEPTED:
-      return '请求已接受，正在处理';
+      return "请求已接受，正在处理";
     case HttpStatus.NO_CONTENT:
-      return '请求成功，无返回内容';
+      return "请求成功，无返回内容";
 
     // 4xx
     case HttpStatus.BAD_REQUEST:
-      return '无效的请求';
+      return "无效的请求";
     case HttpStatus.UNAUTHORIZED:
-      return '未授权访问';
+      return "未授权访问";
     case HttpStatus.FORBIDDEN:
-      return '禁止访问';
+      return "禁止访问";
     case HttpStatus.NOT_FOUND:
-      return '资源不存在';
+      return "资源不存在";
     case HttpStatus.METHOD_NOT_ALLOWED:
-      return '请求方法不允许';
+      return "请求方法不允许";
     case HttpStatus.CONFLICT:
-      return '资源冲突';
+      return "资源冲突";
     case HttpStatus.UNPROCESSABLE_ENTITY:
-      return '请求参数有误';
+      return "请求参数有误";
     case HttpStatus.TOO_MANY_REQUESTS:
-      return '请求过于频繁';
+      return "请求过于频繁";
     case HttpStatus.CLIENT_CLOSED_REQUEST:
-      return '请求被取消';
+      return "请求被取消";
 
     // 5xx
     case HttpStatus.INTERNAL_SERVER_ERROR:
-      return '服务器内部错误';
+      return "服务器内部错误";
     case HttpStatus.NOT_IMPLEMENTED:
-      return '功能未实现';
+      return "功能未实现";
     case HttpStatus.BAD_GATEWAY:
-      return '网关错误';
+      return "网关错误";
     case HttpStatus.SERVICE_UNAVAILABLE:
-      return '服务不可用';
+      return "服务不可用";
     case HttpStatus.GATEWAY_TIMEOUT:
-      return '网关超时';
+      return "网关超时";
 
     default:
-      return '未知状态';
+      return "未知状态";
   }
 }

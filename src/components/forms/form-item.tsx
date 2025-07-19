@@ -1,5 +1,5 @@
-import { useFormContext } from 'react-hook-form';
-import React from 'react';
+import { useFormContext } from "react-hook-form";
+import React from "react";
 import {
   FormField,
   FormItem as ShadcnFormItem,
@@ -7,14 +7,14 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from '@/components/ui/form';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
 interface FormItemProps {
   name: string;
@@ -25,9 +25,9 @@ interface FormItemProps {
   showValidation?: boolean;
   tooltip?: string;
   colon?: boolean;
-  validateStatus?: 'success' | 'warning' | 'error' | 'validating' | '';
+  validateStatus?: "success" | "warning" | "error" | "validating" | "";
   help?: React.ReactNode;
-  layout?: 'vertical' | 'horizontal' | 'inline';
+  layout?: "vertical" | "horizontal" | "inline";
 }
 
 export function FormItem({
@@ -41,32 +41,32 @@ export function FormItem({
   colon = true,
   validateStatus,
   help,
-  layout = 'vertical',
+  layout = "vertical",
 }: FormItemProps) {
   const { control } = useFormContext();
 
   // 根据布局设置样式
   const itemClassName = cn(
-    'w-full',
+    "w-full",
     {
-      'mb-4': layout === 'vertical',
-      'flex items-start': layout === 'horizontal',
-      'inline-flex items-center mr-4': layout === 'inline',
+      "mb-4": layout === "vertical",
+      "flex items-start": layout === "horizontal",
+      "inline-flex items-center mr-4": layout === "inline",
     },
     className,
   );
 
   // 标签样式
   const labelClassName = cn({
-    'text-sm font-medium mb-2': layout === 'vertical',
-    'text-sm font-medium mr-2 min-w-[80px]': layout === 'horizontal',
-    'text-sm font-medium mr-2': layout === 'inline',
+    "text-sm font-medium mb-2": layout === "vertical",
+    "text-sm font-medium mr-2 min-w-[80px]": layout === "horizontal",
+    "text-sm font-medium mr-2": layout === "inline",
   });
 
   // 控制样式
   const controlClassName = cn({
-    'w-full': layout === 'vertical',
-    'flex-1': layout === 'horizontal' || layout === 'inline',
+    "w-full": layout === "vertical",
+    "flex-1": layout === "horizontal" || layout === "inline",
   });
 
   return (
@@ -105,7 +105,7 @@ export function FormItem({
               </FormDescription>
             )}
             {help && <div className="mt-1 text-xs">{help}</div>}
-            {showValidation && validateStatus !== 'success' && <FormMessage />}
+            {showValidation && validateStatus !== "success" && <FormMessage />}
           </div>
         </ShadcnFormItem>
       )}

@@ -1,10 +1,10 @@
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
 import {
   COMPRESSION_OPTIONS,
   IMAGE_SIZE_LIMITS,
   SUPPORTED_IMAGE_TYPES,
   ERROR_MESSAGES,
-} from '@/consts/imageConfig';
+} from "@/consts/imageConfig";
 
 /**
  * 图片压缩选项接口
@@ -103,7 +103,7 @@ export const compressImage = async ({
       compressionRatio,
     };
   } catch (error) {
-    console.error('图片压缩失败:', error);
+    console.error("图片压缩失败:", error);
     return {
       success: false,
       originalSize,

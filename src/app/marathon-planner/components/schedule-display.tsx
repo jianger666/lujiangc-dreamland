@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useRef } from 'react';
-import { SchedulePoster } from './schedule-poster';
+import React, { useRef } from "react";
+import { SchedulePoster } from "./schedule-poster";
 
 interface ScheduleDisplayProps {
   schedule: string;
@@ -14,7 +14,7 @@ export function ScheduleDisplay({
   schedule,
   isLoading,
   error,
-  raceName = '马拉松训练计划',
+  raceName = "马拉松训练计划",
 }: ScheduleDisplayProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -91,4 +91,4 @@ export const ScheduleDisplayWithRef = React.forwardRef<
   );
 });
 
-ScheduleDisplayWithRef.displayName = 'ScheduleDisplayWithRef';
+ScheduleDisplayWithRef.displayName = "ScheduleDisplayWithRef";

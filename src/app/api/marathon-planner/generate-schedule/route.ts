@@ -1,22 +1,22 @@
-import { NextRequest } from 'next/server';
-import { apiHandler } from '@/lib/api/handler';
-import { createErrorResponse, createStreamResponse } from '@/lib/api/response';
-import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
+import { NextRequest } from "next/server";
+import { apiHandler } from "@/lib/api/handler";
+import { createErrorResponse, createStreamResponse } from "@/lib/api/response";
+import { AIModelEnum, AiRoleEnum } from "@/types/ai-assistant";
 import {
   tryChatCompletionWithFailover,
   handleStreamResponse,
-} from '@/app/api/ai-assistant/_utils';
+} from "@/app/api/ai-assistant/_utils";
 import {
   readPromptMarkdown,
   formatTargetTime,
   formatDateString,
-} from '@/lib/utils/prompt-loader';
+} from "@/lib/utils/prompt-loader";
 import {
   MarathonPlanFormData,
   ScheduleResponse,
   WEEKDAYS,
-} from '@/app/marathon-planner/types';
-import type { ChatCompletionChunk } from 'openai/resources';
+} from "@/app/marathon-planner/types";
+import type { ChatCompletionChunk } from "openai/resources";
 
 /**
  * POST处理器 - 生成马拉松训练课表
@@ -46,7 +46,7 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
       !dailyTrainingTime
     ) {
       return createErrorResponse({
-        message: '缺少必填字段',
+        message: "缺少必填字段",
         statusCode: 400,
       });
     }
@@ -58,29 +58,29 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
         const timeInMinutes = dailyTrainingTime[day] || 0;
         const timeFormatted =
           timeInMinutes >= 60
-            ? `${Math.floor(timeInMinutes / 60)}小时${timeInMinutes % 60 > 0 ? `${timeInMinutes % 60}分钟` : ''}`
+            ? `${Math.floor(timeInMinutes / 60)}小时${timeInMinutes % 60 > 0 ? `${timeInMinutes % 60}分钟` : ""}`
             : `${timeInMinutes}分钟`;
         return `${dayLabel}: ${timeFormatted}`;
       })
-      .join('、');
+      .join("、");
 
     // 准备提示词变量
     const variables = {
       raceName,
-      currentPB: currentPB ? currentPB.toString() : '',
+      currentPB: currentPB ? currentPB.toString() : "",
       raceDate: formatDateString(new Date(raceDate)),
       trainingStartDate: formatDateString(
         trainingStartDate ? new Date(trainingStartDate) : new Date(),
       ),
-      marathonType: marathonType === 'half' ? '半程马拉松' : '全程马拉松',
+      marathonType: marathonType === "half" ? "半程马拉松" : "全程马拉松",
       targetTime: formatTargetTime(targetTime),
       trainingSchedule,
-      additionalNotes: formData.additionalNotes || '无特殊要求',
+      additionalNotes: formData.additionalNotes || "无特殊要求",
     };
 
     // 读取并处理提示词模板
     const prompt = readPromptMarkdown(
-      'src/app/api/marathon-planner/_prompts/marathon-schedule.md',
+      "src/app/api/marathon-planner/_prompts/marathon-schedule.md",
       variables,
     );
 
@@ -111,21 +111,21 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
     // 返回流式响应
     return createStreamResponse(stream);
   } catch (error) {
-    console.error('生成马拉松课表错误:', error);
+    console.error("生成马拉松课表错误:", error);
 
     const result: ScheduleResponse = {
-      schedule: '',
+      schedule: "",
       success: false,
       error:
         error instanceof Error
           ? error.message
-          : '生成训练计划时出错，请稍后重试',
+          : "生成训练计划时出错，请稍后重试",
     };
 
     return new Response(JSON.stringify(result), {
       status: 500,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   }

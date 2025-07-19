@@ -1,7 +1,7 @@
-import React from 'react';
-import { ListChildComponentProps } from 'react-window';
-import { MessageItem } from './MessageItem';
-import { ItemData } from './types';
+import React from "react";
+import { ListChildComponentProps } from "react-window";
+import { MessageItem } from "./MessageItem";
+import { ItemData } from "./types";
 
 // 虚拟列表渲染的列表项
 export const Row = React.memo(
@@ -21,4 +21,4 @@ export const Row = React.memo(
   },
 );
 
-Row.displayName = 'VirtualRow';
+Row.displayName = "VirtualRow";

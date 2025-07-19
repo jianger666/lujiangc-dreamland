@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -7,22 +7,22 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
 interface DateFieldProps {
   name: string;
@@ -40,7 +40,7 @@ export function DateField({
   name,
   label,
   description,
-  placeholder = '选择日期',
+  placeholder = "选择日期",
   disabled = false,
   fromYear = new Date().getFullYear(),
   toYear = new Date().getFullYear() + 2,
@@ -51,11 +51,11 @@ export function DateField({
   const [open, setOpen] = useState(false);
 
   const formatDate = (date: Date | undefined) => {
-    if (!date) return '';
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    if (!date) return "";
+    return date.toLocaleDateString("zh-CN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -63,8 +63,8 @@ export function DateField({
     <Button
       variant="outline"
       className={cn(
-        'w-full justify-start text-left font-normal',
-        !field.value && 'text-muted-foreground',
+        "w-full justify-start text-left font-normal",
+        !field.value && "text-muted-foreground",
         className,
       )}
       disabled={disabled}
@@ -107,7 +107,7 @@ export function DateField({
               className={cn(
                 "overflow-hidden p-0",
                 // 移动端适配：确保不会超出屏幕
-                "sm:w-auto"
+                "sm:w-auto",
               )}
               align="start"
               side="bottom"

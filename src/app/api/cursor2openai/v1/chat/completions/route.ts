@@ -1,7 +1,7 @@
-import { NextRequest } from 'next/server';
-import { apiHandler } from '@/lib/api/handler';
+import { NextRequest } from "next/server";
+import { apiHandler } from "@/lib/api/handler";
 
-export const runtime = 'edge';
+export const runtime = "edge";
 
 export const GET = apiHandler(async (request: NextRequest) => {
   const baseUrl = new URL(request.url).origin;
@@ -14,7 +14,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
   });
 
   const response = await fetch(internalUrl, {
-    method: 'GET',
+    method: "GET",
     headers,
   });
 
@@ -34,7 +34,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.text();
 
   const response = await fetch(internalUrl, {
-    method: 'POST',
+    method: "POST",
     headers,
     body,
   });

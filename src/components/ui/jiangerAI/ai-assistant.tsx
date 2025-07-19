@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState, useRef, useEffect, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -10,23 +10,23 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Send, Bot, X } from 'lucide-react';
-import { cn } from '@/lib';
+} from "@/components/ui/dialog";
+import { Send, Bot, X } from "lucide-react";
+import { cn } from "@/lib";
 
 // 消息类型
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
 // 初始消息
 const INITIAL_MESSAGES: Message[] = [
   {
-    id: 'welcome',
-    role: 'assistant',
-    content: '你好！我是江耳的替身，有什么我能帮你的吗？',
+    id: "welcome",
+    role: "assistant",
+    content: "你好！我是江耳的替身，有什么我能帮你的吗？",
   },
 ];
 
@@ -40,8 +40,8 @@ interface AIAssistantProps {
 
 export function AIAssistant({
   initialPrompt,
-  searchQuery = '',
-  triggerLabel = '问问江耳的替身',
+  searchQuery = "",
+  triggerLabel = "问问江耳的替身",
   isFloating = false,
 }: AIAssistantProps) {
   // 对话框开关状态
@@ -49,11 +49,11 @@ export function AIAssistant({
   // 消息列表
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   // 输入框内容
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   // 加载状态
   const [isLoading, setIsLoading] = useState(false);
   // 当前流式生成的消息
-  const [streamingMessage, setStreamingMessage] = useState('');
+  const [streamingMessage, setStreamingMessage] = useState("");
   // 消息列表底部ref，用于自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // EventSource 引用
@@ -74,12 +74,12 @@ export function AIAssistant({
       eventSourceRef.current.close();
     }
 
-    setStreamingMessage('');
-    let accumulatedMessage = '';
+    setStreamingMessage("");
+    let accumulatedMessage = "";
 
     // 构建查询参数
     const params = new URLSearchParams();
-    params.append('searchQuery', searchTerms);
+    params.append("searchQuery", searchTerms);
 
     // 添加消息
     messages.forEach((msg, index) => {
@@ -96,7 +96,7 @@ export function AIAssistant({
     // 处理消息事件
     eventSource.onmessage = (event) => {
       try {
-        if (event.data === '[DONE]') {
+        if (event.data === "[DONE]") {
           eventSource.close();
           // 流结束，将累积的消息添加到消息列表
           if (accumulatedMessage) {
@@ -104,11 +104,11 @@ export function AIAssistant({
               ...prev,
               {
                 id: Date.now().toString(),
-                role: 'assistant',
+                role: "assistant",
                 content: accumulatedMessage,
               },
             ]);
-            setStreamingMessage('');
+            setStreamingMessage("");
           }
           setIsLoading(false);
           return;
@@ -121,13 +121,13 @@ export function AIAssistant({
           setStreamingMessage(accumulatedMessage);
         }
       } catch (error) {
-        console.error('解析响应数据出错:', error);
+        console.error("解析响应数据出错:", error);
       }
     };
 
     // 处理错误
     eventSource.onerror = (error) => {
-      console.error('EventSource 错误:', error);
+      console.error("EventSource 错误:", error);
       eventSource.close();
       setIsLoading(false);
       // 添加错误消息
@@ -135,9 +135,9 @@ export function AIAssistant({
         ...prev,
         {
           id: Date.now().toString(),
-          role: 'assistant',
+          role: "assistant",
           content:
-            '抱歉，我还没有学习到关于这个话题的内容，无法提供相关信息。您可以选择其他问题，我将努力为您解答。',
+            "抱歉，我还没有学习到关于这个话题的内容，无法提供相关信息。您可以选择其他问题，我将努力为您解答。",
         },
       ]);
     };
@@ -153,11 +153,11 @@ export function AIAssistant({
     // 添加用户消息
     const userMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: input,
     };
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     // 使用 EventSource 处理流式响应
@@ -175,7 +175,7 @@ export function AIAssistant({
         // 添加用户消息
         const userMessage: Message = {
           id: Date.now().toString(),
-          role: 'user',
+          role: "user",
           content: initialPrompt,
         };
         setMessages((prev) => [...prev, userMessage]);
@@ -221,7 +221,7 @@ export function AIAssistant({
             <Bot className="h-6 w-6" />
           </Button>
         ) : (
-          <Button title={''} variant="outline" size="sm">
+          <Button title={""} variant="outline" size="sm">
             {triggerLabel}
           </Button>
         )}
@@ -241,19 +241,19 @@ export function AIAssistant({
             <div
               key={message.id}
               className={cn(
-                'mb-3 flex items-start',
-                message.role === 'user' ? 'justify-end' : 'justify-start',
+                "mb-3 flex items-start",
+                message.role === "user" ? "justify-end" : "justify-start",
               )}
             >
               <div
                 className={cn(
-                  'max-w-[90%] rounded-lg px-4 py-2 md:max-w-[80%]',
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted',
+                  "max-w-[90%] rounded-lg px-4 py-2 md:max-w-[80%]",
+                  message.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted",
                 )}
               >
-                {message.role === 'user' ? (
+                {message.role === "user" ? (
                   message.content
                 ) : (
                   <div className="prose prose-sm max-w-none overflow-auto whitespace-pre-wrap dark:prose-invert">
@@ -281,11 +281,11 @@ export function AIAssistant({
                   <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"></div>
                   <div
                     className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-                    style={{ animationDelay: '0.2s' }}
+                    style={{ animationDelay: "0.2s" }}
                   ></div>
                   <div
                     className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-                    style={{ animationDelay: '0.4s' }}
+                    style={{ animationDelay: "0.4s" }}
                   ></div>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export function AIAssistant({
                   variant="ghost"
                   size="icon"
                   className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
-                  onClick={() => setInput('')}
+                  onClick={() => setInput("")}
                   disabled={isLoading}
                 >
                   <X className="h-4 w-4" />

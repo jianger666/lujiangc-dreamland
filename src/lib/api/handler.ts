@@ -1,10 +1,10 @@
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 import {
   createErrorResponse,
   createSuccessResponse,
   ApiResponse,
-} from './response';
-import { HttpStatus } from './httpStatus';
+} from "./response";
+import { HttpStatus } from "./httpStatus";
 
 // Next.js 15 的路由处理函数类型
 type NextRequestContext = {
@@ -43,11 +43,11 @@ export function apiHandler<T>(
       // 否则返回标准成功响应
       return createSuccessResponse({ data: result as T });
     } catch (error) {
-      console.error('API请求处理错误:', error);
+      console.error("API请求处理错误:", error);
 
       // 返回统一的错误响应
       const message =
-        error instanceof Error ? error.message : '服务器处理请求时出错';
+        error instanceof Error ? error.message : "服务器处理请求时出错";
       return createErrorResponse({
         message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

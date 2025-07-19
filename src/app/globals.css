@@ -41,7 +41,7 @@
     --primary-foreground: #ffffff;
     --secondary: #f9c7d9;
     --secondary-foreground: #ffffff;
-    
+
     --muted: #2d353e;
     --muted-foreground: #bebebe;
     --accent: #2d353e;
@@ -67,19 +67,17 @@
   body {
     @apply bg-background text-foreground;
   }
-  
-  
 }
 
 /* 简单的过渡动画效果 */
 @layer components {
-  input, 
-  select, 
-  textarea, 
+  input,
+  select,
+  textarea,
   button {
     @apply transition-colors duration-200;
   }
-  
+
   /* 修复 Radix UI Checkbox 隐藏 input 在移动端造成双重滚动条的问题 */
   button[role="checkbox"] + input[type="checkbox"] {
     display: none !important;
@@ -88,5 +86,3 @@
     display: none !important;
   }
 }
-
-

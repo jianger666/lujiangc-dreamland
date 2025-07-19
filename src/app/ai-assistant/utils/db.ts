@@ -1,6 +1,6 @@
-import { DBSchema, IDBPDatabase } from 'idb';
-import { createDBInstance } from '@/lib';
-import type { Conversation } from '@/types/ai-assistant';
+import { DBSchema, IDBPDatabase } from "idb";
+import { createDBInstance } from "@/lib";
+import type { Conversation } from "@/types/ai-assistant";
 
 // 定义AI助手数据库Schema
 interface AIAssistantDB extends DBSchema {
@@ -8,16 +8,16 @@ interface AIAssistantDB extends DBSchema {
     key: string;
     value: Conversation;
     indexes: {
-      'by-updated': string;
+      "by-updated": string;
     };
   };
   activeConversation: {
-    key: 'activeId';
+    key: "activeId";
     value: string;
   };
 }
 
-const DB_NAME = 'ai-assistant-db';
+const DB_NAME = "ai-assistant-db";
 const DB_VERSION = 1;
 
 // 初始化数据库
@@ -26,13 +26,13 @@ const getDB = createDBInstance<AIAssistantDB>(
   DB_VERSION,
   (db: IDBPDatabase<AIAssistantDB>) => {
     // 创建对话存储
-    const conversationStore = db.createObjectStore('conversations', {
-      keyPath: 'id',
+    const conversationStore = db.createObjectStore("conversations", {
+      keyPath: "id",
     });
-    conversationStore.createIndex('by-updated', 'updatedAt');
+    conversationStore.createIndex("by-updated", "updatedAt");
 
     // 创建活跃对话ID存储
-    db.createObjectStore('activeConversation');
+    db.createObjectStore("activeConversation");
   },
 );
 
@@ -41,7 +41,7 @@ const getDB = createDBInstance<AIAssistantDB>(
  */
 export async function getAllConversations(): Promise<Conversation[]> {
   const db = await getDB();
-  return db.getAllFromIndex('conversations', 'by-updated');
+  return db.getAllFromIndex("conversations", "by-updated");
 }
 
 /**
@@ -50,11 +50,11 @@ export async function getAllConversations(): Promise<Conversation[]> {
 export async function getActiveConversationId(): Promise<string> {
   const db = await getDB();
   try {
-    const activeId = await db.get('activeConversation', 'activeId');
-    return activeId || '';
+    const activeId = await db.get("activeConversation", "activeId");
+    return activeId || "";
   } catch (error) {
-    console.error('获取活跃对话ID失败:', error);
-    return '';
+    console.error("获取活跃对话ID失败:", error);
+    return "";
   }
 }
 
@@ -65,14 +65,14 @@ export async function saveConversations(
   conversations: Conversation[],
 ): Promise<void> {
   const db = await getDB();
-  const tx = db.transaction('conversations', 'readwrite');
+  const tx = db.transaction("conversations", "readwrite");
 
   // 清空当前存储
-  await tx.objectStore('conversations').clear();
+  await tx.objectStore("conversations").clear();
 
   // 添加新的对话
   for (const conversation of conversations) {
-    await tx.objectStore('conversations').add(conversation);
+    await tx.objectStore("conversations").add(conversation);
   }
 
   await tx.done;
@@ -85,7 +85,7 @@ export async function saveConversation(
   conversation: Conversation,
 ): Promise<void> {
   const db = await getDB();
-  await db.put('conversations', conversation);
+  await db.put("conversations", conversation);
 }
 
 /**
@@ -93,7 +93,7 @@ export async function saveConversation(
  */
 export async function deleteConversation(id: string): Promise<void> {
   const db = await getDB();
-  await db.delete('conversations', id);
+  await db.delete("conversations", id);
 }
 
 /**
@@ -101,5 +101,5 @@ export async function deleteConversation(id: string): Promise<void> {
  */
 export async function saveActiveConversationId(id: string): Promise<void> {
   const db = await getDB();
-  await db.put('activeConversation', id, 'activeId');
+  await db.put("activeConversation", id, "activeId");
 }

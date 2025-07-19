@@ -1,5 +1,5 @@
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import React from "react";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -7,16 +7,16 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
 type ValueType = string | number;
 
@@ -32,10 +32,10 @@ interface RadioGroupFieldProps<T extends ValueType = string> {
   description?: string;
   options: RadioOption<T>[];
   className?: string;
-  direction?: 'horizontal' | 'vertical';
-  optionType?: 'default' | 'button';
-  buttonStyle?: 'outline' | 'solid';
-  size?: 'small' | 'middle' | 'large';
+  direction?: "horizontal" | "vertical";
+  optionType?: "default" | "button";
+  buttonStyle?: "outline" | "solid";
+  size?: "small" | "middle" | "large";
   disabled?: boolean;
   onChange?: (value: T) => void;
   tooltip?: string;
@@ -47,13 +47,13 @@ export function RadioGroupField<T extends ValueType = string>({
   description,
   options,
   className,
-  direction = 'vertical',
+  direction = "vertical",
   // 暂未实现的属性，后续可扩展
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionType = 'default',
+  optionType = "default",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  buttonStyle = 'outline',
-  size = 'middle',
+  buttonStyle = "outline",
+  size = "middle",
   disabled = false,
   onChange,
   tooltip,
@@ -62,15 +62,15 @@ export function RadioGroupField<T extends ValueType = string>({
 
   // 方向样式
   const radioGroupClassName = cn({
-    'flex flex-col space-y-2': direction === 'vertical',
-    'flex flex-row flex-wrap gap-4': direction === 'horizontal',
+    "flex flex-col space-y-2": direction === "vertical",
+    "flex flex-row flex-wrap gap-4": direction === "horizontal",
   });
 
   // 尺寸样式
   const radioItemClassName = cn({
-    'text-sm': size === 'small',
-    'text-base': size === 'middle',
-    'text-lg': size === 'large',
+    "text-sm": size === "small",
+    "text-base": size === "middle",
+    "text-lg": size === "large",
   });
 
   return (
@@ -82,16 +82,16 @@ export function RadioGroupField<T extends ValueType = string>({
         const stringValue =
           field.value !== undefined &&
           field.value !== null &&
-          field.value !== ''
+          field.value !== ""
             ? String(field.value)
             : undefined;
 
         // 处理值变更
         const handleValueChange = (value: string) => {
-          if (value === '') {
+          if (value === "") {
             // 如果是空字符串，则设为空值
-            field.onChange('');
-            onChange?.('' as unknown as T);
+            field.onChange("");
+            onChange?.("" as unknown as T);
             return;
           }
 
@@ -144,7 +144,7 @@ export function RadioGroupField<T extends ValueType = string>({
                     <div
                       key={id}
                       className={cn(
-                        'flex items-center space-x-2',
+                        "flex items-center space-x-2",
                         radioItemClassName,
                       )}
                     >
@@ -155,7 +155,7 @@ export function RadioGroupField<T extends ValueType = string>({
                       />
                       <Label
                         htmlFor={id}
-                        className={isDisabled ? 'opacity-50' : ''}
+                        className={isDisabled ? "opacity-50" : ""}
                       >
                         {option.label}
                       </Label>

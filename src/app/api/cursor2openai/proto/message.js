@@ -9,7 +9,7 @@ var $Reader = $protobuf.Reader,
   $util = $protobuf.util;
 
 // Exported root namespace
-var $root = $protobuf.roots['default'] || ($protobuf.roots['default'] = {});
+var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
 $root.AvailableModelsResponse = (function () {
   /**
@@ -169,23 +169,23 @@ $root.AvailableModelsResponse = (function () {
    * @returns {string|null} `null` if valid, otherwise the reason why it is not
    */
   AvailableModelsResponse.verify = function verify(message) {
-    if (typeof message !== 'object' || message === null)
-      return 'object expected';
-    if (message.models != null && message.hasOwnProperty('models')) {
-      if (!Array.isArray(message.models)) return 'models: array expected';
+    if (typeof message !== "object" || message === null)
+      return "object expected";
+    if (message.models != null && message.hasOwnProperty("models")) {
+      if (!Array.isArray(message.models)) return "models: array expected";
       for (var i = 0; i < message.models.length; ++i) {
         var error = $root.AvailableModelsResponse.AvailableModel.verify(
           message.models[i],
         );
-        if (error) return 'models.' + error;
+        if (error) return "models." + error;
       }
     }
-    if (message.modelNames != null && message.hasOwnProperty('modelNames')) {
+    if (message.modelNames != null && message.hasOwnProperty("modelNames")) {
       if (!Array.isArray(message.modelNames))
-        return 'modelNames: array expected';
+        return "modelNames: array expected";
       for (var i = 0; i < message.modelNames.length; ++i)
         if (!$util.isString(message.modelNames[i]))
-          return 'modelNames: string[] expected';
+          return "modelNames: string[] expected";
     }
     return null;
   };
@@ -203,11 +203,11 @@ $root.AvailableModelsResponse = (function () {
     var message = new $root.AvailableModelsResponse();
     if (object.models) {
       if (!Array.isArray(object.models))
-        throw TypeError('.AvailableModelsResponse.models: array expected');
+        throw TypeError(".AvailableModelsResponse.models: array expected");
       message.models = [];
       for (var i = 0; i < object.models.length; ++i) {
-        if (typeof object.models[i] !== 'object')
-          throw TypeError('.AvailableModelsResponse.models: object expected');
+        if (typeof object.models[i] !== "object")
+          throw TypeError(".AvailableModelsResponse.models: object expected");
         message.models[i] =
           $root.AvailableModelsResponse.AvailableModel.fromObject(
             object.models[i],
@@ -216,7 +216,7 @@ $root.AvailableModelsResponse = (function () {
     }
     if (object.modelNames) {
       if (!Array.isArray(object.modelNames))
-        throw TypeError('.AvailableModelsResponse.modelNames: array expected');
+        throw TypeError(".AvailableModelsResponse.modelNames: array expected");
       message.modelNames = [];
       for (var i = 0; i < object.modelNames.length; ++i)
         message.modelNames[i] = String(object.modelNames[i]);
@@ -278,9 +278,9 @@ $root.AvailableModelsResponse = (function () {
    */
   AvailableModelsResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
     if (typeUrlPrefix === undefined) {
-      typeUrlPrefix = 'type.googleapis.com';
+      typeUrlPrefix = "type.googleapis.com";
     }
-    return typeUrlPrefix + '/AvailableModelsResponse';
+    return typeUrlPrefix + "/AvailableModelsResponse";
   };
 
   AvailableModelsResponse.AvailableModel = (function () {
@@ -314,7 +314,7 @@ $root.AvailableModelsResponse = (function () {
      * @memberof AvailableModelsResponse.AvailableModel
      * @instance
      */
-    AvailableModel.prototype.name = '';
+    AvailableModel.prototype.name = "";
 
     /**
      * AvailableModel defaultOn.
@@ -344,14 +344,14 @@ $root.AvailableModelsResponse = (function () {
     var $oneOfFields;
 
     // Virtual OneOf for proto3 optional field
-    Object.defineProperty(AvailableModel.prototype, '_isLongContextOnly', {
-      get: $util.oneOfGetter(($oneOfFields = ['isLongContextOnly'])),
+    Object.defineProperty(AvailableModel.prototype, "_isLongContextOnly", {
+      get: $util.oneOfGetter(($oneOfFields = ["isLongContextOnly"])),
       set: $util.oneOfSetter($oneOfFields),
     });
 
     // Virtual OneOf for proto3 optional field
-    Object.defineProperty(AvailableModel.prototype, '_isChatOnly', {
-      get: $util.oneOfGetter(($oneOfFields = ['isChatOnly'])),
+    Object.defineProperty(AvailableModel.prototype, "_isChatOnly", {
+      get: $util.oneOfGetter(($oneOfFields = ["isChatOnly"])),
       set: $util.oneOfSetter($oneOfFields),
     });
 
@@ -378,23 +378,23 @@ $root.AvailableModelsResponse = (function () {
      */
     AvailableModel.encode = function encode(message, writer) {
       if (!writer) writer = $Writer.create();
-      if (message.name != null && Object.hasOwnProperty.call(message, 'name'))
+      if (message.name != null && Object.hasOwnProperty.call(message, "name"))
         writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.name);
       if (
         message.defaultOn != null &&
-        Object.hasOwnProperty.call(message, 'defaultOn')
+        Object.hasOwnProperty.call(message, "defaultOn")
       )
         writer.uint32(/* id 2, wireType 0 =*/ 16).bool(message.defaultOn);
       if (
         message.isLongContextOnly != null &&
-        Object.hasOwnProperty.call(message, 'isLongContextOnly')
+        Object.hasOwnProperty.call(message, "isLongContextOnly")
       )
         writer
           .uint32(/* id 3, wireType 0 =*/ 24)
           .bool(message.isLongContextOnly);
       if (
         message.isChatOnly != null &&
-        Object.hasOwnProperty.call(message, 'isChatOnly')
+        Object.hasOwnProperty.call(message, "isChatOnly")
       )
         writer.uint32(/* id 4, wireType 0 =*/ 32).bool(message.isChatOnly);
       return writer;
@@ -479,26 +479,26 @@ $root.AvailableModelsResponse = (function () {
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
     AvailableModel.verify = function verify(message) {
-      if (typeof message !== 'object' || message === null)
-        return 'object expected';
+      if (typeof message !== "object" || message === null)
+        return "object expected";
       var properties = {};
-      if (message.name != null && message.hasOwnProperty('name'))
-        if (!$util.isString(message.name)) return 'name: string expected';
-      if (message.defaultOn != null && message.hasOwnProperty('defaultOn'))
-        if (typeof message.defaultOn !== 'boolean')
-          return 'defaultOn: boolean expected';
+      if (message.name != null && message.hasOwnProperty("name"))
+        if (!$util.isString(message.name)) return "name: string expected";
+      if (message.defaultOn != null && message.hasOwnProperty("defaultOn"))
+        if (typeof message.defaultOn !== "boolean")
+          return "defaultOn: boolean expected";
       if (
         message.isLongContextOnly != null &&
-        message.hasOwnProperty('isLongContextOnly')
+        message.hasOwnProperty("isLongContextOnly")
       ) {
         properties._isLongContextOnly = 1;
-        if (typeof message.isLongContextOnly !== 'boolean')
-          return 'isLongContextOnly: boolean expected';
+        if (typeof message.isLongContextOnly !== "boolean")
+          return "isLongContextOnly: boolean expected";
       }
-      if (message.isChatOnly != null && message.hasOwnProperty('isChatOnly')) {
+      if (message.isChatOnly != null && message.hasOwnProperty("isChatOnly")) {
         properties._isChatOnly = 1;
-        if (typeof message.isChatOnly !== 'boolean')
-          return 'isChatOnly: boolean expected';
+        if (typeof message.isChatOnly !== "boolean")
+          return "isChatOnly: boolean expected";
       }
       return null;
     };
@@ -538,23 +538,23 @@ $root.AvailableModelsResponse = (function () {
       if (!options) options = {};
       var object = {};
       if (options.defaults) {
-        object.name = '';
+        object.name = "";
         object.defaultOn = false;
       }
-      if (message.name != null && message.hasOwnProperty('name'))
+      if (message.name != null && message.hasOwnProperty("name"))
         object.name = message.name;
-      if (message.defaultOn != null && message.hasOwnProperty('defaultOn'))
+      if (message.defaultOn != null && message.hasOwnProperty("defaultOn"))
         object.defaultOn = message.defaultOn;
       if (
         message.isLongContextOnly != null &&
-        message.hasOwnProperty('isLongContextOnly')
+        message.hasOwnProperty("isLongContextOnly")
       ) {
         object.isLongContextOnly = message.isLongContextOnly;
-        if (options.oneofs) object._isLongContextOnly = 'isLongContextOnly';
+        if (options.oneofs) object._isLongContextOnly = "isLongContextOnly";
       }
-      if (message.isChatOnly != null && message.hasOwnProperty('isChatOnly')) {
+      if (message.isChatOnly != null && message.hasOwnProperty("isChatOnly")) {
         object.isChatOnly = message.isChatOnly;
-        if (options.oneofs) object._isChatOnly = 'isChatOnly';
+        if (options.oneofs) object._isChatOnly = "isChatOnly";
       }
       return object;
     };
@@ -580,9 +580,9 @@ $root.AvailableModelsResponse = (function () {
      */
     AvailableModel.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
       if (typeUrlPrefix === undefined) {
-        typeUrlPrefix = 'type.googleapis.com';
+        typeUrlPrefix = "type.googleapis.com";
       }
-      return typeUrlPrefix + '/AvailableModelsResponse.AvailableModel';
+      return typeUrlPrefix + "/AvailableModelsResponse.AvailableModel";
     };
 
     return AvailableModel;
@@ -622,7 +622,7 @@ $root.MessageSummary = (function () {
    * @memberof MessageSummary
    * @instance
    */
-  MessageSummary.prototype.content = '';
+  MessageSummary.prototype.content = "";
 
   /**
    * MessageSummary summaryId1.
@@ -630,7 +630,7 @@ $root.MessageSummary = (function () {
    * @memberof MessageSummary
    * @instance
    */
-  MessageSummary.prototype.summaryId1 = '';
+  MessageSummary.prototype.summaryId1 = "";
 
   /**
    * MessageSummary summaryId2.
@@ -638,7 +638,7 @@ $root.MessageSummary = (function () {
    * @memberof MessageSummary
    * @instance
    */
-  MessageSummary.prototype.summaryId2 = '';
+  MessageSummary.prototype.summaryId2 = "";
 
   /**
    * MessageSummary previousSummaryId.
@@ -646,7 +646,7 @@ $root.MessageSummary = (function () {
    * @memberof MessageSummary
    * @instance
    */
-  MessageSummary.prototype.previousSummaryId = '';
+  MessageSummary.prototype.previousSummaryId = "";
 
   /**
    * Creates a new MessageSummary instance using the specified properties.
@@ -673,22 +673,22 @@ $root.MessageSummary = (function () {
     if (!writer) writer = $Writer.create();
     if (
       message.content != null &&
-      Object.hasOwnProperty.call(message, 'content')
+      Object.hasOwnProperty.call(message, "content")
     )
       writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.content);
     if (
       message.summaryId1 != null &&
-      Object.hasOwnProperty.call(message, 'summaryId1')
+      Object.hasOwnProperty.call(message, "summaryId1")
     )
       writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.summaryId1);
     if (
       message.summaryId2 != null &&
-      Object.hasOwnProperty.call(message, 'summaryId2')
+      Object.hasOwnProperty.call(message, "summaryId2")
     )
       writer.uint32(/* id 3, wireType 2 =*/ 26).string(message.summaryId2);
     if (
       message.previousSummaryId != null &&
-      Object.hasOwnProperty.call(message, 'previousSummaryId')
+      Object.hasOwnProperty.call(message, "previousSummaryId")
     )
       writer
         .uint32(/* id 4, wireType 2 =*/ 34)
@@ -775,22 +775,22 @@ $root.MessageSummary = (function () {
    * @returns {string|null} `null` if valid, otherwise the reason why it is not
    */
   MessageSummary.verify = function verify(message) {
-    if (typeof message !== 'object' || message === null)
-      return 'object expected';
-    if (message.content != null && message.hasOwnProperty('content'))
-      if (!$util.isString(message.content)) return 'content: string expected';
-    if (message.summaryId1 != null && message.hasOwnProperty('summaryId1'))
+    if (typeof message !== "object" || message === null)
+      return "object expected";
+    if (message.content != null && message.hasOwnProperty("content"))
+      if (!$util.isString(message.content)) return "content: string expected";
+    if (message.summaryId1 != null && message.hasOwnProperty("summaryId1"))
       if (!$util.isString(message.summaryId1))
-        return 'summaryId1: string expected';
-    if (message.summaryId2 != null && message.hasOwnProperty('summaryId2'))
+        return "summaryId1: string expected";
+    if (message.summaryId2 != null && message.hasOwnProperty("summaryId2"))
       if (!$util.isString(message.summaryId2))
-        return 'summaryId2: string expected';
+        return "summaryId2: string expected";
     if (
       message.previousSummaryId != null &&
-      message.hasOwnProperty('previousSummaryId')
+      message.hasOwnProperty("previousSummaryId")
     )
       if (!$util.isString(message.previousSummaryId))
-        return 'previousSummaryId: string expected';
+        return "previousSummaryId: string expected";
     return null;
   };
 
@@ -828,20 +828,20 @@ $root.MessageSummary = (function () {
     if (!options) options = {};
     var object = {};
     if (options.defaults) {
-      object.content = '';
-      object.summaryId1 = '';
-      object.summaryId2 = '';
-      object.previousSummaryId = '';
+      object.content = "";
+      object.summaryId1 = "";
+      object.summaryId2 = "";
+      object.previousSummaryId = "";
     }
-    if (message.content != null && message.hasOwnProperty('content'))
+    if (message.content != null && message.hasOwnProperty("content"))
       object.content = message.content;
-    if (message.summaryId1 != null && message.hasOwnProperty('summaryId1'))
+    if (message.summaryId1 != null && message.hasOwnProperty("summaryId1"))
       object.summaryId1 = message.summaryId1;
-    if (message.summaryId2 != null && message.hasOwnProperty('summaryId2'))
+    if (message.summaryId2 != null && message.hasOwnProperty("summaryId2"))
       object.summaryId2 = message.summaryId2;
     if (
       message.previousSummaryId != null &&
-      message.hasOwnProperty('previousSummaryId')
+      message.hasOwnProperty("previousSummaryId")
     )
       object.previousSummaryId = message.previousSummaryId;
     return object;
@@ -868,9 +868,9 @@ $root.MessageSummary = (function () {
    */
   MessageSummary.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
     if (typeUrlPrefix === undefined) {
-      typeUrlPrefix = 'type.googleapis.com';
+      typeUrlPrefix = "type.googleapis.com";
     }
-    return typeUrlPrefix + '/MessageSummary';
+    return typeUrlPrefix + "/MessageSummary";
   };
 
   return MessageSummary;
@@ -904,7 +904,7 @@ $root.MessageThinking = (function () {
    * @memberof MessageThinking
    * @instance
    */
-  MessageThinking.prototype.content = '';
+  MessageThinking.prototype.content = "";
 
   /**
    * Creates a new MessageThinking instance using the specified properties.
@@ -931,7 +931,7 @@ $root.MessageThinking = (function () {
     if (!writer) writer = $Writer.create();
     if (
       message.content != null &&
-      Object.hasOwnProperty.call(message, 'content')
+      Object.hasOwnProperty.call(message, "content")
     )
       writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.content);
     return writer;
@@ -1004,10 +1004,10 @@ $root.MessageThinking = (function () {
    * @returns {string|null} `null` if valid, otherwise the reason why it is not
    */
   MessageThinking.verify = function verify(message) {
-    if (typeof message !== 'object' || message === null)
-      return 'object expected';
-    if (message.content != null && message.hasOwnProperty('content'))
-      if (!$util.isString(message.content)) return 'content: string expected';
+    if (typeof message !== "object" || message === null)
+      return "object expected";
+    if (message.content != null && message.hasOwnProperty("content"))
+      if (!$util.isString(message.content)) return "content: string expected";
     return null;
   };
 
@@ -1038,8 +1038,8 @@ $root.MessageThinking = (function () {
   MessageThinking.toObject = function toObject(message, options) {
     if (!options) options = {};
     var object = {};
-    if (options.defaults) object.content = '';
-    if (message.content != null && message.hasOwnProperty('content'))
+    if (options.defaults) object.content = "";
+    if (message.content != null && message.hasOwnProperty("content"))
       object.content = message.content;
     return object;
   };
@@ -1065,9 +1065,9 @@ $root.MessageThinking = (function () {
    */
   MessageThinking.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
     if (typeUrlPrefix === undefined) {
-      typeUrlPrefix = 'type.googleapis.com';
+      typeUrlPrefix = "type.googleapis.com";
     }
-    return typeUrlPrefix + '/MessageThinking';
+    return typeUrlPrefix + "/MessageThinking";
   };
 
   return MessageThinking;
@@ -1128,7 +1128,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
     if (!writer) writer = $Writer.create();
     if (
       message.request != null &&
-      Object.hasOwnProperty.call(message, 'request')
+      Object.hasOwnProperty.call(message, "request")
     )
       $root.StreamUnifiedChatWithToolsRequest.Request.encode(
         message.request,
@@ -1213,13 +1213,13 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
    * @returns {string|null} `null` if valid, otherwise the reason why it is not
    */
   StreamUnifiedChatWithToolsRequest.verify = function verify(message) {
-    if (typeof message !== 'object' || message === null)
-      return 'object expected';
-    if (message.request != null && message.hasOwnProperty('request')) {
+    if (typeof message !== "object" || message === null)
+      return "object expected";
+    if (message.request != null && message.hasOwnProperty("request")) {
       var error = $root.StreamUnifiedChatWithToolsRequest.Request.verify(
         message.request,
       );
-      if (error) return 'request.' + error;
+      if (error) return "request." + error;
     }
     return null;
   };
@@ -1237,9 +1237,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       return object;
     var message = new $root.StreamUnifiedChatWithToolsRequest();
     if (object.request != null) {
-      if (typeof object.request !== 'object')
+      if (typeof object.request !== "object")
         throw TypeError(
-          '.StreamUnifiedChatWithToolsRequest.request: object expected',
+          ".StreamUnifiedChatWithToolsRequest.request: object expected",
         );
       message.request =
         $root.StreamUnifiedChatWithToolsRequest.Request.fromObject(
@@ -1265,7 +1265,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
     if (!options) options = {};
     var object = {};
     if (options.defaults) object.request = null;
-    if (message.request != null && message.hasOwnProperty('request'))
+    if (message.request != null && message.hasOwnProperty("request"))
       object.request = $root.StreamUnifiedChatWithToolsRequest.Request.toObject(
         message.request,
         options,
@@ -1296,9 +1296,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
     typeUrlPrefix,
   ) {
     if (typeUrlPrefix === undefined) {
-      typeUrlPrefix = 'type.googleapis.com';
+      typeUrlPrefix = "type.googleapis.com";
     }
-    return typeUrlPrefix + '/StreamUnifiedChatWithToolsRequest';
+    return typeUrlPrefix + "/StreamUnifiedChatWithToolsRequest";
   };
 
   StreamUnifiedChatWithToolsRequest.Request = (function () {
@@ -1404,7 +1404,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      * @memberof StreamUnifiedChatWithToolsRequest.Request
      * @instance
      */
-    Request.prototype.webTool = '';
+    Request.prototype.webTool = "";
 
     /**
      * Request unknown13.
@@ -1444,7 +1444,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      * @memberof StreamUnifiedChatWithToolsRequest.Request
      * @instance
      */
-    Request.prototype.conversationId = '';
+    Request.prototype.conversationId = "";
 
     /**
      * Request metadata.
@@ -1468,7 +1468,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      * @memberof StreamUnifiedChatWithToolsRequest.Request
      * @instance
      */
-    Request.prototype.unknown29 = '';
+    Request.prototype.unknown29 = "";
 
     /**
      * Request messageIds.
@@ -1508,7 +1508,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      * @memberof StreamUnifiedChatWithToolsRequest.Request
      * @instance
      */
-    Request.prototype.unknown47 = '';
+    Request.prototype.unknown47 = "";
 
     /**
      * Request unknown48.
@@ -1548,7 +1548,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      * @memberof StreamUnifiedChatWithToolsRequest.Request
      * @instance
      */
-    Request.prototype.chatMode = '';
+    Request.prototype.chatMode = "";
 
     /**
      * Creates a new Request instance using the specified properties.
@@ -1581,12 +1581,12 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           ).ldelim();
       if (
         message.unknown2 != null &&
-        Object.hasOwnProperty.call(message, 'unknown2')
+        Object.hasOwnProperty.call(message, "unknown2")
       )
         writer.uint32(/* id 2, wireType 0 =*/ 16).int32(message.unknown2);
       if (
         message.instruction != null &&
-        Object.hasOwnProperty.call(message, 'instruction')
+        Object.hasOwnProperty.call(message, "instruction")
       )
         $root.StreamUnifiedChatWithToolsRequest.Request.Instruction.encode(
           message.instruction,
@@ -1594,10 +1594,10 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         ).ldelim();
       if (
         message.unknown4 != null &&
-        Object.hasOwnProperty.call(message, 'unknown4')
+        Object.hasOwnProperty.call(message, "unknown4")
       )
         writer.uint32(/* id 4, wireType 0 =*/ 32).int32(message.unknown4);
-      if (message.model != null && Object.hasOwnProperty.call(message, 'model'))
+      if (message.model != null && Object.hasOwnProperty.call(message, "model"))
         $root.StreamUnifiedChatWithToolsRequest.Request.Model.encode(
           message.model,
           writer.uint32(/* id 5, wireType 2 =*/ 42).fork(),
@@ -1607,17 +1607,17 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           writer.uint32(/* id 7, wireType 2 =*/ 58).string(message.wikiTool[i]);
       if (
         message.webTool != null &&
-        Object.hasOwnProperty.call(message, 'webTool')
+        Object.hasOwnProperty.call(message, "webTool")
       )
         writer.uint32(/* id 8, wireType 2 =*/ 66).string(message.webTool);
       if (
         message.unknown13 != null &&
-        Object.hasOwnProperty.call(message, 'unknown13')
+        Object.hasOwnProperty.call(message, "unknown13")
       )
         writer.uint32(/* id 13, wireType 0 =*/ 104).int32(message.unknown13);
       if (
         message.cursorSetting != null &&
-        Object.hasOwnProperty.call(message, 'cursorSetting')
+        Object.hasOwnProperty.call(message, "cursorSetting")
       )
         $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.encode(
           message.cursorSetting,
@@ -1625,24 +1625,24 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         ).ldelim();
       if (
         message.unknown19 != null &&
-        Object.hasOwnProperty.call(message, 'unknown19')
+        Object.hasOwnProperty.call(message, "unknown19")
       )
         writer.uint32(/* id 19, wireType 0 =*/ 152).int32(message.unknown19);
       if (
         message.unknown22 != null &&
-        Object.hasOwnProperty.call(message, 'unknown22')
+        Object.hasOwnProperty.call(message, "unknown22")
       )
         writer.uint32(/* id 22, wireType 0 =*/ 176).int32(message.unknown22);
       if (
         message.conversationId != null &&
-        Object.hasOwnProperty.call(message, 'conversationId')
+        Object.hasOwnProperty.call(message, "conversationId")
       )
         writer
           .uint32(/* id 23, wireType 2 =*/ 186)
           .string(message.conversationId);
       if (
         message.metadata != null &&
-        Object.hasOwnProperty.call(message, 'metadata')
+        Object.hasOwnProperty.call(message, "metadata")
       )
         $root.StreamUnifiedChatWithToolsRequest.Request.Metadata.encode(
           message.metadata,
@@ -1650,12 +1650,12 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         ).ldelim();
       if (
         message.unknown27 != null &&
-        Object.hasOwnProperty.call(message, 'unknown27')
+        Object.hasOwnProperty.call(message, "unknown27")
       )
         writer.uint32(/* id 27, wireType 0 =*/ 216).int32(message.unknown27);
       if (
         message.unknown29 != null &&
-        Object.hasOwnProperty.call(message, 'unknown29')
+        Object.hasOwnProperty.call(message, "unknown29")
       )
         writer.uint32(/* id 29, wireType 2 =*/ 234).string(message.unknown29);
       if (message.messageIds != null && message.messageIds.length)
@@ -1666,47 +1666,47 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           ).ldelim();
       if (
         message.largeContext != null &&
-        Object.hasOwnProperty.call(message, 'largeContext')
+        Object.hasOwnProperty.call(message, "largeContext")
       )
         writer.uint32(/* id 35, wireType 0 =*/ 280).int32(message.largeContext);
       if (
         message.unknown38 != null &&
-        Object.hasOwnProperty.call(message, 'unknown38')
+        Object.hasOwnProperty.call(message, "unknown38")
       )
         writer.uint32(/* id 38, wireType 0 =*/ 304).int32(message.unknown38);
       if (
         message.chatModeEnum != null &&
-        Object.hasOwnProperty.call(message, 'chatModeEnum')
+        Object.hasOwnProperty.call(message, "chatModeEnum")
       )
         writer.uint32(/* id 46, wireType 0 =*/ 368).int32(message.chatModeEnum);
       if (
         message.unknown47 != null &&
-        Object.hasOwnProperty.call(message, 'unknown47')
+        Object.hasOwnProperty.call(message, "unknown47")
       )
         writer.uint32(/* id 47, wireType 2 =*/ 378).string(message.unknown47);
       if (
         message.unknown48 != null &&
-        Object.hasOwnProperty.call(message, 'unknown48')
+        Object.hasOwnProperty.call(message, "unknown48")
       )
         writer.uint32(/* id 48, wireType 0 =*/ 384).int32(message.unknown48);
       if (
         message.unknown49 != null &&
-        Object.hasOwnProperty.call(message, 'unknown49')
+        Object.hasOwnProperty.call(message, "unknown49")
       )
         writer.uint32(/* id 49, wireType 0 =*/ 392).int32(message.unknown49);
       if (
         message.unknown51 != null &&
-        Object.hasOwnProperty.call(message, 'unknown51')
+        Object.hasOwnProperty.call(message, "unknown51")
       )
         writer.uint32(/* id 51, wireType 0 =*/ 408).int32(message.unknown51);
       if (
         message.unknown53 != null &&
-        Object.hasOwnProperty.call(message, 'unknown53')
+        Object.hasOwnProperty.call(message, "unknown53")
       )
         writer.uint32(/* id 53, wireType 0 =*/ 424).int32(message.unknown53);
       if (
         message.chatMode != null &&
-        Object.hasOwnProperty.call(message, 'chatMode')
+        Object.hasOwnProperty.call(message, "chatMode")
       )
         writer.uint32(/* id 54, wireType 2 =*/ 434).string(message.chatMode);
       return writer;
@@ -1907,131 +1907,131 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
     Request.verify = function verify(message) {
-      if (typeof message !== 'object' || message === null)
-        return 'object expected';
-      if (message.messages != null && message.hasOwnProperty('messages')) {
-        if (!Array.isArray(message.messages)) return 'messages: array expected';
+      if (typeof message !== "object" || message === null)
+        return "object expected";
+      if (message.messages != null && message.hasOwnProperty("messages")) {
+        if (!Array.isArray(message.messages)) return "messages: array expected";
         for (var i = 0; i < message.messages.length; ++i) {
           var error =
             $root.StreamUnifiedChatWithToolsRequest.Request.Message.verify(
               message.messages[i],
             );
-          if (error) return 'messages.' + error;
+          if (error) return "messages." + error;
         }
       }
-      if (message.unknown2 != null && message.hasOwnProperty('unknown2'))
+      if (message.unknown2 != null && message.hasOwnProperty("unknown2"))
         if (!$util.isInteger(message.unknown2))
-          return 'unknown2: integer expected';
+          return "unknown2: integer expected";
       if (
         message.instruction != null &&
-        message.hasOwnProperty('instruction')
+        message.hasOwnProperty("instruction")
       ) {
         var error =
           $root.StreamUnifiedChatWithToolsRequest.Request.Instruction.verify(
             message.instruction,
           );
-        if (error) return 'instruction.' + error;
+        if (error) return "instruction." + error;
       }
-      if (message.unknown4 != null && message.hasOwnProperty('unknown4'))
+      if (message.unknown4 != null && message.hasOwnProperty("unknown4"))
         if (!$util.isInteger(message.unknown4))
-          return 'unknown4: integer expected';
-      if (message.model != null && message.hasOwnProperty('model')) {
+          return "unknown4: integer expected";
+      if (message.model != null && message.hasOwnProperty("model")) {
         var error =
           $root.StreamUnifiedChatWithToolsRequest.Request.Model.verify(
             message.model,
           );
-        if (error) return 'model.' + error;
+        if (error) return "model." + error;
       }
-      if (message.wikiTool != null && message.hasOwnProperty('wikiTool')) {
-        if (!Array.isArray(message.wikiTool)) return 'wikiTool: array expected';
+      if (message.wikiTool != null && message.hasOwnProperty("wikiTool")) {
+        if (!Array.isArray(message.wikiTool)) return "wikiTool: array expected";
         for (var i = 0; i < message.wikiTool.length; ++i)
           if (!$util.isString(message.wikiTool[i]))
-            return 'wikiTool: string[] expected';
+            return "wikiTool: string[] expected";
       }
-      if (message.webTool != null && message.hasOwnProperty('webTool'))
-        if (!$util.isString(message.webTool)) return 'webTool: string expected';
-      if (message.unknown13 != null && message.hasOwnProperty('unknown13'))
+      if (message.webTool != null && message.hasOwnProperty("webTool"))
+        if (!$util.isString(message.webTool)) return "webTool: string expected";
+      if (message.unknown13 != null && message.hasOwnProperty("unknown13"))
         if (!$util.isInteger(message.unknown13))
-          return 'unknown13: integer expected';
+          return "unknown13: integer expected";
       if (
         message.cursorSetting != null &&
-        message.hasOwnProperty('cursorSetting')
+        message.hasOwnProperty("cursorSetting")
       ) {
         var error =
           $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.verify(
             message.cursorSetting,
           );
-        if (error) return 'cursorSetting.' + error;
+        if (error) return "cursorSetting." + error;
       }
-      if (message.unknown19 != null && message.hasOwnProperty('unknown19'))
+      if (message.unknown19 != null && message.hasOwnProperty("unknown19"))
         if (!$util.isInteger(message.unknown19))
-          return 'unknown19: integer expected';
-      if (message.unknown22 != null && message.hasOwnProperty('unknown22'))
+          return "unknown19: integer expected";
+      if (message.unknown22 != null && message.hasOwnProperty("unknown22"))
         if (!$util.isInteger(message.unknown22))
-          return 'unknown22: integer expected';
+          return "unknown22: integer expected";
       if (
         message.conversationId != null &&
-        message.hasOwnProperty('conversationId')
+        message.hasOwnProperty("conversationId")
       )
         if (!$util.isString(message.conversationId))
-          return 'conversationId: string expected';
-      if (message.metadata != null && message.hasOwnProperty('metadata')) {
+          return "conversationId: string expected";
+      if (message.metadata != null && message.hasOwnProperty("metadata")) {
         var error =
           $root.StreamUnifiedChatWithToolsRequest.Request.Metadata.verify(
             message.metadata,
           );
-        if (error) return 'metadata.' + error;
+        if (error) return "metadata." + error;
       }
-      if (message.unknown27 != null && message.hasOwnProperty('unknown27'))
+      if (message.unknown27 != null && message.hasOwnProperty("unknown27"))
         if (!$util.isInteger(message.unknown27))
-          return 'unknown27: integer expected';
-      if (message.unknown29 != null && message.hasOwnProperty('unknown29'))
+          return "unknown27: integer expected";
+      if (message.unknown29 != null && message.hasOwnProperty("unknown29"))
         if (!$util.isString(message.unknown29))
-          return 'unknown29: string expected';
-      if (message.messageIds != null && message.hasOwnProperty('messageIds')) {
+          return "unknown29: string expected";
+      if (message.messageIds != null && message.hasOwnProperty("messageIds")) {
         if (!Array.isArray(message.messageIds))
-          return 'messageIds: array expected';
+          return "messageIds: array expected";
         for (var i = 0; i < message.messageIds.length; ++i) {
           var error =
             $root.StreamUnifiedChatWithToolsRequest.Request.MessageId.verify(
               message.messageIds[i],
             );
-          if (error) return 'messageIds.' + error;
+          if (error) return "messageIds." + error;
         }
       }
       if (
         message.largeContext != null &&
-        message.hasOwnProperty('largeContext')
+        message.hasOwnProperty("largeContext")
       )
         if (!$util.isInteger(message.largeContext))
-          return 'largeContext: integer expected';
-      if (message.unknown38 != null && message.hasOwnProperty('unknown38'))
+          return "largeContext: integer expected";
+      if (message.unknown38 != null && message.hasOwnProperty("unknown38"))
         if (!$util.isInteger(message.unknown38))
-          return 'unknown38: integer expected';
+          return "unknown38: integer expected";
       if (
         message.chatModeEnum != null &&
-        message.hasOwnProperty('chatModeEnum')
+        message.hasOwnProperty("chatModeEnum")
       )
         if (!$util.isInteger(message.chatModeEnum))
-          return 'chatModeEnum: integer expected';
-      if (message.unknown47 != null && message.hasOwnProperty('unknown47'))
+          return "chatModeEnum: integer expected";
+      if (message.unknown47 != null && message.hasOwnProperty("unknown47"))
         if (!$util.isString(message.unknown47))
-          return 'unknown47: string expected';
-      if (message.unknown48 != null && message.hasOwnProperty('unknown48'))
+          return "unknown47: string expected";
+      if (message.unknown48 != null && message.hasOwnProperty("unknown48"))
         if (!$util.isInteger(message.unknown48))
-          return 'unknown48: integer expected';
-      if (message.unknown49 != null && message.hasOwnProperty('unknown49'))
+          return "unknown48: integer expected";
+      if (message.unknown49 != null && message.hasOwnProperty("unknown49"))
         if (!$util.isInteger(message.unknown49))
-          return 'unknown49: integer expected';
-      if (message.unknown51 != null && message.hasOwnProperty('unknown51'))
+          return "unknown49: integer expected";
+      if (message.unknown51 != null && message.hasOwnProperty("unknown51"))
         if (!$util.isInteger(message.unknown51))
-          return 'unknown51: integer expected';
-      if (message.unknown53 != null && message.hasOwnProperty('unknown53'))
+          return "unknown51: integer expected";
+      if (message.unknown53 != null && message.hasOwnProperty("unknown53"))
         if (!$util.isInteger(message.unknown53))
-          return 'unknown53: integer expected';
-      if (message.chatMode != null && message.hasOwnProperty('chatMode'))
+          return "unknown53: integer expected";
+      if (message.chatMode != null && message.hasOwnProperty("chatMode"))
         if (!$util.isString(message.chatMode))
-          return 'chatMode: string expected';
+          return "chatMode: string expected";
       return null;
     };
 
@@ -2050,13 +2050,13 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       if (object.messages) {
         if (!Array.isArray(object.messages))
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.messages: array expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.messages: array expected",
           );
         message.messages = [];
         for (var i = 0; i < object.messages.length; ++i) {
-          if (typeof object.messages[i] !== 'object')
+          if (typeof object.messages[i] !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsRequest.Request.messages: object expected',
+              ".StreamUnifiedChatWithToolsRequest.Request.messages: object expected",
             );
           message.messages[i] =
             $root.StreamUnifiedChatWithToolsRequest.Request.Message.fromObject(
@@ -2066,9 +2066,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       }
       if (object.unknown2 != null) message.unknown2 = object.unknown2 | 0;
       if (object.instruction != null) {
-        if (typeof object.instruction !== 'object')
+        if (typeof object.instruction !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.instruction: object expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.instruction: object expected",
           );
         message.instruction =
           $root.StreamUnifiedChatWithToolsRequest.Request.Instruction.fromObject(
@@ -2077,9 +2077,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       }
       if (object.unknown4 != null) message.unknown4 = object.unknown4 | 0;
       if (object.model != null) {
-        if (typeof object.model !== 'object')
+        if (typeof object.model !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.model: object expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.model: object expected",
           );
         message.model =
           $root.StreamUnifiedChatWithToolsRequest.Request.Model.fromObject(
@@ -2089,7 +2089,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       if (object.wikiTool) {
         if (!Array.isArray(object.wikiTool))
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.wikiTool: array expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.wikiTool: array expected",
           );
         message.wikiTool = [];
         for (var i = 0; i < object.wikiTool.length; ++i)
@@ -2098,9 +2098,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       if (object.webTool != null) message.webTool = String(object.webTool);
       if (object.unknown13 != null) message.unknown13 = object.unknown13 | 0;
       if (object.cursorSetting != null) {
-        if (typeof object.cursorSetting !== 'object')
+        if (typeof object.cursorSetting !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.cursorSetting: object expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.cursorSetting: object expected",
           );
         message.cursorSetting =
           $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.fromObject(
@@ -2112,9 +2112,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       if (object.conversationId != null)
         message.conversationId = String(object.conversationId);
       if (object.metadata != null) {
-        if (typeof object.metadata !== 'object')
+        if (typeof object.metadata !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.metadata: object expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.metadata: object expected",
           );
         message.metadata =
           $root.StreamUnifiedChatWithToolsRequest.Request.Metadata.fromObject(
@@ -2127,13 +2127,13 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       if (object.messageIds) {
         if (!Array.isArray(object.messageIds))
           throw TypeError(
-            '.StreamUnifiedChatWithToolsRequest.Request.messageIds: array expected',
+            ".StreamUnifiedChatWithToolsRequest.Request.messageIds: array expected",
           );
         message.messageIds = [];
         for (var i = 0; i < object.messageIds.length; ++i) {
-          if (typeof object.messageIds[i] !== 'object')
+          if (typeof object.messageIds[i] !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsRequest.Request.messageIds: object expected',
+              ".StreamUnifiedChatWithToolsRequest.Request.messageIds: object expected",
             );
           message.messageIds[i] =
             $root.StreamUnifiedChatWithToolsRequest.Request.MessageId.fromObject(
@@ -2178,24 +2178,24 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         object.instruction = null;
         object.unknown4 = 0;
         object.model = null;
-        object.webTool = '';
+        object.webTool = "";
         object.unknown13 = 0;
         object.cursorSetting = null;
         object.unknown19 = 0;
         object.unknown22 = 0;
-        object.conversationId = '';
+        object.conversationId = "";
         object.metadata = null;
         object.unknown27 = 0;
-        object.unknown29 = '';
+        object.unknown29 = "";
         object.largeContext = 0;
         object.unknown38 = 0;
         object.chatModeEnum = 0;
-        object.unknown47 = '';
+        object.unknown47 = "";
         object.unknown48 = 0;
         object.unknown49 = 0;
         object.unknown51 = 0;
         object.unknown53 = 0;
-        object.chatMode = '';
+        object.chatMode = "";
       }
       if (message.messages && message.messages.length) {
         object.messages = [];
@@ -2206,17 +2206,17 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
               options,
             );
       }
-      if (message.unknown2 != null && message.hasOwnProperty('unknown2'))
+      if (message.unknown2 != null && message.hasOwnProperty("unknown2"))
         object.unknown2 = message.unknown2;
-      if (message.instruction != null && message.hasOwnProperty('instruction'))
+      if (message.instruction != null && message.hasOwnProperty("instruction"))
         object.instruction =
           $root.StreamUnifiedChatWithToolsRequest.Request.Instruction.toObject(
             message.instruction,
             options,
           );
-      if (message.unknown4 != null && message.hasOwnProperty('unknown4'))
+      if (message.unknown4 != null && message.hasOwnProperty("unknown4"))
         object.unknown4 = message.unknown4;
-      if (message.model != null && message.hasOwnProperty('model'))
+      if (message.model != null && message.hasOwnProperty("model"))
         object.model =
           $root.StreamUnifiedChatWithToolsRequest.Request.Model.toObject(
             message.model,
@@ -2227,37 +2227,37 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         for (var j = 0; j < message.wikiTool.length; ++j)
           object.wikiTool[j] = message.wikiTool[j];
       }
-      if (message.webTool != null && message.hasOwnProperty('webTool'))
+      if (message.webTool != null && message.hasOwnProperty("webTool"))
         object.webTool = message.webTool;
-      if (message.unknown13 != null && message.hasOwnProperty('unknown13'))
+      if (message.unknown13 != null && message.hasOwnProperty("unknown13"))
         object.unknown13 = message.unknown13;
       if (
         message.cursorSetting != null &&
-        message.hasOwnProperty('cursorSetting')
+        message.hasOwnProperty("cursorSetting")
       )
         object.cursorSetting =
           $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.toObject(
             message.cursorSetting,
             options,
           );
-      if (message.unknown19 != null && message.hasOwnProperty('unknown19'))
+      if (message.unknown19 != null && message.hasOwnProperty("unknown19"))
         object.unknown19 = message.unknown19;
-      if (message.unknown22 != null && message.hasOwnProperty('unknown22'))
+      if (message.unknown22 != null && message.hasOwnProperty("unknown22"))
         object.unknown22 = message.unknown22;
       if (
         message.conversationId != null &&
-        message.hasOwnProperty('conversationId')
+        message.hasOwnProperty("conversationId")
       )
         object.conversationId = message.conversationId;
-      if (message.metadata != null && message.hasOwnProperty('metadata'))
+      if (message.metadata != null && message.hasOwnProperty("metadata"))
         object.metadata =
           $root.StreamUnifiedChatWithToolsRequest.Request.Metadata.toObject(
             message.metadata,
             options,
           );
-      if (message.unknown27 != null && message.hasOwnProperty('unknown27'))
+      if (message.unknown27 != null && message.hasOwnProperty("unknown27"))
         object.unknown27 = message.unknown27;
-      if (message.unknown29 != null && message.hasOwnProperty('unknown29'))
+      if (message.unknown29 != null && message.hasOwnProperty("unknown29"))
         object.unknown29 = message.unknown29;
       if (message.messageIds && message.messageIds.length) {
         object.messageIds = [];
@@ -2270,27 +2270,27 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       }
       if (
         message.largeContext != null &&
-        message.hasOwnProperty('largeContext')
+        message.hasOwnProperty("largeContext")
       )
         object.largeContext = message.largeContext;
-      if (message.unknown38 != null && message.hasOwnProperty('unknown38'))
+      if (message.unknown38 != null && message.hasOwnProperty("unknown38"))
         object.unknown38 = message.unknown38;
       if (
         message.chatModeEnum != null &&
-        message.hasOwnProperty('chatModeEnum')
+        message.hasOwnProperty("chatModeEnum")
       )
         object.chatModeEnum = message.chatModeEnum;
-      if (message.unknown47 != null && message.hasOwnProperty('unknown47'))
+      if (message.unknown47 != null && message.hasOwnProperty("unknown47"))
         object.unknown47 = message.unknown47;
-      if (message.unknown48 != null && message.hasOwnProperty('unknown48'))
+      if (message.unknown48 != null && message.hasOwnProperty("unknown48"))
         object.unknown48 = message.unknown48;
-      if (message.unknown49 != null && message.hasOwnProperty('unknown49'))
+      if (message.unknown49 != null && message.hasOwnProperty("unknown49"))
         object.unknown49 = message.unknown49;
-      if (message.unknown51 != null && message.hasOwnProperty('unknown51'))
+      if (message.unknown51 != null && message.hasOwnProperty("unknown51"))
         object.unknown51 = message.unknown51;
-      if (message.unknown53 != null && message.hasOwnProperty('unknown53'))
+      if (message.unknown53 != null && message.hasOwnProperty("unknown53"))
         object.unknown53 = message.unknown53;
-      if (message.chatMode != null && message.hasOwnProperty('chatMode'))
+      if (message.chatMode != null && message.hasOwnProperty("chatMode"))
         object.chatMode = message.chatMode;
       return object;
     };
@@ -2316,9 +2316,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
      */
     Request.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
       if (typeUrlPrefix === undefined) {
-        typeUrlPrefix = 'type.googleapis.com';
+        typeUrlPrefix = "type.googleapis.com";
       }
-      return typeUrlPrefix + '/StreamUnifiedChatWithToolsRequest.Request';
+      return typeUrlPrefix + "/StreamUnifiedChatWithToolsRequest.Request";
     };
 
     Request.Message = (function () {
@@ -2358,7 +2358,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Message
        * @instance
        */
-      Message.prototype.content = '';
+      Message.prototype.content = "";
 
       /**
        * Message role.
@@ -2382,7 +2382,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Message
        * @instance
        */
-      Message.prototype.messageId = '';
+      Message.prototype.messageId = "";
 
       /**
        * Message unknown29.
@@ -2390,7 +2390,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Message
        * @instance
        */
-      Message.prototype.unknown29 = '';
+      Message.prototype.unknown29 = "";
 
       /**
        * Message summaryId.
@@ -2398,7 +2398,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Message
        * @instance
        */
-      Message.prototype.summaryId = '';
+      Message.prototype.summaryId = "";
 
       /**
        * Message summary.
@@ -2449,14 +2449,14 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!writer) writer = $Writer.create();
         if (
           message.content != null &&
-          Object.hasOwnProperty.call(message, 'content')
+          Object.hasOwnProperty.call(message, "content")
         )
           writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.content);
-        if (message.role != null && Object.hasOwnProperty.call(message, 'role'))
+        if (message.role != null && Object.hasOwnProperty.call(message, "role"))
           writer.uint32(/* id 2, wireType 0 =*/ 16).int32(message.role);
         if (
           message.image != null &&
-          Object.hasOwnProperty.call(message, 'image')
+          Object.hasOwnProperty.call(message, "image")
         )
           $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.encode(
             message.image,
@@ -2464,22 +2464,22 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           ).ldelim();
         if (
           message.messageId != null &&
-          Object.hasOwnProperty.call(message, 'messageId')
+          Object.hasOwnProperty.call(message, "messageId")
         )
           writer.uint32(/* id 13, wireType 2 =*/ 106).string(message.messageId);
         if (
           message.unknown29 != null &&
-          Object.hasOwnProperty.call(message, 'unknown29')
+          Object.hasOwnProperty.call(message, "unknown29")
         )
           writer.uint32(/* id 29, wireType 2 =*/ 234).string(message.unknown29);
         if (
           message.summaryId != null &&
-          Object.hasOwnProperty.call(message, 'summaryId')
+          Object.hasOwnProperty.call(message, "summaryId")
         )
           writer.uint32(/* id 32, wireType 2 =*/ 258).string(message.summaryId);
         if (
           message.summary != null &&
-          Object.hasOwnProperty.call(message, 'summary')
+          Object.hasOwnProperty.call(message, "summary")
         )
           $root.MessageSummary.encode(
             message.summary,
@@ -2487,7 +2487,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           ).ldelim();
         if (
           message.thinking != null &&
-          Object.hasOwnProperty.call(message, 'thinking')
+          Object.hasOwnProperty.call(message, "thinking")
         )
           $root.MessageThinking.encode(
             message.thinking,
@@ -2495,7 +2495,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           ).ldelim();
         if (
           message.chatModeEnum != null &&
-          Object.hasOwnProperty.call(message, 'chatModeEnum')
+          Object.hasOwnProperty.call(message, "chatModeEnum")
         )
           writer
             .uint32(/* id 47, wireType 0 =*/ 376)
@@ -2613,43 +2613,43 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       Message.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.content != null && message.hasOwnProperty('content'))
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.content != null && message.hasOwnProperty("content"))
           if (!$util.isString(message.content))
-            return 'content: string expected';
-        if (message.role != null && message.hasOwnProperty('role'))
-          if (!$util.isInteger(message.role)) return 'role: integer expected';
-        if (message.image != null && message.hasOwnProperty('image')) {
+            return "content: string expected";
+        if (message.role != null && message.hasOwnProperty("role"))
+          if (!$util.isInteger(message.role)) return "role: integer expected";
+        if (message.image != null && message.hasOwnProperty("image")) {
           var error =
             $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.verify(
               message.image,
             );
-          if (error) return 'image.' + error;
+          if (error) return "image." + error;
         }
-        if (message.messageId != null && message.hasOwnProperty('messageId'))
+        if (message.messageId != null && message.hasOwnProperty("messageId"))
           if (!$util.isString(message.messageId))
-            return 'messageId: string expected';
-        if (message.unknown29 != null && message.hasOwnProperty('unknown29'))
+            return "messageId: string expected";
+        if (message.unknown29 != null && message.hasOwnProperty("unknown29"))
           if (!$util.isString(message.unknown29))
-            return 'unknown29: string expected';
-        if (message.summaryId != null && message.hasOwnProperty('summaryId'))
+            return "unknown29: string expected";
+        if (message.summaryId != null && message.hasOwnProperty("summaryId"))
           if (!$util.isString(message.summaryId))
-            return 'summaryId: string expected';
-        if (message.summary != null && message.hasOwnProperty('summary')) {
+            return "summaryId: string expected";
+        if (message.summary != null && message.hasOwnProperty("summary")) {
           var error = $root.MessageSummary.verify(message.summary);
-          if (error) return 'summary.' + error;
+          if (error) return "summary." + error;
         }
-        if (message.thinking != null && message.hasOwnProperty('thinking')) {
+        if (message.thinking != null && message.hasOwnProperty("thinking")) {
           var error = $root.MessageThinking.verify(message.thinking);
-          if (error) return 'thinking.' + error;
+          if (error) return "thinking." + error;
         }
         if (
           message.chatModeEnum != null &&
-          message.hasOwnProperty('chatModeEnum')
+          message.hasOwnProperty("chatModeEnum")
         )
           if (!$util.isInteger(message.chatModeEnum))
-            return 'chatModeEnum: integer expected';
+            return "chatModeEnum: integer expected";
         return null;
       };
 
@@ -2672,9 +2672,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (object.content != null) message.content = String(object.content);
         if (object.role != null) message.role = object.role | 0;
         if (object.image != null) {
-          if (typeof object.image !== 'object')
+          if (typeof object.image !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsRequest.Request.Message.image: object expected',
+              ".StreamUnifiedChatWithToolsRequest.Request.Message.image: object expected",
             );
           message.image =
             $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.fromObject(
@@ -2688,16 +2688,16 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (object.summaryId != null)
           message.summaryId = String(object.summaryId);
         if (object.summary != null) {
-          if (typeof object.summary !== 'object')
+          if (typeof object.summary !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsRequest.Request.Message.summary: object expected',
+              ".StreamUnifiedChatWithToolsRequest.Request.Message.summary: object expected",
             );
           message.summary = $root.MessageSummary.fromObject(object.summary);
         }
         if (object.thinking != null) {
-          if (typeof object.thinking !== 'object')
+          if (typeof object.thinking !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsRequest.Request.Message.thinking: object expected',
+              ".StreamUnifiedChatWithToolsRequest.Request.Message.thinking: object expected",
             );
           message.thinking = $root.MessageThinking.fromObject(object.thinking);
         }
@@ -2719,45 +2719,45 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!options) options = {};
         var object = {};
         if (options.defaults) {
-          object.content = '';
+          object.content = "";
           object.role = 0;
           object.image = null;
-          object.messageId = '';
-          object.unknown29 = '';
-          object.summaryId = '';
+          object.messageId = "";
+          object.unknown29 = "";
+          object.summaryId = "";
           object.summary = null;
           object.thinking = null;
           object.chatModeEnum = 0;
         }
-        if (message.content != null && message.hasOwnProperty('content'))
+        if (message.content != null && message.hasOwnProperty("content"))
           object.content = message.content;
-        if (message.role != null && message.hasOwnProperty('role'))
+        if (message.role != null && message.hasOwnProperty("role"))
           object.role = message.role;
-        if (message.image != null && message.hasOwnProperty('image'))
+        if (message.image != null && message.hasOwnProperty("image"))
           object.image =
             $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.toObject(
               message.image,
               options,
             );
-        if (message.messageId != null && message.hasOwnProperty('messageId'))
+        if (message.messageId != null && message.hasOwnProperty("messageId"))
           object.messageId = message.messageId;
-        if (message.unknown29 != null && message.hasOwnProperty('unknown29'))
+        if (message.unknown29 != null && message.hasOwnProperty("unknown29"))
           object.unknown29 = message.unknown29;
-        if (message.summaryId != null && message.hasOwnProperty('summaryId'))
+        if (message.summaryId != null && message.hasOwnProperty("summaryId"))
           object.summaryId = message.summaryId;
-        if (message.summary != null && message.hasOwnProperty('summary'))
+        if (message.summary != null && message.hasOwnProperty("summary"))
           object.summary = $root.MessageSummary.toObject(
             message.summary,
             options,
           );
-        if (message.thinking != null && message.hasOwnProperty('thinking'))
+        if (message.thinking != null && message.hasOwnProperty("thinking"))
           object.thinking = $root.MessageThinking.toObject(
             message.thinking,
             options,
           );
         if (
           message.chatModeEnum != null &&
-          message.hasOwnProperty('chatModeEnum')
+          message.hasOwnProperty("chatModeEnum")
         )
           object.chatModeEnum = message.chatModeEnum;
         return object;
@@ -2784,10 +2784,10 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       Message.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
-          typeUrlPrefix + '/StreamUnifiedChatWithToolsRequest.Request.Message'
+          typeUrlPrefix + "/StreamUnifiedChatWithToolsRequest.Request.Message"
         );
       };
 
@@ -2860,12 +2860,12 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           if (!writer) writer = $Writer.create();
           if (
             message.data != null &&
-            Object.hasOwnProperty.call(message, 'data')
+            Object.hasOwnProperty.call(message, "data")
           )
             writer.uint32(/* id 1, wireType 2 =*/ 10).bytes(message.data);
           if (
             message.metadata != null &&
-            Object.hasOwnProperty.call(message, 'metadata')
+            Object.hasOwnProperty.call(message, "metadata")
           )
             $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.Metadata.encode(
               message.metadata,
@@ -2950,22 +2950,22 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
         Image.verify = function verify(message) {
-          if (typeof message !== 'object' || message === null)
-            return 'object expected';
-          if (message.data != null && message.hasOwnProperty('data'))
+          if (typeof message !== "object" || message === null)
+            return "object expected";
+          if (message.data != null && message.hasOwnProperty("data"))
             if (
               !(
-                (message.data && typeof message.data.length === 'number') ||
+                (message.data && typeof message.data.length === "number") ||
                 $util.isString(message.data)
               )
             )
-              return 'data: buffer expected';
-          if (message.metadata != null && message.hasOwnProperty('metadata')) {
+              return "data: buffer expected";
+          if (message.metadata != null && message.hasOwnProperty("metadata")) {
             var error =
               $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.Metadata.verify(
                 message.metadata,
               );
-            if (error) return 'metadata.' + error;
+            if (error) return "metadata." + error;
           }
           return null;
         };
@@ -2987,7 +2987,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           var message =
             new $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image();
           if (object.data != null)
-            if (typeof object.data === 'string')
+            if (typeof object.data === "string")
               $util.base64.decode(
                 object.data,
                 (message.data = $util.newBuffer(
@@ -2997,9 +2997,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
               );
             else if (object.data.length >= 0) message.data = object.data;
           if (object.metadata != null) {
-            if (typeof object.metadata !== 'object')
+            if (typeof object.metadata !== "object")
               throw TypeError(
-                '.StreamUnifiedChatWithToolsRequest.Request.Message.Image.metadata: object expected',
+                ".StreamUnifiedChatWithToolsRequest.Request.Message.Image.metadata: object expected",
               );
             message.metadata =
               $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.Metadata.fromObject(
@@ -3022,7 +3022,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           if (!options) options = {};
           var object = {};
           if (options.defaults) {
-            if (options.bytes === String) object.data = '';
+            if (options.bytes === String) object.data = "";
             else {
               object.data = [];
               if (options.bytes !== Array)
@@ -3030,14 +3030,14 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
             }
             object.metadata = null;
           }
-          if (message.data != null && message.hasOwnProperty('data'))
+          if (message.data != null && message.hasOwnProperty("data"))
             object.data =
               options.bytes === String
                 ? $util.base64.encode(message.data, 0, message.data.length)
                 : options.bytes === Array
                   ? Array.prototype.slice.call(message.data)
                   : message.data;
-          if (message.metadata != null && message.hasOwnProperty('metadata'))
+          if (message.metadata != null && message.hasOwnProperty("metadata"))
             object.metadata =
               $root.StreamUnifiedChatWithToolsRequest.Request.Message.Image.Metadata.toObject(
                 message.metadata,
@@ -3067,11 +3067,11 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
          */
         Image.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
           if (typeUrlPrefix === undefined) {
-            typeUrlPrefix = 'type.googleapis.com';
+            typeUrlPrefix = "type.googleapis.com";
           }
           return (
             typeUrlPrefix +
-            '/StreamUnifiedChatWithToolsRequest.Request.Message.Image'
+            "/StreamUnifiedChatWithToolsRequest.Request.Message.Image"
           );
         };
 
@@ -3144,12 +3144,12 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
             if (!writer) writer = $Writer.create();
             if (
               message.width != null &&
-              Object.hasOwnProperty.call(message, 'width')
+              Object.hasOwnProperty.call(message, "width")
             )
               writer.uint32(/* id 1, wireType 0 =*/ 8).int32(message.width);
             if (
               message.height != null &&
-              Object.hasOwnProperty.call(message, 'height')
+              Object.hasOwnProperty.call(message, "height")
             )
               writer.uint32(/* id 2, wireType 0 =*/ 16).int32(message.height);
             return writer;
@@ -3227,14 +3227,14 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
            * @returns {string|null} `null` if valid, otherwise the reason why it is not
            */
           Metadata.verify = function verify(message) {
-            if (typeof message !== 'object' || message === null)
-              return 'object expected';
-            if (message.width != null && message.hasOwnProperty('width'))
+            if (typeof message !== "object" || message === null)
+              return "object expected";
+            if (message.width != null && message.hasOwnProperty("width"))
               if (!$util.isInteger(message.width))
-                return 'width: integer expected';
-            if (message.height != null && message.hasOwnProperty('height'))
+                return "width: integer expected";
+            if (message.height != null && message.hasOwnProperty("height"))
               if (!$util.isInteger(message.height))
-                return 'height: integer expected';
+                return "height: integer expected";
             return null;
           };
 
@@ -3276,9 +3276,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
               object.width = 0;
               object.height = 0;
             }
-            if (message.width != null && message.hasOwnProperty('width'))
+            if (message.width != null && message.hasOwnProperty("width"))
               object.width = message.width;
-            if (message.height != null && message.hasOwnProperty('height'))
+            if (message.height != null && message.hasOwnProperty("height"))
               object.height = message.height;
             return object;
           };
@@ -3307,11 +3307,11 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
            */
           Metadata.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
-              typeUrlPrefix = 'type.googleapis.com';
+              typeUrlPrefix = "type.googleapis.com";
             }
             return (
               typeUrlPrefix +
-              '/StreamUnifiedChatWithToolsRequest.Request.Message.Image.Metadata'
+              "/StreamUnifiedChatWithToolsRequest.Request.Message.Image.Metadata"
             );
           };
 
@@ -3353,7 +3353,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Instruction
        * @instance
        */
-      Instruction.prototype.instruction = '';
+      Instruction.prototype.instruction = "";
 
       /**
        * Creates a new Instruction instance using the specified properties.
@@ -3380,7 +3380,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!writer) writer = $Writer.create();
         if (
           message.instruction != null &&
-          Object.hasOwnProperty.call(message, 'instruction')
+          Object.hasOwnProperty.call(message, "instruction")
         )
           writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.instruction);
         return writer;
@@ -3454,14 +3454,14 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       Instruction.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
+        if (typeof message !== "object" || message === null)
+          return "object expected";
         if (
           message.instruction != null &&
-          message.hasOwnProperty('instruction')
+          message.hasOwnProperty("instruction")
         )
           if (!$util.isString(message.instruction))
-            return 'instruction: string expected';
+            return "instruction: string expected";
         return null;
       };
 
@@ -3498,10 +3498,10 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
       Instruction.toObject = function toObject(message, options) {
         if (!options) options = {};
         var object = {};
-        if (options.defaults) object.instruction = '';
+        if (options.defaults) object.instruction = "";
         if (
           message.instruction != null &&
-          message.hasOwnProperty('instruction')
+          message.hasOwnProperty("instruction")
         )
           object.instruction = message.instruction;
         return object;
@@ -3528,11 +3528,11 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       Instruction.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
           typeUrlPrefix +
-          '/StreamUnifiedChatWithToolsRequest.Request.Instruction'
+          "/StreamUnifiedChatWithToolsRequest.Request.Instruction"
         );
       };
 
@@ -3569,7 +3569,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Model
        * @instance
        */
-      Model.prototype.name = '';
+      Model.prototype.name = "";
 
       /**
        * Model empty.
@@ -3602,11 +3602,11 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       Model.encode = function encode(message, writer) {
         if (!writer) writer = $Writer.create();
-        if (message.name != null && Object.hasOwnProperty.call(message, 'name'))
+        if (message.name != null && Object.hasOwnProperty.call(message, "name"))
           writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.name);
         if (
           message.empty != null &&
-          Object.hasOwnProperty.call(message, 'empty')
+          Object.hasOwnProperty.call(message, "empty")
         )
           writer.uint32(/* id 4, wireType 2 =*/ 34).bytes(message.empty);
         return writer;
@@ -3683,18 +3683,18 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       Model.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.name != null && message.hasOwnProperty('name'))
-          if (!$util.isString(message.name)) return 'name: string expected';
-        if (message.empty != null && message.hasOwnProperty('empty'))
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.name != null && message.hasOwnProperty("name"))
+          if (!$util.isString(message.name)) return "name: string expected";
+        if (message.empty != null && message.hasOwnProperty("empty"))
           if (
             !(
-              (message.empty && typeof message.empty.length === 'number') ||
+              (message.empty && typeof message.empty.length === "number") ||
               $util.isString(message.empty)
             )
           )
-            return 'empty: buffer expected';
+            return "empty: buffer expected";
         return null;
       };
 
@@ -3716,7 +3716,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           new $root.StreamUnifiedChatWithToolsRequest.Request.Model();
         if (object.name != null) message.name = String(object.name);
         if (object.empty != null)
-          if (typeof object.empty === 'string')
+          if (typeof object.empty === "string")
             $util.base64.decode(
               object.empty,
               (message.empty = $util.newBuffer(
@@ -3741,17 +3741,17 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!options) options = {};
         var object = {};
         if (options.defaults) {
-          object.name = '';
-          if (options.bytes === String) object.empty = '';
+          object.name = "";
+          if (options.bytes === String) object.empty = "";
           else {
             object.empty = [];
             if (options.bytes !== Array)
               object.empty = $util.newBuffer(object.empty);
           }
         }
-        if (message.name != null && message.hasOwnProperty('name'))
+        if (message.name != null && message.hasOwnProperty("name"))
           object.name = message.name;
-        if (message.empty != null && message.hasOwnProperty('empty'))
+        if (message.empty != null && message.hasOwnProperty("empty"))
           object.empty =
             options.bytes === String
               ? $util.base64.encode(message.empty, 0, message.empty.length)
@@ -3782,10 +3782,10 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       Model.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
-          typeUrlPrefix + '/StreamUnifiedChatWithToolsRequest.Request.Model'
+          typeUrlPrefix + "/StreamUnifiedChatWithToolsRequest.Request.Model"
         );
       };
 
@@ -3825,7 +3825,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.CursorSetting
        * @instance
        */
-      CursorSetting.prototype.name = '';
+      CursorSetting.prototype.name = "";
 
       /**
        * CursorSetting unknown3.
@@ -3882,16 +3882,16 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       CursorSetting.encode = function encode(message, writer) {
         if (!writer) writer = $Writer.create();
-        if (message.name != null && Object.hasOwnProperty.call(message, 'name'))
+        if (message.name != null && Object.hasOwnProperty.call(message, "name"))
           writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.name);
         if (
           message.unknown3 != null &&
-          Object.hasOwnProperty.call(message, 'unknown3')
+          Object.hasOwnProperty.call(message, "unknown3")
         )
           writer.uint32(/* id 3, wireType 2 =*/ 26).bytes(message.unknown3);
         if (
           message.unknown6 != null &&
-          Object.hasOwnProperty.call(message, 'unknown6')
+          Object.hasOwnProperty.call(message, "unknown6")
         )
           $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6.encode(
             message.unknown6,
@@ -3899,12 +3899,12 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           ).ldelim();
         if (
           message.unknown8 != null &&
-          Object.hasOwnProperty.call(message, 'unknown8')
+          Object.hasOwnProperty.call(message, "unknown8")
         )
           writer.uint32(/* id 8, wireType 0 =*/ 64).int32(message.unknown8);
         if (
           message.unknown9 != null &&
-          Object.hasOwnProperty.call(message, 'unknown9')
+          Object.hasOwnProperty.call(message, "unknown9")
         )
           writer.uint32(/* id 9, wireType 0 =*/ 72).int32(message.unknown9);
         return writer;
@@ -4001,32 +4001,32 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       CursorSetting.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.name != null && message.hasOwnProperty('name'))
-          if (!$util.isString(message.name)) return 'name: string expected';
-        if (message.unknown3 != null && message.hasOwnProperty('unknown3'))
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.name != null && message.hasOwnProperty("name"))
+          if (!$util.isString(message.name)) return "name: string expected";
+        if (message.unknown3 != null && message.hasOwnProperty("unknown3"))
           if (
             !(
               (message.unknown3 &&
-                typeof message.unknown3.length === 'number') ||
+                typeof message.unknown3.length === "number") ||
               $util.isString(message.unknown3)
             )
           )
-            return 'unknown3: buffer expected';
-        if (message.unknown6 != null && message.hasOwnProperty('unknown6')) {
+            return "unknown3: buffer expected";
+        if (message.unknown6 != null && message.hasOwnProperty("unknown6")) {
           var error =
             $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6.verify(
               message.unknown6,
             );
-          if (error) return 'unknown6.' + error;
+          if (error) return "unknown6." + error;
         }
-        if (message.unknown8 != null && message.hasOwnProperty('unknown8'))
+        if (message.unknown8 != null && message.hasOwnProperty("unknown8"))
           if (!$util.isInteger(message.unknown8))
-            return 'unknown8: integer expected';
-        if (message.unknown9 != null && message.hasOwnProperty('unknown9'))
+            return "unknown8: integer expected";
+        if (message.unknown9 != null && message.hasOwnProperty("unknown9"))
           if (!$util.isInteger(message.unknown9))
-            return 'unknown9: integer expected';
+            return "unknown9: integer expected";
         return null;
       };
 
@@ -4048,7 +4048,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           new $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting();
         if (object.name != null) message.name = String(object.name);
         if (object.unknown3 != null)
-          if (typeof object.unknown3 === 'string')
+          if (typeof object.unknown3 === "string")
             $util.base64.decode(
               object.unknown3,
               (message.unknown3 = $util.newBuffer(
@@ -4059,9 +4059,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           else if (object.unknown3.length >= 0)
             message.unknown3 = object.unknown3;
         if (object.unknown6 != null) {
-          if (typeof object.unknown6 !== 'object')
+          if (typeof object.unknown6 !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.unknown6: object expected',
+              ".StreamUnifiedChatWithToolsRequest.Request.CursorSetting.unknown6: object expected",
             );
           message.unknown6 =
             $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6.fromObject(
@@ -4086,8 +4086,8 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!options) options = {};
         var object = {};
         if (options.defaults) {
-          object.name = '';
-          if (options.bytes === String) object.unknown3 = '';
+          object.name = "";
+          if (options.bytes === String) object.unknown3 = "";
           else {
             object.unknown3 = [];
             if (options.bytes !== Array)
@@ -4097,9 +4097,9 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           object.unknown8 = 0;
           object.unknown9 = 0;
         }
-        if (message.name != null && message.hasOwnProperty('name'))
+        if (message.name != null && message.hasOwnProperty("name"))
           object.name = message.name;
-        if (message.unknown3 != null && message.hasOwnProperty('unknown3'))
+        if (message.unknown3 != null && message.hasOwnProperty("unknown3"))
           object.unknown3 =
             options.bytes === String
               ? $util.base64.encode(
@@ -4110,15 +4110,15 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
               : options.bytes === Array
                 ? Array.prototype.slice.call(message.unknown3)
                 : message.unknown3;
-        if (message.unknown6 != null && message.hasOwnProperty('unknown6'))
+        if (message.unknown6 != null && message.hasOwnProperty("unknown6"))
           object.unknown6 =
             $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6.toObject(
               message.unknown6,
               options,
             );
-        if (message.unknown8 != null && message.hasOwnProperty('unknown8'))
+        if (message.unknown8 != null && message.hasOwnProperty("unknown8"))
           object.unknown8 = message.unknown8;
-        if (message.unknown9 != null && message.hasOwnProperty('unknown9'))
+        if (message.unknown9 != null && message.hasOwnProperty("unknown9"))
           object.unknown9 = message.unknown9;
         return object;
       };
@@ -4144,11 +4144,11 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       CursorSetting.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
           typeUrlPrefix +
-          '/StreamUnifiedChatWithToolsRequest.Request.CursorSetting'
+          "/StreamUnifiedChatWithToolsRequest.Request.CursorSetting"
         );
       };
 
@@ -4221,12 +4221,12 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           if (!writer) writer = $Writer.create();
           if (
             message.unknown1 != null &&
-            Object.hasOwnProperty.call(message, 'unknown1')
+            Object.hasOwnProperty.call(message, "unknown1")
           )
             writer.uint32(/* id 1, wireType 2 =*/ 10).bytes(message.unknown1);
           if (
             message.unknown2 != null &&
-            Object.hasOwnProperty.call(message, 'unknown2')
+            Object.hasOwnProperty.call(message, "unknown2")
           )
             writer.uint32(/* id 2, wireType 2 =*/ 18).bytes(message.unknown2);
           return writer;
@@ -4304,26 +4304,26 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
         Unknown6.verify = function verify(message) {
-          if (typeof message !== 'object' || message === null)
-            return 'object expected';
-          if (message.unknown1 != null && message.hasOwnProperty('unknown1'))
+          if (typeof message !== "object" || message === null)
+            return "object expected";
+          if (message.unknown1 != null && message.hasOwnProperty("unknown1"))
             if (
               !(
                 (message.unknown1 &&
-                  typeof message.unknown1.length === 'number') ||
+                  typeof message.unknown1.length === "number") ||
                 $util.isString(message.unknown1)
               )
             )
-              return 'unknown1: buffer expected';
-          if (message.unknown2 != null && message.hasOwnProperty('unknown2'))
+              return "unknown1: buffer expected";
+          if (message.unknown2 != null && message.hasOwnProperty("unknown2"))
             if (
               !(
                 (message.unknown2 &&
-                  typeof message.unknown2.length === 'number') ||
+                  typeof message.unknown2.length === "number") ||
                 $util.isString(message.unknown2)
               )
             )
-              return 'unknown2: buffer expected';
+              return "unknown2: buffer expected";
           return null;
         };
 
@@ -4345,7 +4345,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           var message =
             new $root.StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6();
           if (object.unknown1 != null)
-            if (typeof object.unknown1 === 'string')
+            if (typeof object.unknown1 === "string")
               $util.base64.decode(
                 object.unknown1,
                 (message.unknown1 = $util.newBuffer(
@@ -4356,7 +4356,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
             else if (object.unknown1.length >= 0)
               message.unknown1 = object.unknown1;
           if (object.unknown2 != null)
-            if (typeof object.unknown2 === 'string')
+            if (typeof object.unknown2 === "string")
               $util.base64.decode(
                 object.unknown2,
                 (message.unknown2 = $util.newBuffer(
@@ -4382,20 +4382,20 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
           if (!options) options = {};
           var object = {};
           if (options.defaults) {
-            if (options.bytes === String) object.unknown1 = '';
+            if (options.bytes === String) object.unknown1 = "";
             else {
               object.unknown1 = [];
               if (options.bytes !== Array)
                 object.unknown1 = $util.newBuffer(object.unknown1);
             }
-            if (options.bytes === String) object.unknown2 = '';
+            if (options.bytes === String) object.unknown2 = "";
             else {
               object.unknown2 = [];
               if (options.bytes !== Array)
                 object.unknown2 = $util.newBuffer(object.unknown2);
             }
           }
-          if (message.unknown1 != null && message.hasOwnProperty('unknown1'))
+          if (message.unknown1 != null && message.hasOwnProperty("unknown1"))
             object.unknown1 =
               options.bytes === String
                 ? $util.base64.encode(
@@ -4406,7 +4406,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
                 : options.bytes === Array
                   ? Array.prototype.slice.call(message.unknown1)
                   : message.unknown1;
-          if (message.unknown2 != null && message.hasOwnProperty('unknown2'))
+          if (message.unknown2 != null && message.hasOwnProperty("unknown2"))
             object.unknown2 =
               options.bytes === String
                 ? $util.base64.encode(
@@ -4441,11 +4441,11 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
          */
         Unknown6.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
           if (typeUrlPrefix === undefined) {
-            typeUrlPrefix = 'type.googleapis.com';
+            typeUrlPrefix = "type.googleapis.com";
           }
           return (
             typeUrlPrefix +
-            '/StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6'
+            "/StreamUnifiedChatWithToolsRequest.Request.CursorSetting.Unknown6"
           );
         };
 
@@ -4488,7 +4488,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Metadata
        * @instance
        */
-      Metadata.prototype.os = '';
+      Metadata.prototype.os = "";
 
       /**
        * Metadata arch.
@@ -4496,7 +4496,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Metadata
        * @instance
        */
-      Metadata.prototype.arch = '';
+      Metadata.prototype.arch = "";
 
       /**
        * Metadata version.
@@ -4504,7 +4504,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Metadata
        * @instance
        */
-      Metadata.prototype.version = '';
+      Metadata.prototype.version = "";
 
       /**
        * Metadata path.
@@ -4512,7 +4512,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Metadata
        * @instance
        */
-      Metadata.prototype.path = '';
+      Metadata.prototype.path = "";
 
       /**
        * Metadata timestamp.
@@ -4520,7 +4520,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.Metadata
        * @instance
        */
-      Metadata.prototype.timestamp = '';
+      Metadata.prototype.timestamp = "";
 
       /**
        * Creates a new Metadata instance using the specified properties.
@@ -4545,20 +4545,20 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       Metadata.encode = function encode(message, writer) {
         if (!writer) writer = $Writer.create();
-        if (message.os != null && Object.hasOwnProperty.call(message, 'os'))
+        if (message.os != null && Object.hasOwnProperty.call(message, "os"))
           writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.os);
-        if (message.arch != null && Object.hasOwnProperty.call(message, 'arch'))
+        if (message.arch != null && Object.hasOwnProperty.call(message, "arch"))
           writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.arch);
         if (
           message.version != null &&
-          Object.hasOwnProperty.call(message, 'version')
+          Object.hasOwnProperty.call(message, "version")
         )
           writer.uint32(/* id 3, wireType 2 =*/ 26).string(message.version);
-        if (message.path != null && Object.hasOwnProperty.call(message, 'path'))
+        if (message.path != null && Object.hasOwnProperty.call(message, "path"))
           writer.uint32(/* id 4, wireType 2 =*/ 34).string(message.path);
         if (
           message.timestamp != null &&
-          Object.hasOwnProperty.call(message, 'timestamp')
+          Object.hasOwnProperty.call(message, "timestamp")
         )
           writer.uint32(/* id 5, wireType 2 =*/ 42).string(message.timestamp);
         return writer;
@@ -4648,20 +4648,20 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       Metadata.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.os != null && message.hasOwnProperty('os'))
-          if (!$util.isString(message.os)) return 'os: string expected';
-        if (message.arch != null && message.hasOwnProperty('arch'))
-          if (!$util.isString(message.arch)) return 'arch: string expected';
-        if (message.version != null && message.hasOwnProperty('version'))
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.os != null && message.hasOwnProperty("os"))
+          if (!$util.isString(message.os)) return "os: string expected";
+        if (message.arch != null && message.hasOwnProperty("arch"))
+          if (!$util.isString(message.arch)) return "arch: string expected";
+        if (message.version != null && message.hasOwnProperty("version"))
           if (!$util.isString(message.version))
-            return 'version: string expected';
-        if (message.path != null && message.hasOwnProperty('path'))
-          if (!$util.isString(message.path)) return 'path: string expected';
-        if (message.timestamp != null && message.hasOwnProperty('timestamp'))
+            return "version: string expected";
+        if (message.path != null && message.hasOwnProperty("path"))
+          if (!$util.isString(message.path)) return "path: string expected";
+        if (message.timestamp != null && message.hasOwnProperty("timestamp"))
           if (!$util.isString(message.timestamp))
-            return 'timestamp: string expected';
+            return "timestamp: string expected";
         return null;
       };
 
@@ -4703,21 +4703,21 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!options) options = {};
         var object = {};
         if (options.defaults) {
-          object.os = '';
-          object.arch = '';
-          object.version = '';
-          object.path = '';
-          object.timestamp = '';
+          object.os = "";
+          object.arch = "";
+          object.version = "";
+          object.path = "";
+          object.timestamp = "";
         }
-        if (message.os != null && message.hasOwnProperty('os'))
+        if (message.os != null && message.hasOwnProperty("os"))
           object.os = message.os;
-        if (message.arch != null && message.hasOwnProperty('arch'))
+        if (message.arch != null && message.hasOwnProperty("arch"))
           object.arch = message.arch;
-        if (message.version != null && message.hasOwnProperty('version'))
+        if (message.version != null && message.hasOwnProperty("version"))
           object.version = message.version;
-        if (message.path != null && message.hasOwnProperty('path'))
+        if (message.path != null && message.hasOwnProperty("path"))
           object.path = message.path;
-        if (message.timestamp != null && message.hasOwnProperty('timestamp'))
+        if (message.timestamp != null && message.hasOwnProperty("timestamp"))
           object.timestamp = message.timestamp;
         return object;
       };
@@ -4743,10 +4743,10 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       Metadata.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
-          typeUrlPrefix + '/StreamUnifiedChatWithToolsRequest.Request.Metadata'
+          typeUrlPrefix + "/StreamUnifiedChatWithToolsRequest.Request.Metadata"
         );
       };
 
@@ -4784,7 +4784,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.MessageId
        * @instance
        */
-      MessageId.prototype.messageId = '';
+      MessageId.prototype.messageId = "";
 
       /**
        * MessageId summaryId.
@@ -4792,7 +4792,7 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @memberof StreamUnifiedChatWithToolsRequest.Request.MessageId
        * @instance
        */
-      MessageId.prototype.summaryId = '';
+      MessageId.prototype.summaryId = "";
 
       /**
        * MessageId role.
@@ -4827,15 +4827,15 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!writer) writer = $Writer.create();
         if (
           message.messageId != null &&
-          Object.hasOwnProperty.call(message, 'messageId')
+          Object.hasOwnProperty.call(message, "messageId")
         )
           writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.messageId);
         if (
           message.summaryId != null &&
-          Object.hasOwnProperty.call(message, 'summaryId')
+          Object.hasOwnProperty.call(message, "summaryId")
         )
           writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.summaryId);
-        if (message.role != null && Object.hasOwnProperty.call(message, 'role'))
+        if (message.role != null && Object.hasOwnProperty.call(message, "role"))
           writer.uint32(/* id 3, wireType 0 =*/ 24).int32(message.role);
         return writer;
       };
@@ -4916,16 +4916,16 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       MessageId.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.messageId != null && message.hasOwnProperty('messageId'))
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.messageId != null && message.hasOwnProperty("messageId"))
           if (!$util.isString(message.messageId))
-            return 'messageId: string expected';
-        if (message.summaryId != null && message.hasOwnProperty('summaryId'))
+            return "messageId: string expected";
+        if (message.summaryId != null && message.hasOwnProperty("summaryId"))
           if (!$util.isString(message.summaryId))
-            return 'summaryId: string expected';
-        if (message.role != null && message.hasOwnProperty('role'))
-          if (!$util.isInteger(message.role)) return 'role: integer expected';
+            return "summaryId: string expected";
+        if (message.role != null && message.hasOwnProperty("role"))
+          if (!$util.isInteger(message.role)) return "role: integer expected";
         return null;
       };
 
@@ -4966,15 +4966,15 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
         if (!options) options = {};
         var object = {};
         if (options.defaults) {
-          object.messageId = '';
-          object.summaryId = '';
+          object.messageId = "";
+          object.summaryId = "";
           object.role = 0;
         }
-        if (message.messageId != null && message.hasOwnProperty('messageId'))
+        if (message.messageId != null && message.hasOwnProperty("messageId"))
           object.messageId = message.messageId;
-        if (message.summaryId != null && message.hasOwnProperty('summaryId'))
+        if (message.summaryId != null && message.hasOwnProperty("summaryId"))
           object.summaryId = message.summaryId;
-        if (message.role != null && message.hasOwnProperty('role'))
+        if (message.role != null && message.hasOwnProperty("role"))
           object.role = message.role;
         return object;
       };
@@ -5000,10 +5000,10 @@ $root.StreamUnifiedChatWithToolsRequest = (function () {
        */
       MessageId.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
-          typeUrlPrefix + '/StreamUnifiedChatWithToolsRequest.Request.MessageId'
+          typeUrlPrefix + "/StreamUnifiedChatWithToolsRequest.Request.MessageId"
         );
       };
 
@@ -5080,7 +5080,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
     if (!writer) writer = $Writer.create();
     if (
       message.message != null &&
-      Object.hasOwnProperty.call(message, 'message')
+      Object.hasOwnProperty.call(message, "message")
     )
       $root.StreamUnifiedChatWithToolsResponse.Message.encode(
         message.message,
@@ -5088,7 +5088,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       ).ldelim();
     if (
       message.summary != null &&
-      Object.hasOwnProperty.call(message, 'summary')
+      Object.hasOwnProperty.call(message, "summary")
     )
       $root.MessageSummary.encode(
         message.summary,
@@ -5180,17 +5180,17 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
    * @returns {string|null} `null` if valid, otherwise the reason why it is not
    */
   StreamUnifiedChatWithToolsResponse.verify = function verify(message) {
-    if (typeof message !== 'object' || message === null)
-      return 'object expected';
-    if (message.message != null && message.hasOwnProperty('message')) {
+    if (typeof message !== "object" || message === null)
+      return "object expected";
+    if (message.message != null && message.hasOwnProperty("message")) {
       var error = $root.StreamUnifiedChatWithToolsResponse.Message.verify(
         message.message,
       );
-      if (error) return 'message.' + error;
+      if (error) return "message." + error;
     }
-    if (message.summary != null && message.hasOwnProperty('summary')) {
+    if (message.summary != null && message.hasOwnProperty("summary")) {
       var error = $root.MessageSummary.verify(message.summary);
-      if (error) return 'summary.' + error;
+      if (error) return "summary." + error;
     }
     return null;
   };
@@ -5208,9 +5208,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       return object;
     var message = new $root.StreamUnifiedChatWithToolsResponse();
     if (object.message != null) {
-      if (typeof object.message !== 'object')
+      if (typeof object.message !== "object")
         throw TypeError(
-          '.StreamUnifiedChatWithToolsResponse.message: object expected',
+          ".StreamUnifiedChatWithToolsResponse.message: object expected",
         );
       message.message =
         $root.StreamUnifiedChatWithToolsResponse.Message.fromObject(
@@ -5218,9 +5218,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         );
     }
     if (object.summary != null) {
-      if (typeof object.summary !== 'object')
+      if (typeof object.summary !== "object")
         throw TypeError(
-          '.StreamUnifiedChatWithToolsResponse.summary: object expected',
+          ".StreamUnifiedChatWithToolsResponse.summary: object expected",
         );
       message.summary = $root.MessageSummary.fromObject(object.summary);
     }
@@ -5246,13 +5246,13 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       object.message = null;
       object.summary = null;
     }
-    if (message.message != null && message.hasOwnProperty('message'))
+    if (message.message != null && message.hasOwnProperty("message"))
       object.message =
         $root.StreamUnifiedChatWithToolsResponse.Message.toObject(
           message.message,
           options,
         );
-    if (message.summary != null && message.hasOwnProperty('summary'))
+    if (message.summary != null && message.hasOwnProperty("summary"))
       object.summary = $root.MessageSummary.toObject(message.summary, options);
     return object;
   };
@@ -5280,9 +5280,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
     typeUrlPrefix,
   ) {
     if (typeUrlPrefix === undefined) {
-      typeUrlPrefix = 'type.googleapis.com';
+      typeUrlPrefix = "type.googleapis.com";
     }
-    return typeUrlPrefix + '/StreamUnifiedChatWithToolsResponse';
+    return typeUrlPrefix + "/StreamUnifiedChatWithToolsResponse";
   };
 
   StreamUnifiedChatWithToolsResponse.Message = (function () {
@@ -5319,7 +5319,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
      * @memberof StreamUnifiedChatWithToolsResponse.Message
      * @instance
      */
-    Message.prototype.content = '';
+    Message.prototype.content = "";
 
     /**
      * Message webtool.
@@ -5343,7 +5343,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
      * @memberof StreamUnifiedChatWithToolsResponse.Message
      * @instance
      */
-    Message.prototype.unknown22 = '';
+    Message.prototype.unknown22 = "";
 
     /**
      * Message unknown23.
@@ -5351,7 +5351,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
      * @memberof StreamUnifiedChatWithToolsResponse.Message
      * @instance
      */
-    Message.prototype.unknown23 = '';
+    Message.prototype.unknown23 = "";
 
     /**
      * Message unknown27.
@@ -5359,7 +5359,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
      * @memberof StreamUnifiedChatWithToolsResponse.Message
      * @instance
      */
-    Message.prototype.unknown27 = '';
+    Message.prototype.unknown27 = "";
 
     /**
      * Message thinking.
@@ -5394,12 +5394,12 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       if (!writer) writer = $Writer.create();
       if (
         message.content != null &&
-        Object.hasOwnProperty.call(message, 'content')
+        Object.hasOwnProperty.call(message, "content")
       )
         writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.content);
       if (
         message.webtool != null &&
-        Object.hasOwnProperty.call(message, 'webtool')
+        Object.hasOwnProperty.call(message, "webtool")
       )
         $root.StreamUnifiedChatWithToolsResponse.Message.WebTool.encode(
           message.webtool,
@@ -5407,7 +5407,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         ).ldelim();
       if (
         message.unknown12 != null &&
-        Object.hasOwnProperty.call(message, 'unknown12')
+        Object.hasOwnProperty.call(message, "unknown12")
       )
         $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.encode(
           message.unknown12,
@@ -5415,17 +5415,17 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         ).ldelim();
       if (
         message.unknown22 != null &&
-        Object.hasOwnProperty.call(message, 'unknown22')
+        Object.hasOwnProperty.call(message, "unknown22")
       )
         writer.uint32(/* id 22, wireType 2 =*/ 178).string(message.unknown22);
       if (
         message.unknown23 != null &&
-        Object.hasOwnProperty.call(message, 'unknown23')
+        Object.hasOwnProperty.call(message, "unknown23")
       )
         writer.uint32(/* id 23, wireType 2 =*/ 186).string(message.unknown23);
       if (
         message.thinking != null &&
-        Object.hasOwnProperty.call(message, 'thinking')
+        Object.hasOwnProperty.call(message, "thinking")
       )
         $root.MessageThinking.encode(
           message.thinking,
@@ -5433,7 +5433,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         ).ldelim();
       if (
         message.unknown27 != null &&
-        Object.hasOwnProperty.call(message, 'unknown27')
+        Object.hasOwnProperty.call(message, "unknown27")
       )
         writer.uint32(/* id 27, wireType 2 =*/ 218).string(message.unknown27);
       return writer;
@@ -5541,36 +5541,36 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
     Message.verify = function verify(message) {
-      if (typeof message !== 'object' || message === null)
-        return 'object expected';
-      if (message.content != null && message.hasOwnProperty('content'))
-        if (!$util.isString(message.content)) return 'content: string expected';
-      if (message.webtool != null && message.hasOwnProperty('webtool')) {
+      if (typeof message !== "object" || message === null)
+        return "object expected";
+      if (message.content != null && message.hasOwnProperty("content"))
+        if (!$util.isString(message.content)) return "content: string expected";
+      if (message.webtool != null && message.hasOwnProperty("webtool")) {
         var error =
           $root.StreamUnifiedChatWithToolsResponse.Message.WebTool.verify(
             message.webtool,
           );
-        if (error) return 'webtool.' + error;
+        if (error) return "webtool." + error;
       }
-      if (message.unknown12 != null && message.hasOwnProperty('unknown12')) {
+      if (message.unknown12 != null && message.hasOwnProperty("unknown12")) {
         var error =
           $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.verify(
             message.unknown12,
           );
-        if (error) return 'unknown12.' + error;
+        if (error) return "unknown12." + error;
       }
-      if (message.unknown22 != null && message.hasOwnProperty('unknown22'))
+      if (message.unknown22 != null && message.hasOwnProperty("unknown22"))
         if (!$util.isString(message.unknown22))
-          return 'unknown22: string expected';
-      if (message.unknown23 != null && message.hasOwnProperty('unknown23'))
+          return "unknown22: string expected";
+      if (message.unknown23 != null && message.hasOwnProperty("unknown23"))
         if (!$util.isString(message.unknown23))
-          return 'unknown23: string expected';
-      if (message.unknown27 != null && message.hasOwnProperty('unknown27'))
+          return "unknown23: string expected";
+      if (message.unknown27 != null && message.hasOwnProperty("unknown27"))
         if (!$util.isString(message.unknown27))
-          return 'unknown27: string expected';
-      if (message.thinking != null && message.hasOwnProperty('thinking')) {
+          return "unknown27: string expected";
+      if (message.thinking != null && message.hasOwnProperty("thinking")) {
         var error = $root.MessageThinking.verify(message.thinking);
-        if (error) return 'thinking.' + error;
+        if (error) return "thinking." + error;
       }
       return null;
     };
@@ -5589,9 +5589,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       var message = new $root.StreamUnifiedChatWithToolsResponse.Message();
       if (object.content != null) message.content = String(object.content);
       if (object.webtool != null) {
-        if (typeof object.webtool !== 'object')
+        if (typeof object.webtool !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsResponse.Message.webtool: object expected',
+            ".StreamUnifiedChatWithToolsResponse.Message.webtool: object expected",
           );
         message.webtool =
           $root.StreamUnifiedChatWithToolsResponse.Message.WebTool.fromObject(
@@ -5599,9 +5599,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
           );
       }
       if (object.unknown12 != null) {
-        if (typeof object.unknown12 !== 'object')
+        if (typeof object.unknown12 !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsResponse.Message.unknown12: object expected',
+            ".StreamUnifiedChatWithToolsResponse.Message.unknown12: object expected",
           );
         message.unknown12 =
           $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.fromObject(
@@ -5615,9 +5615,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       if (object.unknown27 != null)
         message.unknown27 = String(object.unknown27);
       if (object.thinking != null) {
-        if (typeof object.thinking !== 'object')
+        if (typeof object.thinking !== "object")
           throw TypeError(
-            '.StreamUnifiedChatWithToolsResponse.Message.thinking: object expected',
+            ".StreamUnifiedChatWithToolsResponse.Message.thinking: object expected",
           );
         message.thinking = $root.MessageThinking.fromObject(object.thinking);
       }
@@ -5637,38 +5637,38 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
       if (!options) options = {};
       var object = {};
       if (options.defaults) {
-        object.content = '';
+        object.content = "";
         object.webtool = null;
         object.unknown12 = null;
-        object.unknown22 = '';
-        object.unknown23 = '';
+        object.unknown22 = "";
+        object.unknown23 = "";
         object.thinking = null;
-        object.unknown27 = '';
+        object.unknown27 = "";
       }
-      if (message.content != null && message.hasOwnProperty('content'))
+      if (message.content != null && message.hasOwnProperty("content"))
         object.content = message.content;
-      if (message.webtool != null && message.hasOwnProperty('webtool'))
+      if (message.webtool != null && message.hasOwnProperty("webtool"))
         object.webtool =
           $root.StreamUnifiedChatWithToolsResponse.Message.WebTool.toObject(
             message.webtool,
             options,
           );
-      if (message.unknown12 != null && message.hasOwnProperty('unknown12'))
+      if (message.unknown12 != null && message.hasOwnProperty("unknown12"))
         object.unknown12 =
           $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.toObject(
             message.unknown12,
             options,
           );
-      if (message.unknown22 != null && message.hasOwnProperty('unknown22'))
+      if (message.unknown22 != null && message.hasOwnProperty("unknown22"))
         object.unknown22 = message.unknown22;
-      if (message.unknown23 != null && message.hasOwnProperty('unknown23'))
+      if (message.unknown23 != null && message.hasOwnProperty("unknown23"))
         object.unknown23 = message.unknown23;
-      if (message.thinking != null && message.hasOwnProperty('thinking'))
+      if (message.thinking != null && message.hasOwnProperty("thinking"))
         object.thinking = $root.MessageThinking.toObject(
           message.thinking,
           options,
         );
-      if (message.unknown27 != null && message.hasOwnProperty('unknown27'))
+      if (message.unknown27 != null && message.hasOwnProperty("unknown27"))
         object.unknown27 = message.unknown27;
       return object;
     };
@@ -5694,9 +5694,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
      */
     Message.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
       if (typeUrlPrefix === undefined) {
-        typeUrlPrefix = 'type.googleapis.com';
+        typeUrlPrefix = "type.googleapis.com";
       }
-      return typeUrlPrefix + '/StreamUnifiedChatWithToolsResponse.Message';
+      return typeUrlPrefix + "/StreamUnifiedChatWithToolsResponse.Message";
     };
 
     Message.WebTool = (function () {
@@ -5838,16 +5838,16 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       WebTool.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.webPage != null && message.hasOwnProperty('webPage')) {
-          if (!Array.isArray(message.webPage)) return 'webPage: array expected';
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.webPage != null && message.hasOwnProperty("webPage")) {
+          if (!Array.isArray(message.webPage)) return "webPage: array expected";
           for (var i = 0; i < message.webPage.length; ++i) {
             var error =
               $root.StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage.verify(
                 message.webPage[i],
               );
-            if (error) return 'webPage.' + error;
+            if (error) return "webPage." + error;
           }
         }
         return null;
@@ -5872,13 +5872,13 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         if (object.webPage) {
           if (!Array.isArray(object.webPage))
             throw TypeError(
-              '.StreamUnifiedChatWithToolsResponse.Message.WebTool.webPage: array expected',
+              ".StreamUnifiedChatWithToolsResponse.Message.WebTool.webPage: array expected",
             );
           message.webPage = [];
           for (var i = 0; i < object.webPage.length; ++i) {
-            if (typeof object.webPage[i] !== 'object')
+            if (typeof object.webPage[i] !== "object")
               throw TypeError(
-                '.StreamUnifiedChatWithToolsResponse.Message.WebTool.webPage: object expected',
+                ".StreamUnifiedChatWithToolsResponse.Message.WebTool.webPage: object expected",
               );
             message.webPage[i] =
               $root.StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage.fromObject(
@@ -5935,10 +5935,10 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
        */
       WebTool.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
-          typeUrlPrefix + '/StreamUnifiedChatWithToolsResponse.Message.WebTool'
+          typeUrlPrefix + "/StreamUnifiedChatWithToolsResponse.Message.WebTool"
         );
       };
 
@@ -5977,7 +5977,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          * @memberof StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage
          * @instance
          */
-        WebPage.prototype.url = '';
+        WebPage.prototype.url = "";
 
         /**
          * WebPage title.
@@ -5985,7 +5985,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          * @memberof StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage
          * @instance
          */
-        WebPage.prototype.title = '';
+        WebPage.prototype.title = "";
 
         /**
          * WebPage content.
@@ -5993,7 +5993,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          * @memberof StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage
          * @instance
          */
-        WebPage.prototype.content = '';
+        WebPage.prototype.content = "";
 
         /**
          * Creates a new WebPage instance using the specified properties.
@@ -6018,16 +6018,16 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          */
         WebPage.encode = function encode(message, writer) {
           if (!writer) writer = $Writer.create();
-          if (message.url != null && Object.hasOwnProperty.call(message, 'url'))
+          if (message.url != null && Object.hasOwnProperty.call(message, "url"))
             writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.url);
           if (
             message.title != null &&
-            Object.hasOwnProperty.call(message, 'title')
+            Object.hasOwnProperty.call(message, "title")
           )
             writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.title);
           if (
             message.content != null &&
-            Object.hasOwnProperty.call(message, 'content')
+            Object.hasOwnProperty.call(message, "content")
           )
             writer.uint32(/* id 3, wireType 2 =*/ 26).string(message.content);
           return writer;
@@ -6109,15 +6109,15 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
         WebPage.verify = function verify(message) {
-          if (typeof message !== 'object' || message === null)
-            return 'object expected';
-          if (message.url != null && message.hasOwnProperty('url'))
-            if (!$util.isString(message.url)) return 'url: string expected';
-          if (message.title != null && message.hasOwnProperty('title'))
-            if (!$util.isString(message.title)) return 'title: string expected';
-          if (message.content != null && message.hasOwnProperty('content'))
+          if (typeof message !== "object" || message === null)
+            return "object expected";
+          if (message.url != null && message.hasOwnProperty("url"))
+            if (!$util.isString(message.url)) return "url: string expected";
+          if (message.title != null && message.hasOwnProperty("title"))
+            if (!$util.isString(message.title)) return "title: string expected";
+          if (message.content != null && message.hasOwnProperty("content"))
             if (!$util.isString(message.content))
-              return 'content: string expected';
+              return "content: string expected";
           return null;
         };
 
@@ -6156,15 +6156,15 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
           if (!options) options = {};
           var object = {};
           if (options.defaults) {
-            object.url = '';
-            object.title = '';
-            object.content = '';
+            object.url = "";
+            object.title = "";
+            object.content = "";
           }
-          if (message.url != null && message.hasOwnProperty('url'))
+          if (message.url != null && message.hasOwnProperty("url"))
             object.url = message.url;
-          if (message.title != null && message.hasOwnProperty('title'))
+          if (message.title != null && message.hasOwnProperty("title"))
             object.title = message.title;
-          if (message.content != null && message.hasOwnProperty('content'))
+          if (message.content != null && message.hasOwnProperty("content"))
             object.content = message.content;
           return object;
         };
@@ -6190,11 +6190,11 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          */
         WebPage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
           if (typeUrlPrefix === undefined) {
-            typeUrlPrefix = 'type.googleapis.com';
+            typeUrlPrefix = "type.googleapis.com";
           }
           return (
             typeUrlPrefix +
-            '/StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage'
+            "/StreamUnifiedChatWithToolsResponse.Message.WebTool.WebPage"
           );
         };
 
@@ -6260,7 +6260,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         if (!writer) writer = $Writer.create();
         if (
           message.content != null &&
-          Object.hasOwnProperty.call(message, 'content')
+          Object.hasOwnProperty.call(message, "content")
         )
           $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content.encode(
             message.content,
@@ -6341,14 +6341,14 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
        * @returns {string|null} `null` if valid, otherwise the reason why it is not
        */
       Unknown12.verify = function verify(message) {
-        if (typeof message !== 'object' || message === null)
-          return 'object expected';
-        if (message.content != null && message.hasOwnProperty('content')) {
+        if (typeof message !== "object" || message === null)
+          return "object expected";
+        if (message.content != null && message.hasOwnProperty("content")) {
           var error =
             $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content.verify(
               message.content,
             );
-          if (error) return 'content.' + error;
+          if (error) return "content." + error;
         }
         return null;
       };
@@ -6370,9 +6370,9 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         var message =
           new $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12();
         if (object.content != null) {
-          if (typeof object.content !== 'object')
+          if (typeof object.content !== "object")
             throw TypeError(
-              '.StreamUnifiedChatWithToolsResponse.Message.Unknown12.content: object expected',
+              ".StreamUnifiedChatWithToolsResponse.Message.Unknown12.content: object expected",
             );
           message.content =
             $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content.fromObject(
@@ -6395,7 +6395,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         if (!options) options = {};
         var object = {};
         if (options.defaults) object.content = null;
-        if (message.content != null && message.hasOwnProperty('content'))
+        if (message.content != null && message.hasOwnProperty("content"))
           object.content =
             $root.StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content.toObject(
               message.content,
@@ -6425,11 +6425,11 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
        */
       Unknown12.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
         if (typeUrlPrefix === undefined) {
-          typeUrlPrefix = 'type.googleapis.com';
+          typeUrlPrefix = "type.googleapis.com";
         }
         return (
           typeUrlPrefix +
-          '/StreamUnifiedChatWithToolsResponse.Message.Unknown12'
+          "/StreamUnifiedChatWithToolsResponse.Message.Unknown12"
         );
       };
 
@@ -6466,7 +6466,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          * @memberof StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content
          * @instance
          */
-        Content.prototype.content = '';
+        Content.prototype.content = "";
 
         /**
          * Creates a new Content instance using the specified properties.
@@ -6493,7 +6493,7 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
           if (!writer) writer = $Writer.create();
           if (
             message.content != null &&
-            Object.hasOwnProperty.call(message, 'content')
+            Object.hasOwnProperty.call(message, "content")
           )
             writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.content);
           return writer;
@@ -6567,11 +6567,11 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
         Content.verify = function verify(message) {
-          if (typeof message !== 'object' || message === null)
-            return 'object expected';
-          if (message.content != null && message.hasOwnProperty('content'))
+          if (typeof message !== "object" || message === null)
+            return "object expected";
+          if (message.content != null && message.hasOwnProperty("content"))
             if (!$util.isString(message.content))
-              return 'content: string expected';
+              return "content: string expected";
           return null;
         };
 
@@ -6607,8 +6607,8 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
         Content.toObject = function toObject(message, options) {
           if (!options) options = {};
           var object = {};
-          if (options.defaults) object.content = '';
-          if (message.content != null && message.hasOwnProperty('content'))
+          if (options.defaults) object.content = "";
+          if (message.content != null && message.hasOwnProperty("content"))
             object.content = message.content;
           return object;
         };
@@ -6634,11 +6634,11 @@ $root.StreamUnifiedChatWithToolsResponse = (function () {
          */
         Content.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
           if (typeUrlPrefix === undefined) {
-            typeUrlPrefix = 'type.googleapis.com';
+            typeUrlPrefix = "type.googleapis.com";
           }
           return (
             typeUrlPrefix +
-            '/StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content'
+            "/StreamUnifiedChatWithToolsResponse.Message.Unknown12.Content"
           );
         };
 

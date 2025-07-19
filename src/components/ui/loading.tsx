@@ -1,35 +1,35 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
-import { createPortal } from 'react-dom';
-import { createRoot, type Root } from 'react-dom/client';
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import { createPortal } from "react-dom";
+import { createRoot, type Root } from "react-dom/client";
 
-const loadingVariants = cva('flex items-center justify-center', {
+const loadingVariants = cva("flex items-center justify-center", {
   variants: {
     variant: {
-      default: 'text-primary',
-      secondary: 'text-secondary',
-      destructive: 'text-destructive',
-      muted: 'text-muted-foreground',
+      default: "text-primary",
+      secondary: "text-secondary",
+      destructive: "text-destructive",
+      muted: "text-muted-foreground",
     },
     size: {
-      default: 'h-10 w-10',
-      sm: 'h-6 w-6',
-      lg: 'h-16 w-16',
+      default: "h-10 w-10",
+      sm: "h-6 w-6",
+      lg: "h-16 w-16",
     },
     overlay: {
-      true: 'fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm dark:bg-background/80 w-full h-full min-h-screen',
-      false: '',
+      true: "fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm dark:bg-background/80 w-full h-full min-h-screen",
+      false: "",
     },
     container: {
-      true: 'absolute inset-0 bg-background/60 backdrop-blur-[1px] dark:bg-background/80 z-10 h-full w-full',
-      false: '',
+      true: "absolute inset-0 bg-background/60 backdrop-blur-[1px] dark:bg-background/80 z-10 h-full w-full",
+      false: "",
     },
   },
   defaultVariants: {
-    variant: 'default',
-    size: 'default',
+    variant: "default",
+    size: "default",
     overlay: false,
     container: false,
   },
@@ -100,17 +100,17 @@ const DotLoadingContent = ({
       <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
       <div
         className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-        style={{ animationDelay: '0.2s' }}
+        style={{ animationDelay: "0.2s" }}
       />
       <div
         className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground"
-        style={{ animationDelay: '0.4s' }}
+        style={{ animationDelay: "0.4s" }}
       />
     </div>
     {text && (
       <p
         className={cn(
-          'mt-2 max-w-[300px] overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm font-medium text-muted-foreground',
+          "mt-2 max-w-[300px] overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm font-medium text-muted-foreground",
           textClassName,
         )}
       >
@@ -123,16 +123,16 @@ const DotLoadingContent = ({
 // 渲染旋转加载器的内容
 const SpinnerLoadingContent = ({
   text,
-  size = 'default',
+  size = "default",
 }: {
   text?: string;
-  size?: 'default' | 'sm' | 'lg';
+  size?: "default" | "sm" | "lg";
 }) => (
   <div className="flex flex-col items-center gap-2">
     <Loader2
       className={cn(
-        'animate-spin',
-        size === 'lg' ? 'h-10 w-10' : size === 'sm' ? 'h-4 w-4' : 'h-6 w-6',
+        "animate-spin",
+        size === "lg" ? "h-10 w-10" : size === "sm" ? "h-4 w-4" : "h-6 w-6",
       )}
     />
     {text && (
@@ -184,10 +184,10 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
           updateDimensions();
 
           // 监听窗口大小变化
-          window.addEventListener('resize', updateDimensions);
+          window.addEventListener("resize", updateDimensions);
 
           return () => {
-            window.removeEventListener('resize', updateDimensions);
+            window.removeEventListener("resize", updateDimensions);
           };
         }
       }
@@ -209,12 +209,12 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
     ) : (
       <div
         className={cn(
-          'flex flex-col items-center gap-2',
+          "flex flex-col items-center gap-2",
           (container || overlay) &&
-            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
+            "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
         )}
       >
-        <SpinnerLoadingContent text={text} size={size || 'default'} />
+        <SpinnerLoadingContent text={text} size={size || "default"} />
       </div>
     );
 
@@ -233,14 +233,14 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
         <div
           ref={containerRef}
           className={cn(
-            'bg-background/80 absolute flex items-center justify-center backdrop-blur-sm',
+            "bg-background/80 absolute flex items-center justify-center backdrop-blur-sm",
             className,
           )}
           style={{
             top: 0,
             left: 0,
-            width: dimensions.width || '100%',
-            height: dimensions.height || '100%',
+            width: dimensions.width || "100%",
+            height: dimensions.height || "100%",
             zIndex: zIndex,
           }}
           {...props}
@@ -275,7 +275,7 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
             overlay,
             className,
           }),
-          'bg-background/80 fixed inset-0 flex h-full min-h-screen w-full items-center justify-center backdrop-blur-sm',
+          "bg-background/80 fixed inset-0 flex h-full min-h-screen w-full items-center justify-center backdrop-blur-sm",
         )}
         style={getOverlayStyle()}
         {...props}
@@ -310,14 +310,14 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
     );
   },
 );
-Loading.displayName = 'Loading';
+Loading.displayName = "Loading";
 
 // 全局加载API管理
 export interface LoadingInstance {
   close: () => void;
 }
 
-type LoadingOptions = Omit<LoadingProps, 'loading'>;
+type LoadingOptions = Omit<LoadingProps, "loading">;
 
 // 全局加载状态管理
 class LoadingManager {
@@ -333,7 +333,7 @@ class LoadingManager {
   static show(options: LoadingOptions = {}): LoadingInstance {
     // 创建容器
     const id = `loading-${++this.counter}`;
-    const container = document.createElement('div');
+    const container = document.createElement("div");
     container.id = id;
     document.body.appendChild(container);
 
@@ -350,7 +350,7 @@ class LoadingManager {
         loading={true}
         overlay={true}
         className={cn(
-          'fixed inset-0 h-full min-h-screen w-full',
+          "fixed inset-0 h-full min-h-screen w-full",
           options.className,
         )}
       />,

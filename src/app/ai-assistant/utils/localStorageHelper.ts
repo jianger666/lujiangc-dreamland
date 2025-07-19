@@ -1,7 +1,7 @@
-import store from 'store';
-import { Conversation } from '@/types/ai-assistant';
+import store from "store";
+import { Conversation } from "@/types/ai-assistant";
 
-const INTERRUPTED_CONVERSATIONS_KEY = 'ai-assistant-interrupted-conversations';
+const INTERRUPTED_CONVERSATIONS_KEY = "ai-assistant-interrupted-conversations";
 
 /**
  * 将对话列表保存到 LocalStorage
@@ -13,7 +13,7 @@ export function saveConversationsToLocalStorage(
   try {
     store.set(INTERRUPTED_CONVERSATIONS_KEY, conversations);
   } catch (error) {
-    console.error('保存中断对话到LocalStorage失败:', error);
+    console.error("保存中断对话到LocalStorage失败:", error);
   }
 }
 
@@ -26,7 +26,7 @@ export function loadConversationsFromLocalStorage(): Conversation[] | null {
     const storedData = store.get(INTERRUPTED_CONVERSATIONS_KEY);
     return storedData === undefined ? null : storedData;
   } catch (error) {
-    console.error('从LocalStorage加载中断对话失败:', error);
+    console.error("从LocalStorage加载中断对话失败:", error);
     return null;
   }
 }
@@ -38,6 +38,6 @@ export function clearConversationsFromLocalStorage(): void {
   try {
     store.remove(INTERRUPTED_CONVERSATIONS_KEY);
   } catch (error) {
-    console.error('清理LocalStorage中断对话失败:', error);
+    console.error("清理LocalStorage中断对话失败:", error);
   }
 }

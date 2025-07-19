@@ -1,5 +1,5 @@
-import React from 'react';
-import { Bot } from 'lucide-react';
+import React from "react";
+import { Bot } from "lucide-react";
 
 // 空状态组件
 export function EmptyState() {

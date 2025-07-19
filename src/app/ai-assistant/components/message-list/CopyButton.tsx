@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Copy, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { useCopy } from '@/app/ai-assistant/hooks';
+import React from "react";
+import { Copy, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useCopy } from "@/app/ai-assistant/hooks";
 
 /**
  * 通用复制按钮组件
@@ -17,8 +17,8 @@ interface CopyButtonProps {
 
 export function CopyButton({
   textToCopy,
-  className = '',
-  title = '复制',
+  className = "",
+  title = "复制",
 }: CopyButtonProps) {
   const { copied, copyToClipboard } = useCopy();
 
@@ -32,7 +32,7 @@ export function CopyButton({
       type="button"
       variant="ghost"
       size="icon"
-      className={cn('h-6 w-6', className)}
+      className={cn("h-6 w-6", className)}
       title={title}
     >
       {copied ? <Check /> : <Copy />}

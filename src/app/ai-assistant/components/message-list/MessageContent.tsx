@@ -1,14 +1,14 @@
-import React, { useCallback, memo, useMemo } from 'react';
-import { cn } from '@/lib/utils';
-import { AiRoleEnum } from '@/types/ai-assistant';
-import ReactMarkdown, { Components } from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeHighlight from 'rehype-highlight';
-import { CopyButton } from './CopyButton';
+import React, { useCallback, memo, useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { AiRoleEnum } from "@/types/ai-assistant";
+import ReactMarkdown, { Components } from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import rehypeHighlight from "rehype-highlight";
+import { CopyButton } from "./CopyButton";
 
 // 消息内容组件
 const MessageContentComponent = ({
@@ -20,27 +20,27 @@ const MessageContentComponent = ({
 }) => {
   // 创建代码文本提取函数，处理复杂的React元素树
   const extractTextContent = useCallback((nodes: React.ReactNode): string => {
-    if (!nodes) return '';
+    if (!nodes) return "";
 
-    if (typeof nodes === 'string') return nodes;
+    if (typeof nodes === "string") return nodes;
 
     if (Array.isArray(nodes)) {
-      return nodes.map(extractTextContent).join('');
+      return nodes.map(extractTextContent).join("");
     }
 
     // 处理React元素 (如span标签等)
     if (
-      typeof nodes === 'object' &&
+      typeof nodes === "object" &&
       nodes !== null &&
-      'props' in nodes &&
-      typeof nodes.props === 'object' &&
+      "props" in nodes &&
+      typeof nodes.props === "object" &&
       nodes.props !== null &&
-      'children' in nodes.props
+      "children" in nodes.props
     ) {
       return extractTextContent(nodes.props.children as React.ReactNode);
     }
 
-    return '';
+    return "";
   }, []);
 
   const MarkdownComponents = useMemo<Components>(
@@ -49,14 +49,14 @@ const MessageContentComponent = ({
         return <a target="_blank" {...props} />;
       },
       table({ className, ...rest }) {
-        return <table className={cn(className, 'border-collapse')} {...rest} />;
+        return <table className={cn(className, "border-collapse")} {...rest} />;
       },
       th({ className, ...rest }) {
         return (
           <th
             className={cn(
               className,
-              'border border-foreground bg-card bg-opacity-50 p-2',
+              "border border-foreground bg-card bg-opacity-50 p-2",
             )}
             {...rest}
           />
@@ -65,13 +65,13 @@ const MessageContentComponent = ({
       td({ className, ...rest }) {
         return (
           <td
-            className={cn(className, 'border border-foreground p-2')}
+            className={cn(className, "border border-foreground p-2")}
             {...rest}
           />
         );
       },
       code({ className, children, ...rest }) {
-        const match = /language-(\w+)/.exec(className || '');
+        const match = /language-(\w+)/.exec(className || "");
         const language = match?.[1];
 
         if (!language) {
@@ -89,8 +89,8 @@ const MessageContentComponent = ({
           <div className="relative overflow-hidden rounded-md">
             <div
               className={cn(
-                role === AiRoleEnum.User ? 'bg-card' : 'bg-accent',
-                'flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground',
+                role === AiRoleEnum.User ? "bg-card" : "bg-accent",
+                "flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground",
               )}
             >
               <span>{language}</span>
@@ -100,7 +100,7 @@ const MessageContentComponent = ({
             <code
               className={cn(
                 className,
-                'block w-full overflow-x-auto p-4 text-xs',
+                "block w-full overflow-x-auto p-4 text-xs",
               )}
               {...rest}
             >
@@ -115,7 +115,7 @@ const MessageContentComponent = ({
           <pre
             className={cn(
               className,
-              'overflow-hidden bg-transparent p-0 text-xs',
+              "overflow-hidden bg-transparent p-0 text-xs",
             )}
             {...rest}
           />
@@ -129,10 +129,10 @@ const MessageContentComponent = ({
   return (
     <div
       className={cn(
-        'prose prose-sm max-w-none break-words',
+        "prose prose-sm max-w-none break-words",
         role === AiRoleEnum.User
-          ? 'prose-white dark:prose-invert'
-          : 'dark:prose-invert',
+          ? "prose-white dark:prose-invert"
+          : "dark:prose-invert",
       )}
     >
       <ReactMarkdown

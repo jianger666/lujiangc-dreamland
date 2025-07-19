@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { compressImage } from '../utils/imageCompression';
-import type { ImageCompressionOptions } from '../utils/imageCompression';
+import { useState, useCallback, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { compressImage } from "../utils/imageCompression";
+import type { ImageCompressionOptions } from "../utils/imageCompression";
 
 // 定义单个图片的压缩信息
 export interface ImageCompressionInfo {
@@ -76,7 +76,7 @@ export const useImageUpload = ({
    */
   const resetFileInput = useCallback(() => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   }, []);
 
@@ -92,8 +92,8 @@ export const useImageUpload = ({
       // 检查是否已达到最大图片数量
       if (images.length >= maxImages) {
         toast({
-          variant: 'destructive',
-          title: '图片数量已达上限',
+          variant: "destructive",
+          title: "图片数量已达上限",
           description: `最多只能上传 ${maxImages} 张图片`,
         });
         return;
@@ -141,23 +141,23 @@ export const useImageUpload = ({
         } else {
           // 压缩失败
           toast({
-            variant: 'destructive',
-            title: '图片处理失败',
-            description: result.error || '未知错误',
+            variant: "destructive",
+            title: "图片处理失败",
+            description: result.error || "未知错误",
           });
 
           onCompressionComplete?.({ success: false, error: result.error });
         }
       } catch (error) {
-        console.error('处理图片错误:', error);
+        console.error("处理图片错误:", error);
 
         toast({
-          variant: 'destructive',
-          title: '处理图片出错',
-          description: '处理图片出错，请重试',
+          variant: "destructive",
+          title: "处理图片出错",
+          description: "处理图片出错，请重试",
         });
 
-        onCompressionComplete?.({ success: false, error: '处理图片出错' });
+        onCompressionComplete?.({ success: false, error: "处理图片出错" });
       } finally {
         setIsProcessingImage(false);
         resetFileInput();

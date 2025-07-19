@@ -1,13 +1,13 @@
-import OpenAI from 'openai';
+import OpenAI from "openai";
 import type {
   ChatCompletion,
   ChatCompletionChunk,
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionCreateParamsStreaming,
-} from 'openai/resources';
-import { shuffle } from 'lodash';
-import { getClientConfigForModel } from '../_config';
-import { AIModelEnum } from '@/types/ai-assistant';
+} from "openai/resources";
+import { shuffle } from "lodash";
+import { getClientConfigForModel } from "../_config";
+import { AIModelEnum } from "@/types/ai-assistant";
 
 /**
  * 检查消息是否包含多模态内容（图片+文本）
@@ -18,7 +18,7 @@ function containsMultiModalContent(messages: any[]): boolean {
   return messages.some((message) => {
     return (
       Array.isArray(message.content) &&
-      message.content.some((item: any) => item.type === 'image_url')
+      message.content.some((item: any) => item.type === "image_url")
     );
   });
 }
@@ -37,7 +37,7 @@ export async function tryChatCompletionWithFailover(
   requestOptions: Omit<
     | ChatCompletionCreateParamsStreaming
     | ChatCompletionCreateParamsNonStreaming,
-    'model'
+    "model"
   >,
 ): Promise<AsyncIterable<ChatCompletionChunk> | ChatCompletion> {
   const configurationsRaw = getClientConfigForModel(selectedModel);
@@ -58,13 +58,13 @@ export async function tryChatCompletionWithFailover(
         // 1. 智谱的glm-4v系列
         // 2. Google的gemini系列
         return (
-          config.modelId.includes('glm-4v') || config.modelId.includes('gemini')
+          config.modelId.includes("glm-4v") || config.modelId.includes("gemini")
         );
       })
     : shuffledConfigs;
 
   if (hasMultiModalContent && configs.length === 0) {
-    throw new Error('没有找到支持多模态内容（图片）的模型实例');
+    throw new Error("没有找到支持多模态内容（图片）的模型实例");
   }
 
   for (const config of configs) {
@@ -112,7 +112,7 @@ export async function tryChatCompletionWithFailover(
     }
   }
 
-  console.error('[Failover] 所有尝试均失败。');
+  console.error("[Failover] 所有尝试均失败。");
   throw new Error(
     `所有可用模型实例均调用失败。详情: ${JSON.stringify(errors, null, 2)}`,
   );

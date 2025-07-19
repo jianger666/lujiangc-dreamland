@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
-import { Conversation } from '@/types/ai-assistant';
-import { useTitle } from './useTitle';
+import { useCallback, useState } from "react";
+import { Conversation } from "@/types/ai-assistant";
+import { useTitle } from "./useTitle";
 
 export const useTitleGeneration = () => {
   // 等待生成标题的对话ID集合
@@ -66,7 +66,7 @@ export const useTitleGeneration = () => {
           // 移除已处理的对话ID
           removePendingTitleGeneration(conversationId);
         } catch (error) {
-          console.error('生成标题失败:', error);
+          console.error("生成标题失败:", error);
         }
       }
     },
