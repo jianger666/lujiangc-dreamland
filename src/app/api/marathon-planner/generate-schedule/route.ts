@@ -5,6 +5,7 @@ import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
 import {
   tryChatCompletionWithFailover,
   handleStreamResponse,
+  createStreamErrorResponse,
 } from '@/app/api/ai-assistant/_utils';
 import {
   readPromptMarkdown,
@@ -113,21 +114,15 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
   } catch (error) {
     console.error('生成马拉松课表错误:', error);
 
-    const result: ScheduleResponse = {
-      schedule: '',
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : '生成训练计划时出错，请稍后重试',
-    };
+    // 返回流式错误响应，保持与前端的一致性
+    const errorMessage = error instanceof Error
+      ? error.message
+      : '生成训练计划时出错，请稍后重试';
 
-    return new Response(JSON.stringify(result), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // 使用统一的流式错误响应函数
+    return createStreamErrorResponse(
+      `生成训练计划时遇到了问题：${errorMessage}\n\n请检查您的输入信息并重试，或稍后再试。如果问题持续存在，请联系技术支持。`
+    );
   }
 });
 
