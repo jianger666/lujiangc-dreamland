@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,10 +9,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/card';
+import { Toggle } from '@/components/ui/toggle';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   FormContainer,
   RadioGroupField,
@@ -20,13 +20,13 @@ import {
   ToggleGroupField,
   SelectField,
   InputField,
-} from "@/components/forms";
-import { Loading } from "@/components/ui/loading";
+} from '@/components/forms';
+import { Loading } from '@/components/ui/loading';
 
-import { z } from "zod";
+import { z } from 'zod';
 
 export default function UIShowcase() {
-  const [activeTab, setActiveTab] = useState("design");
+  const [activeTab, setActiveTab] = useState('design');
   // 同步Tab状态到URL
   const updateTabParam = (tab: string) => {
     setActiveTab(tab);
@@ -364,35 +364,35 @@ function ComponentsShowcase() {
 
   // 添加表单验证模式
   const schema = z.object({
-    categories: z.array(z.string()).min(1, "请至少选择一个分类"),
-    distance: z.string().min(1, "请选择距离范围"),
-    rating: z.string().min(1, "请选择评分要求"),
-    priceRange: z.string().min(1, "请选择价格范围"),
+    categories: z.array(z.string()).min(1, '请至少选择一个分类'),
+    distance: z.string().min(1, '请选择距离范围'),
+    rating: z.string().min(1, '请选择评分要求'),
+    priceRange: z.string().min(1, '请选择价格范围'),
     keywords: z
       .string()
-      .min(1, "请输入关键词")
-      .max(50, "关键词不能超过50个字符"),
-    singleRadio: z.string().min(1, "请选择一个选项"),
-    multiCheckbox: z.array(z.string()).min(1, "请至少选择一个选项"),
-    singleSelect: z.string().min(1, "请选择一个选项"),
+      .min(1, '请输入关键词')
+      .max(50, '关键词不能超过50个字符'),
+    singleRadio: z.string().min(1, '请选择一个选项'),
+    multiCheckbox: z.array(z.string()).min(1, '请至少选择一个选项'),
+    singleSelect: z.string().min(1, '请选择一个选项'),
   });
 
   // 表单默认值
   const defaultFormValues: FormData = {
     categories: [],
-    distance: "",
-    rating: "",
-    priceRange: "",
-    keywords: "",
-    singleRadio: "",
+    distance: '',
+    rating: '',
+    priceRange: '',
+    keywords: '',
+    singleRadio: '',
     multiCheckbox: [],
-    singleSelect: "",
+    singleSelect: '',
   };
 
   // 表单提交处理
   const handleFormSubmit = async (data: FormData) => {
     // 记录表单数据但不重置表单
-    console.log("表单提交数据:", data);
+    console.log('表单提交数据:', data);
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
   };
@@ -400,10 +400,10 @@ function ComponentsShowcase() {
   // 表单值变化处理
   const handleValuesChange = (
     changedValues: Partial<FormData>,
-    allValues: FormData,
+    allValues: FormData
   ) => {
-    console.log("变更的值:", changedValues);
-    console.log("所有的值:", allValues);
+    console.log('变更的值:', changedValues);
+    console.log('所有的值:', allValues);
   };
 
   return (
@@ -440,10 +440,10 @@ function ComponentsShowcase() {
                       label="分类选择"
                       description="请至少选择一个分类（必填多选）"
                       options={[
-                        { value: "tech", label: "科技" },
-                        { value: "design", label: "设计" },
-                        { value: "business", label: "商业" },
-                        { value: "lifestyle", label: "生活" },
+                        { value: 'tech', label: '科技' },
+                        { value: 'design', label: '设计' },
+                        { value: 'business', label: '商业' },
+                        { value: 'lifestyle', label: '生活' },
                       ]}
                       mode="multiple"
                       tooltip="选择感兴趣的分类"
@@ -454,10 +454,10 @@ function ComponentsShowcase() {
                       label="距离范围"
                       description="单选且选中后可取消"
                       options={[
-                        { value: "1000", label: "1公里" },
-                        { value: "3000", label: "3公里" },
-                        { value: "5000", label: "5公里" },
-                        { value: "10000", label: "10公里" },
+                        { value: '1000', label: '1公里' },
+                        { value: '3000', label: '3公里' },
+                        { value: '5000', label: '5公里' },
+                        { value: '10000', label: '10公里' },
                       ]}
                       mode="single"
                       tooltip="选择距离范围"
@@ -468,10 +468,10 @@ function ComponentsShowcase() {
                       label="评分要求"
                       description="单选且选中后可取消"
                       options={[
-                        { value: "3", label: "3星以上" },
-                        { value: "4", label: "4星以上" },
-                        { value: "4.5", label: "4.5星以上" },
-                        { value: "5", label: "5星" },
+                        { value: '3', label: '3星以上' },
+                        { value: '4', label: '4星以上' },
+                        { value: '4.5', label: '4.5星以上' },
+                        { value: '5', label: '5星' },
                       ]}
                       mode="single"
                       optionType="button"
@@ -483,10 +483,10 @@ function ComponentsShowcase() {
                       label="价格范围"
                       description="单选且选中后可取消"
                       options={[
-                        { value: "0_50", label: "50以下" },
-                        { value: "50_100", label: "50-100" },
-                        { value: "100_200", label: "100-200" },
-                        { value: "200_999", label: "200以上" },
+                        { value: '0_50', label: '50以下' },
+                        { value: '50_100', label: '50-100' },
+                        { value: '100_200', label: '100-200' },
+                        { value: '200_999', label: '200以上' },
                       ]}
                       mode="single"
                       optionType="button"
@@ -503,10 +503,10 @@ function ComponentsShowcase() {
                       label="单选框组"
                       description="请选择一个选项（单选）"
                       options={[
-                        { value: "option1", label: "选项一" },
-                        { value: "option2", label: "选项二" },
-                        { value: "option3", label: "选项三", disabled: true },
-                        { value: "option4", label: "选项四" },
+                        { value: 'option1', label: '选项一' },
+                        { value: 'option2', label: '选项二' },
+                        { value: 'option3', label: '选项三', disabled: true },
+                        { value: 'option4', label: '选项四' },
                       ]}
                       direction="horizontal"
                     />
@@ -516,10 +516,10 @@ function ComponentsShowcase() {
                       label="复选框组"
                       description="请选择多个选项（多选）"
                       options={[
-                        { value: "option1", label: "选项一" },
-                        { value: "option2", label: "选项二" },
-                        { value: "option3", label: "选项三" },
-                        { value: "option4", label: "选项四", disabled: true },
+                        { value: 'option1', label: '选项一' },
+                        { value: 'option2', label: '选项二' },
+                        { value: 'option3', label: '选项三' },
+                        { value: 'option4', label: '选项四', disabled: true },
                       ]}
                       direction="horizontal"
                       tooltip="可以选择多个选项"
@@ -531,10 +531,10 @@ function ComponentsShowcase() {
                       description="请从下拉列表中选择一个选项"
                       placeholder="请选择..."
                       options={[
-                        { value: "option1", label: "选项一" },
-                        { value: "option2", label: "选项二" },
-                        { value: "option3", label: "选项三" },
-                        { value: "option4", label: "选项四", disabled: true },
+                        { value: 'option1', label: '选项一' },
+                        { value: 'option2', label: '选项二' },
+                        { value: 'option3', label: '选项三' },
+                        { value: 'option4', label: '选项四', disabled: true },
                       ]}
                       allowClear={true}
                     />
@@ -629,7 +629,7 @@ function ComponentsShowcase() {
                       <p className="mb-2 text-sm font-medium">自定义宽度骨架</p>
                       <div className="space-y-2">
                         <Skeleton
-                          lines={["100%", "75%", "50%"]}
+                          lines={['100%', '75%', '50%']}
                           className="h-4"
                         />
                       </div>

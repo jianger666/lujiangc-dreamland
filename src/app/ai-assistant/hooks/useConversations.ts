@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useState } from "react";
+import { RefObject, useCallback, useState } from 'react';
 import {
   Conversation,
   AIModel,
@@ -6,14 +6,14 @@ import {
   AiRoleEnum,
   StreamingState,
   AIModelEnum,
-} from "@/types/ai-assistant";
+} from '@/types/ai-assistant';
 import {
   createNewConversation,
   saveConversation,
   deleteConversation as deleteConversationFromDB,
   optimizeConversationHistory,
-} from "../utils";
-import { generateUUID } from "@/lib";
+} from '../utils';
+import { generateUUID } from '@/lib';
 
 interface UseConversationsProps {
   abortControllersRef: RefObject<Record<string, AbortController | null>>;
@@ -32,7 +32,7 @@ interface UseConversationsProps {
   handleStreamingComplete: (conversationId: string) => void;
   resetStreamingState: (
     setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>,
-    conversationId: string,
+    conversationId: string
   ) => void;
   setStreamingState: React.Dispatch<React.SetStateAction<StreamingState>>;
 }
@@ -48,7 +48,7 @@ export const useConversations = ({
   // 所有对话列表
   const [conversations, setConversations] = useState<Conversation[]>([]);
   // 当前激活的对话ID
-  const [activeConversationId, setActiveConversationId] = useState<string>("");
+  const [activeConversationId, setActiveConversationId] = useState<string>('');
 
   // 更新指定对话的属性
   const updateConversation = useCallback(
@@ -57,7 +57,7 @@ export const useConversations = ({
       updates,
     }: {
       id: string;
-      updates: Partial<Omit<Conversation, "id" | "createdAt">>;
+      updates: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
     }) => {
       setConversations((currentConversations) =>
         currentConversations.map((conv) =>
@@ -67,23 +67,23 @@ export const useConversations = ({
                 ...updates,
                 updatedAt: new Date().toISOString(),
               }
-            : conv,
-        ),
+            : conv
+        )
       );
     },
-    [],
+    []
   );
 
   // 清理指定对话的AbortController连接
   const cleanupAbortController = useCallback(
     (conversationId: string) => {
       if (abortControllersRef.current[conversationId]) {
-        console.log("清理AbortController:", conversationId);
+        console.log('清理AbortController:', conversationId);
         abortControllersRef.current[conversationId]?.abort();
         abortControllersRef.current[conversationId] = null;
       }
     },
-    [abortControllersRef],
+    [abortControllersRef]
   );
 
   // 创建新对话
@@ -103,12 +103,12 @@ export const useConversations = ({
       try {
         await saveConversation(newConversation);
       } catch (error) {
-        console.error("保存新对话失败:", error);
+        console.error('保存新对话失败:', error);
       }
 
       return newConversation;
     },
-    [setActiveConversationId],
+    [setActiveConversationId]
   );
 
   // 删除对话
@@ -147,11 +147,11 @@ export const useConversations = ({
             await saveConversation(newConversation);
           } else {
             // 没有其他对话也没有可用模型，清空激活ID
-            setActiveConversationId("");
+            setActiveConversationId('');
           }
         }
       } catch (error) {
-        console.error("删除对话失败:", error);
+        console.error('删除对话失败:', error);
       }
     },
     [
@@ -160,7 +160,7 @@ export const useConversations = ({
       activeConversationId,
       conversations,
       setStreamingState,
-    ],
+    ]
   );
 
   // 保存编辑后的对话标题
@@ -178,7 +178,7 @@ export const useConversations = ({
         },
       });
     },
-    [activeConversationId, removePendingTitleGeneration, updateConversation],
+    [activeConversationId, removePendingTitleGeneration, updateConversation]
   );
 
   // 更改当前对话使用的AI模型
@@ -190,7 +190,7 @@ export const useConversations = ({
         updates: { selectedModel: model },
       });
     },
-    [activeConversationId, updateConversation],
+    [activeConversationId, updateConversation]
   );
 
   // 清空当前对话的所有消息
@@ -206,7 +206,7 @@ export const useConversations = ({
         id: activeConversationId,
         updates: {
           messages: [],
-          title: "新对话",
+          title: '新对话',
           hasGeneratedTitle: false,
         },
       });
@@ -221,7 +221,7 @@ export const useConversations = ({
       updateConversation,
       resetStreamingState,
       setStreamingState,
-    ],
+    ]
   );
 
   // 切换指定对话的联网搜索状态
@@ -234,8 +234,8 @@ export const useConversations = ({
               isWebSearchEnabled: !conv.isWebSearchEnabled, // 状态取反
               updatedAt: new Date().toISOString(),
             }
-          : conv,
-      ),
+          : conv
+      )
     );
     // 注意：这里没有调用 saveConversation，如果需要持久化此状态，
     // 需要在 conversations 状态变化时（useEffect in Provider）统一保存
@@ -252,7 +252,7 @@ export const useConversations = ({
         return;
 
       const activeConversation = conversations.find(
-        (conv) => conv.id === activeConversationId,
+        (conv) => conv.id === activeConversationId
       );
 
       if (!activeConversation) return;
@@ -277,14 +277,14 @@ export const useConversations = ({
                   messages: [...conv.messages, userMessage],
                   updatedAt: new Date().toISOString(),
                 }
-              : conv,
+              : conv
           );
           return updatedConversations;
         });
 
         // 获取当前实时更新的对话
         const currentConversation = conversations.find(
-          (conv) => conv.id === activeConversationId,
+          (conv) => conv.id === activeConversationId
         );
 
         if (!currentConversation) return;
@@ -307,7 +307,7 @@ export const useConversations = ({
           imageDatas: imageDatas,
         });
       } catch (error) {
-        console.error("发送消息失败:", error);
+        console.error('发送消息失败:', error);
       }
     },
     [
@@ -317,7 +317,7 @@ export const useConversations = ({
       setStreamingState,
       startStreamResponse,
       handleStreamingComplete,
-    ],
+    ]
   );
 
   return {

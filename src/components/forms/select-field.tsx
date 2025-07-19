@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import {
   FormField,
   FormItem,
@@ -7,22 +7,22 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { XCircle } from "lucide-react";
+} from '@/components/ui/tooltip';
+import { XCircle } from 'lucide-react';
 
 type ValueType = string | number;
 
@@ -42,8 +42,8 @@ interface SelectFieldProps<T extends ValueType = string> {
   disabled?: boolean;
   loading?: boolean;
   allowClear?: boolean;
-  size?: "default" | "large" | "small";
-  status?: "error" | "warning";
+  size?: 'default' | 'large' | 'small';
+  status?: 'error' | 'warning';
   style?: React.CSSProperties;
   onChange?: (value: T | null) => void;
   tooltip?: string;
@@ -54,12 +54,12 @@ export function SelectField<T extends ValueType = string>({
   label,
   description,
   options,
-  placeholder = "请选择...",
+  placeholder = '请选择...',
   className,
   disabled = false,
   loading = false,
   allowClear = false,
-  size = "default",
+  size = 'default',
   status,
   style,
   onChange,
@@ -70,18 +70,18 @@ export function SelectField<T extends ValueType = string>({
 
   // 根据尺寸和状态设置样式
   const triggerClassName = cn(
-    "w-full",
+    'w-full',
     // 尺寸样式
     {
-      "h-8 text-sm": size === "small",
-      "h-10": size === "default",
-      "h-11 text-lg": size === "large",
+      'h-8 text-sm': size === 'small',
+      'h-10': size === 'default',
+      'h-11 text-lg': size === 'large',
     },
     // 状态样式
-    status === "error" && "border-destructive",
-    status === "warning" && "border-warning",
+    status === 'error' && 'border-destructive',
+    status === 'warning' && 'border-warning',
     // 加载状态样式
-    loading && "opacity-70 cursor-not-allowed",
+    loading && 'opacity-70 cursor-not-allowed'
   );
 
   return (
@@ -93,22 +93,22 @@ export function SelectField<T extends ValueType = string>({
         const stringValue =
           field.value !== undefined &&
           field.value !== null &&
-          field.value !== ""
+          field.value !== ''
             ? String(field.value)
             : undefined;
 
         // 处理值变更
         const handleValueChange = (value: string) => {
-          if (value === "") {
+          if (value === '') {
             // 如果是空字符串，可能是清除操作
-            field.onChange("");
+            field.onChange('');
             onChange?.(null);
             return;
           }
 
           // 找到对应的原始类型选项值
           const selectedOption = options.find(
-            (opt) => String(opt.value) === value,
+            (opt) => String(opt.value) === value
           );
           const typedValue = selectedOption?.value || value;
 
@@ -126,7 +126,7 @@ export function SelectField<T extends ValueType = string>({
 
           if (field.value !== undefined && field.value !== null) {
             // 始终将值设置为空字符串，而不是null
-            field.onChange("");
+            field.onChange('');
             onChange?.(null);
           }
         };
@@ -194,10 +194,10 @@ export function SelectField<T extends ValueType = string>({
                 <button
                   type="button"
                   className={cn(
-                    "absolute right-8 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground",
-                    "opacity-0 transition-opacity duration-200",
-                    (isFocused || loading) && "opacity-100",
-                    "focus:opacity-100",
+                    'absolute right-8 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground',
+                    'opacity-0 transition-opacity duration-200',
+                    (isFocused || loading) && 'opacity-100',
+                    'focus:opacity-100'
                   )}
                   onClick={handleClear}
                   aria-label="清除选择"

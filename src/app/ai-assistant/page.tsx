@@ -8,9 +8,9 @@
  * - 自动生成对话标题
  */
 
-import { AIAssistantProvider } from "./providers";
-import { getAllModels } from "@/app/api/ai-assistant/_config";
-import { ClientContent } from "./components/ClientContent";
+import { AIAssistantProvider } from './providers';
+import { getAllModels } from '@/app/api/ai-assistant/_config';
+import { ClientContent } from './components/ClientContent';
 
 export default async function AIAssistantPage() {
   // 在服务端获取可用模型列表

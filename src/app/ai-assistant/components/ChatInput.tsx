@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Send, StopCircle, Globe, Image as ImageIcon, X } from "lucide-react";
-import { Toggle } from "@/components/ui/toggle";
-import { cn } from "@/lib/utils";
-import { useAIAssistant } from "../hooks";
-import { useBreakpoint } from "@/hooks/use-breakpoint";
-import { useImageUpload } from "../hooks/useImageUpload";
-import { useFocusTextarea } from "../hooks/useFocusTextarea";
-import { fileToBase64 } from "../utils";
+} from '@/components/ui/select';
+import { Send, StopCircle, Globe, Image as ImageIcon, X } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
+import { cn } from '@/lib/utils';
+import { useAIAssistant } from '../hooks';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { useImageUpload } from '../hooks/useImageUpload';
+import { useFocusTextarea } from '../hooks/useFocusTextarea';
+import { fileToBase64 } from '../utils';
 
 export function ChatInput() {
   const {
@@ -31,18 +31,18 @@ export function ChatInput() {
     currentStreamingState,
   } = useAIAssistant();
 
-  const isDesktop = useBreakpoint("md");
+  const isDesktop = useBreakpoint('md');
 
   // 定义文本框行数
   const minTextareaRows = useMemo(() => (isDesktop ? 2 : 1), [isDesktop]);
   const maxTextareaRows = useMemo(() => (isDesktop ? 10 : 5), [isDesktop]);
 
-  const { selectedModel = "", isWebSearchEnabled = false } =
+  const { selectedModel = '', isWebSearchEnabled = false } =
     activeConversation || {};
 
   const isLoading = currentStreamingState.isLoading;
 
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
   // 使用图片上传hook
@@ -80,7 +80,7 @@ export function ChatInput() {
 
       // 查找第一个图片文件
       const imageFile = Array.from(files).find((file) =>
-        file.type.startsWith("image/"),
+        file.type.startsWith('image/')
       );
 
       if (imageFile) {
@@ -91,7 +91,7 @@ export function ChatInput() {
       }
       // 如果没有图片文件，保持默认的文本粘贴行为
     },
-    [handleImageUpload],
+    [handleImageUpload]
   );
 
   // 自动调整文本框高度
@@ -99,13 +99,13 @@ export function ChatInput() {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    textarea.style.height = "auto";
+    textarea.style.height = 'auto';
     const scrollHeight = textarea.scrollHeight;
     const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
     const maxHeight = lineHeight * maxTextareaRows;
     const newHeight = Math.min(
       Math.max(lineHeight * minTextareaRows, scrollHeight),
-      maxHeight,
+      maxHeight
     );
 
     textarea.style.height = `${newHeight}px`;
@@ -131,7 +131,7 @@ export function ChatInput() {
       const imagesToSend = [...images];
 
       // 立即清空输入和图片
-      setInput("");
+      setInput('');
       handleRemoveAllImages();
 
       // 重置高度
@@ -143,12 +143,12 @@ export function ChatInput() {
       if (imagesToSend.length > 0) {
         try {
           const base64Images = await Promise.all(
-            imagesToSend.map((image) => fileToBase64(image.file)),
+            imagesToSend.map((image) => fileToBase64(image.file))
           );
 
           await sendMessage(messageToSend, base64Images);
         } catch (error) {
-          console.error("转换图片失败:", error);
+          console.error('转换图片失败:', error);
           // 如果发送失败，恢复输入内容
           setInput(messageToSend);
           return;
@@ -166,7 +166,7 @@ export function ChatInput() {
       handleRemoveAllImages,
       textareaRef,
       minTextareaRows,
-    ],
+    ]
   );
 
   // 点击容器时聚焦输入框
@@ -175,8 +175,8 @@ export function ChatInput() {
     if (
       e.target instanceof HTMLButtonElement ||
       e.target instanceof HTMLSelectElement ||
-      (e.target as HTMLElement).closest("button") ||
-      (e.target as HTMLElement).closest("select")
+      (e.target as HTMLElement).closest('button') ||
+      (e.target as HTMLElement).closest('select')
     ) {
       return;
     }
@@ -189,8 +189,8 @@ export function ChatInput() {
       <form onSubmit={handleSubmit}>
         <div
           className={cn(
-            "relative rounded-md border border-border transition-all duration-150",
-            isFocused && "border-primary shadow-sm",
+            'relative rounded-md border border-border transition-all duration-150',
+            isFocused && 'border-primary shadow-sm'
           )}
         >
           {/* 图片预览区域 */}
@@ -235,7 +235,7 @@ export function ChatInput() {
             enterKeyHint="send"
             onKeyDown={(e) => {
               if (
-                e.key === "Enter" &&
+                e.key === 'Enter' &&
                 !e.shiftKey &&
                 !e.nativeEvent.isComposing
               ) {

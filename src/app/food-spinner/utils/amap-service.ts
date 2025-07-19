@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import AMapLoader from "@amap/amap-jsapi-loader";
-import { WeatherInfo } from "../types";
+import AMapLoader from '@amap/amap-jsapi-loader';
+import { WeatherInfo } from '../types';
 
 // 从环境变量获取高德地图API密钥
-const API_KEY = process.env._AMAP_KEY || "";
-const SECURITY_KEY = process.env.AMAP_SECRET || "";
+const API_KEY = process.env._AMAP_KEY || '';
+const SECURITY_KEY = process.env.AMAP_SECRET || '';
 
 // 为Window添加高德地图安全配置接口
 declare global {
@@ -19,7 +19,7 @@ declare global {
 // 设置安全配置的函数，确保只在客户端环境调用
 function setupSecurityConfig() {
   // 确保安全密钥在客户端设置（在任何API加载之前）
-  if (typeof window !== "undefined" && SECURITY_KEY) {
+  if (typeof window !== 'undefined' && SECURITY_KEY) {
     // 确保_AMapSecurityConfig只被设置一次
     if (!window._AMapSecurityConfig) {
       window._AMapSecurityConfig = {
@@ -82,7 +82,7 @@ export interface AMapPoiItem {
   cityname: string;
   adname: string;
   email: string;
-  photos?: AMapPoiPhoto[] | "";
+  photos?: AMapPoiPhoto[] | '';
   entr_location: [number, number] | null;
   exit_location: [number, number] | null;
   groupbuy: boolean;
@@ -149,7 +149,7 @@ interface AMapWeatherResult {
 interface AMapType {
   Geolocation: new (options: AMapGeolocationOptions) => {
     getCurrentPosition: (
-      callback: (status: string, result: AMapGeolocationResult) => void,
+      callback: (status: string, result: AMapGeolocationResult) => void
     ) => void;
   };
   PlaceSearch: new (options: AMapSearchOptions) => {
@@ -157,13 +157,13 @@ interface AMapType {
       keywords: string,
       location: [number, number],
       distance: number,
-      callback: (status: string, result: AMapSearchResult) => void,
+      callback: (status: string, result: AMapSearchResult) => void
     ) => void;
   };
   Weather: new () => {
     getLive: (
       city: string | number,
-      callback: (err: string | null, result: AMapWeatherResult) => void,
+      callback: (err: string | null, result: AMapWeatherResult) => void
     ) => void;
   };
   plugin: (name: string[], callback: () => void) => void;
@@ -200,8 +200,8 @@ let amapInitPromise: Promise<AMapType> | null = null;
 
 export async function initAMap(): Promise<AMapType> {
   // 确保只在客户端环境执行
-  if (typeof window === "undefined") {
-    throw new Error("高德地图只能在客户端环境中初始化");
+  if (typeof window === 'undefined') {
+    throw new Error('高德地图只能在客户端环境中初始化');
   }
 
   // 设置安全配置
@@ -211,15 +211,15 @@ export async function initAMap(): Promise<AMapType> {
     // 构建加载配置
     const options: AMapLoaderOptions = {
       key: API_KEY,
-      version: "2.0",
+      version: '2.0',
       plugins: [
-        "AMap.PlaceSearch",
-        "AMap.Geolocation",
-        "AMap.Scale",
-        "AMap.Weather",
+        'AMap.PlaceSearch',
+        'AMap.Geolocation',
+        'AMap.Scale',
+        'AMap.Weather',
       ],
       AMapUI: {
-        version: "1.1",
+        version: '1.1',
         plugins: [],
       },
     };
@@ -231,7 +231,7 @@ export async function initAMap(): Promise<AMapType> {
   try {
     return await amapInitPromise;
   } catch (error) {
-    console.error("高德地图API加载失败:", error);
+    console.error('高德地图API加载失败:', error);
     amapInitPromise = null;
     throw error;
   }
@@ -252,12 +252,12 @@ export async function getCurrentLocation(): Promise<{
     timeout: 10000, // 超时时间为10秒
     noIpLocate: 0, // 关闭IP定位
     needAddress: true, // 需要获取详细地址
-    extensions: "all", // 获取所有定位信息
+    extensions: 'all', // 获取所有定位信息
   });
 
   return new Promise((resolve, reject) => {
     geolocation.getCurrentPosition((status, result) => {
-      if (status === "complete") {
+      if (status === 'complete') {
         // 解析返回的结果
         const { position, addressComponent, formattedAddress } =
           result as AMapGeolocationResult;
@@ -271,8 +271,8 @@ export async function getCurrentLocation(): Promise<{
         });
       } else {
         // 备用方案：如果高精度定位失败，尝试使用IP定位
-        console.warn("高精度定位失败，使用IP定位");
-        reject(new Error("定位失败: " + status));
+        console.warn('高精度定位失败，使用IP定位');
+        reject(new Error('定位失败: ' + status));
       }
     });
   });
@@ -282,7 +282,7 @@ export async function getCurrentLocation(): Promise<{
 export async function searchNearbyRestaurants(
   location: [number, number],
   keywords: string,
-  distance: number,
+  distance: number
 ): Promise<AMapPoiItem[]> {
   const AMap = await initAMap();
 
@@ -290,21 +290,21 @@ export async function searchNearbyRestaurants(
   const placeSearch = new AMap.PlaceSearch({
     pageSize: 50, // 每页结果数
     pageIndex: 1, // 页码
-    type: "餐饮", // 搜索类型限定为餐饮
-    extensions: "all", // 返回详细信息
+    type: '餐饮', // 搜索类型限定为餐饮
+    extensions: 'all', // 返回详细信息
   });
 
   return new Promise((resolve, reject) => {
     // 搜索周边
     placeSearch.searchNearBy(keywords, location, distance, (status, result) => {
-      if (status === "complete" && result.poiList) {
+      if (status === 'complete' && result.poiList) {
         // 成功获取结果
         const restaurants = result.poiList.pois;
         resolve(restaurants);
       } else {
         // 搜索失败
-        console.error("搜索失败:", status, result);
-        reject(new Error("搜索餐厅失败: " + status));
+        console.error('搜索失败:', status, result);
+        reject(new Error('搜索餐厅失败: ' + status));
       }
     });
   });
@@ -312,10 +312,10 @@ export async function searchNearbyRestaurants(
 
 // 获取当前位置的天气信息
 export async function getWeatherInfo(
-  location: [number, number],
+  location: [number, number]
 ): Promise<WeatherInfo | null> {
   try {
-    console.log("调用getWeatherInfo，传入坐标:", location);
+    console.log('调用getWeatherInfo，传入坐标:', location);
     const AMap = await initAMap();
     const weather = new AMap.Weather();
 
@@ -325,54 +325,54 @@ export async function getWeatherInfo(
     try {
       // 当前仍然使用getCurrentLocation获取adcode，但保留传入的位置信息用于调试
       const locationInfo = await getCurrentLocation();
-      console.log("locationInfo", locationInfo);
+      console.log('locationInfo', locationInfo);
 
       adcode = locationInfo.adcode;
       console.log(
-        "获取到行政区编码:",
+        '获取到行政区编码:',
         adcode,
-        "当前位置:",
-        locationInfo.location,
+        '当前位置:',
+        locationInfo.location
       );
     } catch (error) {
-      console.error("获取行政区编码失败:", error);
+      console.error('获取行政区编码失败:', error);
       return null;
     }
 
     return new Promise<WeatherInfo>((resolve, reject) => {
       weather.getLive(adcode, (err, result) => {
         if (err) {
-          reject(new Error("获取天气信息失败: " + err));
+          reject(new Error('获取天气信息失败: ' + err));
           return;
         }
-        console.log("result", JSON.stringify(result));
+        console.log('result', JSON.stringify(result));
 
         // 检查响应是否成功
-        const isSuccess = result.status === "1" || result.info === "OK";
+        const isSuccess = result.status === '1' || result.info === 'OK';
 
         // 直接处理返回的数据格式
         if (result && isSuccess && result.weather) {
           const windDirection =
-            result.windDirection || result.winddirection || "";
-          const windPower = result.windPower || result.windpower || "";
+            result.windDirection || result.winddirection || '';
+          const windPower = result.windPower || result.windpower || '';
 
           const weatherData: WeatherInfo = {
             weather: result.weather,
-            temperature: result.temperature?.toString() || "",
+            temperature: result.temperature?.toString() || '',
             wind: `${windDirection}风 ${windPower}`,
-            humidity: result.humidity || "",
-            reportTime: result.reportTime || result.reporttime || "",
-            city: result.city || "",
+            humidity: result.humidity || '',
+            reportTime: result.reportTime || result.reporttime || '',
+            city: result.city || '',
           };
 
           resolve(weatherData);
         } else {
-          reject(new Error("获取天气信息失败"));
+          reject(new Error('获取天气信息失败'));
         }
       });
     });
   } catch (error) {
-    console.error("获取天气信息过程中出错:", error);
+    console.error('获取天气信息过程中出错:', error);
     return null;
   }
 }

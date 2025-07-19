@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 // Import shared breakpoints and type
-import { SCREEN_BREAKPOINTS, type BreakpointKey } from "@/consts/breakpoints";
+import { SCREEN_BREAKPOINTS, type BreakpointKey } from '@/consts/breakpoints';
 
 /**
  * 一个自定义 React Hook，用于检测视口宽度是否达到指定的 Tailwind CSS 断点。
@@ -13,7 +13,7 @@ export function useBreakpoint(breakpointKey: BreakpointKey): boolean {
 
   useEffect(() => {
     // 确保只在客户端执行
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return;
     }
 
@@ -38,7 +38,7 @@ export function useBreakpoint(breakpointKey: BreakpointKey): boolean {
     // 添加监听器
     // 使用 addEventListener/removeEventListener 替代旧的 addListener/removeListener
     try {
-      mediaQuery.addEventListener("change", handleChange);
+      mediaQuery.addEventListener('change', handleChange);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_e) {
       // 兼容旧版浏览器
@@ -48,7 +48,7 @@ export function useBreakpoint(breakpointKey: BreakpointKey): boolean {
     // 清理函数
     return () => {
       try {
-        mediaQuery.removeEventListener("change", handleChange);
+        mediaQuery.removeEventListener('change', handleChange);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_e) {
         // 兼容旧版浏览器

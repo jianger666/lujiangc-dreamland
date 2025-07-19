@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import html2canvas from "html2canvas";
-import { saveAs } from "file-saver";
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 
 /**
  * html2canvas 配置选项
@@ -18,7 +18,7 @@ const getHtml2CanvasOptions = (element: HTMLElement) => {
     scale: window.devicePixelRatio || 2,
 
     // 背景颜色，使用白色作为默认背景
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
 
     // 移除 html2canvas 创建的临时容器
     // removeContainer: true,
@@ -40,9 +40,9 @@ const getHtml2CanvasOptions = (element: HTMLElement) => {
     ignoreElements: (element: Element) => {
       // 忽略某些不需要渲染的元素
       return (
-        element.tagName === "SCRIPT" ||
-        element.tagName === "STYLE" ||
-        element.classList.contains("no-capture")
+        element.tagName === 'SCRIPT' ||
+        element.tagName === 'STYLE' ||
+        element.classList.contains('no-capture')
       );
     },
   };
@@ -55,11 +55,11 @@ const getHtml2CanvasOptions = (element: HTMLElement) => {
  */
 async function waitForElementReady(
   element: HTMLElement,
-  timeout = 3000,
+  timeout = 3000
 ): Promise<void> {
   return new Promise((resolve) => {
     // 检查图片是否加载完成
-    const images = element.querySelectorAll("img");
+    const images = element.querySelectorAll('img');
     const imagePromises = Array.from(images).map((img) => {
       return new Promise<void>((resolveImg) => {
         if (img.complete) {
@@ -97,22 +97,22 @@ async function waitForElementReady(
  */
 async function htmlToCanvas(element: HTMLElement): Promise<HTMLCanvasElement> {
   try {
-    console.log("开始将 HTML 元素转换为 Canvas...");
+    console.log('开始将 HTML 元素转换为 Canvas...');
 
     // 等待元素完全渲染
     await waitForElementReady(element);
 
     const options = getHtml2CanvasOptions(element);
-    console.log("html2canvas 配置:", options);
+    console.log('html2canvas 配置:', options);
 
     const canvas = await html2canvas(element, options);
 
     console.log(`Canvas 生成成功，尺寸: ${canvas.width}x${canvas.height}`);
     return canvas;
   } catch (error) {
-    console.error("html2canvas 转换失败:", error);
+    console.error('html2canvas 转换失败:', error);
     throw new Error(
-      `转换为图片失败: ${error instanceof Error ? error.message : "未知错误"}`,
+      `转换为图片失败: ${error instanceof Error ? error.message : '未知错误'}`
     );
   }
 }
@@ -124,10 +124,10 @@ async function htmlToCanvas(element: HTMLElement): Promise<HTMLCanvasElement> {
  */
 export async function downloadImageFromElement(
   element: HTMLElement,
-  filename: string = "marathon-schedule.png",
+  filename: string = 'marathon-schedule.png'
 ): Promise<void> {
   try {
-    console.log("开始下载训练计划图片...");
+    console.log('开始下载训练计划图片...');
 
     const canvas = await htmlToCanvas(element);
 
@@ -135,19 +135,19 @@ export async function downloadImageFromElement(
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            console.log("训练计划图片生成成功，开始下载");
+            console.log('训练计划图片生成成功，开始下载');
             saveAs(blob, filename);
             resolve();
           } else {
-            reject(new Error("无法生成图片 blob"));
+            reject(new Error('无法生成图片 blob'));
           }
         },
-        "image/png",
-        1.0,
+        'image/png',
+        1.0
       );
     });
   } catch (error) {
-    console.error("下载训练计划图片失败:", error);
+    console.error('下载训练计划图片失败:', error);
     throw error;
   }
 }
@@ -157,14 +157,14 @@ export async function downloadImageFromElement(
  * @param element 要转换的 HTML 元素
  */
 export async function copyImageFromElement(
-  element: HTMLElement,
+  element: HTMLElement
 ): Promise<void> {
   try {
-    console.log("开始复制训练计划图片到剪贴板...");
+    console.log('开始复制训练计划图片到剪贴板...');
 
     // 检查浏览器是否支持剪贴板API
     if (!navigator.clipboard) {
-      throw new Error("浏览器不支持剪贴板功能");
+      throw new Error('浏览器不支持剪贴板功能');
     }
 
     const canvas = await htmlToCanvas(element);
@@ -174,22 +174,22 @@ export async function copyImageFromElement(
         if (blob) {
           try {
             const clipboardItem = new ClipboardItem({
-              "image/png": blob,
+              'image/png': blob,
             });
             await navigator.clipboard.write([clipboardItem]);
-            console.log("训练计划图片复制到剪贴板成功");
+            console.log('训练计划图片复制到剪贴板成功');
             resolve();
           } catch (clipboardError) {
-            console.error("写入剪贴板失败:", clipboardError);
-            reject(new Error("写入剪贴板失败"));
+            console.error('写入剪贴板失败:', clipboardError);
+            reject(new Error('写入剪贴板失败'));
           }
         } else {
-          reject(new Error("无法生成图片 blob"));
+          reject(new Error('无法生成图片 blob'));
         }
-      }, "image/png");
+      }, 'image/png');
     });
   } catch (error) {
-    console.error("复制训练计划图片失败:", error);
+    console.error('复制训练计划图片失败:', error);
     throw error;
   }
 }

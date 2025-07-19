@@ -1,98 +1,98 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, FormProvider } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { useBreakpoint } from "@/hooks/use-breakpoint";
+import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, FormProvider } from 'react-hook-form';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
 
 import {
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   InputField,
   RadioGroupField,
   DateField,
   TextareaField,
-} from "@/components/forms";
-import { MarathonPlanFormData, WEEKDAYS, MARATHON_TYPES } from "../types";
+} from '@/components/forms';
+import { MarathonPlanFormData, WEEKDAYS, MARATHON_TYPES } from '../types';
 
 // 表单验证schema
 const marathonFormSchema = z
   .object({
     raceName: z
       .string()
-      .min(1, "比赛名称不能为空")
-      .max(20, "比赛名称不能超过20个字符"),
+      .min(1, '比赛名称不能为空')
+      .max(20, '比赛名称不能超过20个字符'),
     raceDate: z
       .date({
-        required_error: "请选择比赛日期",
-        invalid_type_error: "请选择有效的日期",
+        required_error: '请选择比赛日期',
+        invalid_type_error: '请选择有效的日期',
       })
-      .refine((date) => date > new Date(), "比赛日期必须是未来的日期"),
+      .refine((date) => date > new Date(), '比赛日期必须是未来的日期'),
     trainingStartDate: z
       .date({
-        invalid_type_error: "请选择有效的日期",
+        invalid_type_error: '请选择有效的日期',
       })
       .optional(),
-    marathonType: z.enum(["half", "full"], {
-      required_error: "请选择马拉松类型",
+    marathonType: z.enum(['half', 'full'], {
+      required_error: '请选择马拉松类型',
     }),
     currentPB: z
       .string()
       .optional()
       .refine(
         (val) => {
-          if (!val || val === "") return true; // 空值允许通过
+          if (!val || val === '') return true; // 空值允许通过
           const num = Number(val);
           return !isNaN(num) && num >= 30 && num <= 600;
         },
         {
-          message: "当前PB必须是30-600分钟之间的数字",
-        },
+          message: '当前PB必须是30-600分钟之间的数字',
+        }
       )
       .transform((val) => {
-        if (!val || val === "") return undefined;
+        if (!val || val === '') return undefined;
         return Number(val);
       }),
     targetTime: z.coerce
       .number({
-        required_error: "请输入目标成绩",
-        invalid_type_error: "请输入有效的数字",
+        required_error: '请输入目标成绩',
+        invalid_type_error: '请输入有效的数字',
       })
-      .min(30, "目标成绩不能少于30分钟")
-      .max(600, "目标成绩不能超过600分钟"),
-    trainingDays: z.array(z.string()).min(1, "请至少选择一个训练日"),
+      .min(30, '目标成绩不能少于30分钟')
+      .max(600, '目标成绩不能超过600分钟'),
+    trainingDays: z.array(z.string()).min(1, '请至少选择一个训练日'),
     dailyTrainingTime: z
       .record(z.string(), z.number())
       .refine(
         (data) =>
           Object.values(data).every((time) => time >= 30 && time <= 300),
-        "每日训练时长必须在30-300分钟之间",
+        '每日训练时长必须在30-300分钟之间'
       ),
     additionalNotes: z
       .string()
-      .max(500, "额外备注不能超过500个字符")
+      .max(500, '额外备注不能超过500个字符')
       .optional(),
   })
   .refine(
     (data) => {
       // 验证每个选择的训练日都必须设置训练时长
       return data.trainingDays.every(
-        (day) => data.dailyTrainingTime[day] && data.dailyTrainingTime[day] > 0,
+        (day) => data.dailyTrainingTime[day] && data.dailyTrainingTime[day] > 0
       );
     },
     {
-      message: "请为所有选择的训练日设置训练时长",
-      path: ["dailyTrainingTime"],
-    },
+      message: '请为所有选择的训练日设置训练时长',
+      path: ['dailyTrainingTime'],
+    }
   )
   .refine(
     (data) => {
@@ -103,9 +103,9 @@ const marathonFormSchema = z
       return true;
     },
     {
-      message: "训练开始日期不能晚于比赛日期",
-      path: ["trainingStartDate"],
-    },
+      message: '训练开始日期不能晚于比赛日期',
+      path: ['trainingStartDate'],
+    }
   );
 
 interface MarathonFormProps {
@@ -120,18 +120,18 @@ export function MarathonForm({
   defaultValues,
 }: MarathonFormProps) {
   const [selectedDays, setSelectedDays] = useState<string[]>(
-    defaultValues?.trainingDays || [],
+    defaultValues?.trainingDays || []
   );
   const [dailyTimes, setDailyTimes] = useState<Record<string, number>>(
-    defaultValues?.dailyTrainingTime || {},
+    defaultValues?.dailyTrainingTime || {}
   );
 
-  const isDesktop = useBreakpoint("lg");
+  const isDesktop = useBreakpoint('lg');
 
   const form = useForm<MarathonPlanFormData>({
     resolver: zodResolver(marathonFormSchema),
     defaultValues: {
-      raceName: "",
+      raceName: '',
       raceDate: undefined,
       trainingStartDate: new Date(), // 默认为今天
       marathonType: undefined,
@@ -139,18 +139,18 @@ export function MarathonForm({
       targetTime: undefined,
       trainingDays: [],
       dailyTrainingTime: {},
-      additionalNotes: "",
+      additionalNotes: '',
       ...defaultValues,
     },
   });
 
   // 监听成绩变化
-  const currentPB = form.watch("currentPB");
-  const targetTime = form.watch("targetTime");
+  const currentPB = form.watch('currentPB');
+  const targetTime = form.watch('targetTime');
 
   // 将分钟转换为小时分钟格式
   const formatTime = (minutes: number): string => {
-    if (!minutes || minutes <= 0) return "";
+    if (!minutes || minutes <= 0) return '';
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
 
@@ -173,17 +173,17 @@ export function MarathonForm({
       const newDailyTimes = { ...dailyTimes };
       delete newDailyTimes[dayValue];
       setDailyTimes(newDailyTimes);
-      form.setValue("dailyTrainingTime", newDailyTimes);
+      form.setValue('dailyTrainingTime', newDailyTimes);
     }
 
     setSelectedDays(newSelectedDays);
-    form.setValue("trainingDays", newSelectedDays);
+    form.setValue('trainingDays', newSelectedDays);
   };
 
   const handleTimeChange = (dayValue: string, minutes: number) => {
     const newDailyTimes = { ...dailyTimes, [dayValue]: minutes };
     setDailyTimes(newDailyTimes);
-    form.setValue("dailyTrainingTime", newDailyTimes);
+    form.setValue('dailyTrainingTime', newDailyTimes);
   };
 
   const handleSubmit = (data: MarathonPlanFormData) => {
@@ -200,7 +200,7 @@ export function MarathonForm({
             </CardHeader>
             <CardContent>
               <div
-                className={`space-y-6 ${isDesktop ? "lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0" : ""}`}
+                className={`space-y-6 ${isDesktop ? 'lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0' : ''}`}
               >
                 {/* 左侧：比赛信息 */}
                 <div className="space-y-4">
@@ -235,7 +235,7 @@ export function MarathonForm({
                     label="当前PB（分钟）（选填）"
                     type="number"
                     placeholder="如：300（5小时），没有可不填"
-                    description={currentPB ? formatTime(currentPB) : ""}
+                    description={currentPB ? formatTime(currentPB) : ''}
                   />
 
                   <InputField
@@ -272,7 +272,7 @@ export function MarathonForm({
                                     onCheckedChange={(checked) =>
                                       handleDayChange(
                                         day.value,
-                                        checked as boolean,
+                                        checked as boolean
                                       )
                                     }
                                   />
@@ -293,10 +293,10 @@ export function MarathonForm({
                                           dailyTimes[day.value] &&
                                           (dailyTimes[day.value] < 30 ||
                                             dailyTimes[day.value] > 300)
-                                            ? "bg-destructive/10 border-destructive focus-visible:ring-destructive"
-                                            : ""
+                                            ? 'bg-destructive/10 border-destructive focus-visible:ring-destructive'
+                                            : ''
                                         }`}
-                                        value={dailyTimes[day.value] || ""}
+                                        value={dailyTimes[day.value] || ''}
                                         onChange={(e) => {
                                           const inputValue = e.target.value;
                                           const value = inputValue
@@ -359,7 +359,7 @@ export function MarathonForm({
                       <span>正在生成...</span>
                     </div>
                   ) : (
-                    "生成训练计划"
+                    '生成训练计划'
                   )}
                 </Button>
               </div>

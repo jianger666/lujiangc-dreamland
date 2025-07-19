@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { memo } from "react";
-import { Button } from "@/components/ui/button";
-import { LoaderCircle, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Conversation } from "@/types/ai-assistant";
-import dayjs from "dayjs";
+import React, { memo } from 'react';
+import { Button } from '@/components/ui/button';
+import { LoaderCircle, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Conversation } from '@/types/ai-assistant';
+import dayjs from 'dayjs';
 
 export const ConversationItem = memo(
   ({
@@ -25,8 +25,8 @@ export const ConversationItem = memo(
       <div
         key={conversation.id}
         className={cn(
-          "group relative flex cursor-pointer items-center rounded-md px-2 py-2 hover:bg-card",
-          isActive && "bg-card",
+          'group relative flex cursor-pointer items-center rounded-md px-2 py-2 hover:bg-card',
+          isActive && 'bg-card'
         )}
         onClick={onSelect}
       >
@@ -39,12 +39,12 @@ export const ConversationItem = memo(
           </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>
-              {dayjs(conversation.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+              {dayjs(conversation.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
             </span>
             <span>
               {conversation.messages.length > 99
-                ? "99+"
-                : conversation.messages.length}{" "}
+                ? '99+'
+                : conversation.messages.length}{' '}
               条消息
             </span>
           </div>
@@ -63,7 +63,7 @@ export const ConversationItem = memo(
         </div>
       </div>
     );
-  },
+  }
 );
 
-ConversationItem.displayName = "ConversationItem";
+ConversationItem.displayName = 'ConversationItem';

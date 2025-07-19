@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Restaurant } from "../types";
+import { Restaurant } from '../types';
 import {
   Dialog,
   DialogContent,
@@ -9,11 +9,11 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogBody,
-} from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
-import { Search, ChevronRight, Store } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
+} from '@/components/ui/dialog';
+import { Card } from '@/components/ui/card';
+import { Search, ChevronRight, Store } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 // import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
 
 interface RestaurantListProps {
@@ -24,11 +24,11 @@ interface RestaurantListProps {
 export function RestaurantList({ restaurants, title }: RestaurantListProps) {
   // 餐厅评分等级
   const getRatingClass = (rating: number) => {
-    if (rating >= 4.5) return "text-green-500 font-bold";
-    if (rating >= 4.0) return "text-green-400 font-semibold";
-    if (rating >= 3.5) return "text-yellow-500";
-    if (rating >= 3.0) return "text-yellow-400";
-    return "text-muted-foreground";
+    if (rating >= 4.5) return 'text-green-500 font-bold';
+    if (rating >= 4.0) return 'text-green-400 font-semibold';
+    if (rating >= 3.5) return 'text-yellow-500';
+    if (rating >= 3.0) return 'text-yellow-400';
+    return 'text-muted-foreground';
   };
 
   // 格式化距离
@@ -41,13 +41,13 @@ export function RestaurantList({ restaurants, title }: RestaurantListProps) {
 
   // 格式化价格
   const formatPrice = (price: number) => {
-    if (price === 0) return "未知";
+    if (price === 0) return '未知';
     return `¥${price}`;
   };
 
   // 检查图片URL是否有效
   const isValidImageUrl = (url?: string) => {
-    return url && (url.startsWith("http://") || url.startsWith("https://"));
+    return url && (url.startsWith('http://') || url.startsWith('https://'));
   };
 
   // 存储加载失败的图片ID
@@ -70,10 +70,10 @@ export function RestaurantList({ restaurants, title }: RestaurantListProps) {
             </div>
             <p className="flex items-center justify-center gap-2">
               <Search className="h-5 w-5 text-primary" />
-              {title}{" "}
+              {title}{' '}
               <span className="font-semibold text-primary">
                 {restaurants.length}
-              </span>{" "}
+              </span>{' '}
               个美食选项
             </p>
             <p className="mt-1 text-xs text-muted-foreground">

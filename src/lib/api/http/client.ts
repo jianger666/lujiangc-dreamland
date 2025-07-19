@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { getStatusMessage, HttpStatus } from "../httpStatus";
-import { toast } from "@/hooks/use-toast";
-import { ApiResponse } from "../response";
+import { getStatusMessage, HttpStatus } from '../httpStatus';
+import { toast } from '@/hooks/use-toast';
+import { ApiResponse } from '../response';
 
 /**
  * 请求取消映射
@@ -54,7 +54,7 @@ export interface HttpClientOptions {
  */
 export interface RequestConfig<D = unknown> {
   url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE";
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   headers?: Record<string, string>;
   params?: Record<string, JsonValue>;
   data?: D;
@@ -82,10 +82,10 @@ export class HttpClient {
   private timeout: number;
 
   constructor(options: HttpClientOptions = {}) {
-    this.baseURL = options.baseURL || "";
+    this.baseURL = options.baseURL || '';
     this.timeout = options.timeout || 30000;
     this.defaultHeaders = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...(options.headers || {}),
     };
   }
@@ -95,7 +95,7 @@ export class HttpClient {
    * @param config 请求配置
    */
   async request<T = unknown, D = unknown>(
-    config: RequestConfig<D>,
+    config: RequestConfig<D>
   ): Promise<T> {
     const {
       url,
@@ -120,7 +120,7 @@ export class HttpClient {
 
     // 如果需要取消之前的相同请求
     if (cancelPrevious && abortControllers[requestKey]) {
-      abortControllers[requestKey].abort("Canceled due to duplicate request");
+      abortControllers[requestKey].abort('Canceled due to duplicate request');
     }
 
     // 创建新的AbortController
@@ -140,9 +140,9 @@ export class HttpClient {
     };
 
     // 添加请求体（仅对非GET请求）
-    if (method !== "GET" && data !== undefined) {
+    if (method !== 'GET' && data !== undefined) {
       requestOptions.body =
-        typeof data === "object" ? JSON.stringify(data) : String(data);
+        typeof data === 'object' ? JSON.stringify(data) : String(data);
     }
 
     try {
@@ -151,7 +151,7 @@ export class HttpClient {
 
       // 创建AbortTimeout
       const timeoutId = setTimeout(() => {
-        controller.abort("Timeout of " + timeout + "ms exceeded");
+        controller.abort('Timeout of ' + timeout + 'ms exceeded');
       }, timeout);
 
       // 发送请求
@@ -169,7 +169,7 @@ export class HttpClient {
       return this.responseInterceptor<T>(
         response,
         skipErrorHandler,
-        extractData,
+        extractData
       );
     } catch (error) {
       // 清除AbortController引用
@@ -180,7 +180,7 @@ export class HttpClient {
       // 重试处理
       if (
         retry > 0 &&
-        !(error instanceof DOMException && error.name === "AbortError")
+        !(error instanceof DOMException && error.name === 'AbortError')
       ) {
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
         return this.request<T, D>({
@@ -203,10 +203,10 @@ export class HttpClient {
   async get<T = unknown>(
     url: string,
     params?: Record<string, JsonValue>,
-    config?: Partial<RequestConfig<undefined>>,
+    config?: Partial<RequestConfig<undefined>>
   ): Promise<T> {
     return this.request<T, undefined>({
-      method: "GET",
+      method: 'GET',
       url,
       params,
       ...(config || {}),
@@ -222,10 +222,10 @@ export class HttpClient {
   async post<T = unknown, D = unknown>(
     url: string,
     data?: D,
-    config?: Partial<RequestConfig<D>>,
+    config?: Partial<RequestConfig<D>>
   ): Promise<T> {
     return this.request<T, D>({
-      method: "POST",
+      method: 'POST',
       url,
       data,
       ...(config || {}),
@@ -241,10 +241,10 @@ export class HttpClient {
   async put<T = unknown, D = unknown>(
     url: string,
     data?: D,
-    config?: Partial<RequestConfig<D>>,
+    config?: Partial<RequestConfig<D>>
   ): Promise<T> {
     return this.request<T, D>({
-      method: "PUT",
+      method: 'PUT',
       url,
       data,
       ...(config || {}),
@@ -260,10 +260,10 @@ export class HttpClient {
   async delete<T = unknown>(
     url: string,
     params?: Record<string, JsonValue>,
-    config?: Partial<RequestConfig<undefined>>,
+    config?: Partial<RequestConfig<undefined>>
   ): Promise<T> {
     return this.request<T, undefined>({
-      method: "DELETE",
+      method: 'DELETE',
       url,
       params,
       ...(config || {}),
@@ -275,7 +275,7 @@ export class HttpClient {
    */
   cancelAll(): void {
     Object.values(abortControllers).forEach((controller) => {
-      controller.abort("User cancelled all requests");
+      controller.abort('User cancelled all requests');
     });
   }
 
@@ -288,11 +288,11 @@ export class HttpClient {
   private buildURL(
     url: string,
     params?: Record<string, JsonValue>,
-    customBaseUrl?: string,
+    customBaseUrl?: string
   ): string {
     // 构建基础URL
     const baseURL = customBaseUrl !== undefined ? customBaseUrl : this.baseURL;
-    let fullURL = url.startsWith("http") ? url : `${baseURL}${url}`;
+    let fullURL = url.startsWith('http') ? url : `${baseURL}${url}`;
 
     // 添加查询参数
     if (params && Object.keys(params).length > 0) {
@@ -305,7 +305,7 @@ export class HttpClient {
 
       const queryString = searchParams.toString();
       if (queryString) {
-        fullURL += (fullURL.includes("?") ? "&" : "?") + queryString;
+        fullURL += (fullURL.includes('?') ? '&' : '?') + queryString;
       }
     }
 
@@ -319,10 +319,10 @@ export class HttpClient {
   private async requestInterceptor(config: RequestInit): Promise<RequestInit> {
     // 在这里添加请求拦截逻辑，比如添加认证信息
     // 示例: 从localStorage获取token并添加到请求头
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("auth_token");
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
       if (token && config.headers) {
-        (config.headers as Record<string, string>)["Authorization"] =
+        (config.headers as Record<string, string>)['Authorization'] =
           `Bearer ${token}`;
       }
     }
@@ -339,7 +339,7 @@ export class HttpClient {
   private async responseInterceptor<T>(
     response: Response,
     skipErrorHandler = false,
-    extractData = true,
+    extractData = true
   ): Promise<T> {
     // 处理不同的响应状态
     if (!response.ok) {
@@ -361,8 +361,8 @@ export class HttpClient {
 
     // 解析响应内容
     let responseBody: unknown;
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
       responseBody = await response.json();
     } else {
       responseBody = await response.text();
@@ -373,9 +373,9 @@ export class HttpClient {
     if (
       extractData &&
       responseBody &&
-      typeof responseBody === "object" &&
+      typeof responseBody === 'object' &&
       responseBody !== null &&
-      "data" in responseBody
+      'data' in responseBody
     ) {
       data = (responseBody as Record<string, unknown>).data as T;
     } else {
@@ -394,20 +394,20 @@ export class HttpClient {
    */
   private async handleHttpError(
     status: number,
-    errorData: Record<string, unknown>,
+    errorData: Record<string, unknown>
   ): Promise<void> {
     // 处理特定状态码
     if (status === HttpStatus.UNAUTHORIZED) {
       // 登录过期或未授权处理
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         // 清除本地存储的token
-        localStorage.removeItem("auth_token");
+        localStorage.removeItem('auth_token');
 
         // 显示未授权提示
         toast({
-          variant: "destructive",
-          title: "认证失败",
-          description: "您的登录已过期，请重新登录",
+          variant: 'destructive',
+          title: '认证失败',
+          description: '您的登录已过期，请重新登录',
         });
 
         // 可以重定向到登录页
@@ -417,28 +417,28 @@ export class HttpClient {
       // 422错误，显示响应中的message
       const message = errorData.message
         ? String(errorData.message)
-        : "请求参数有误";
+        : '请求参数有误';
 
       toast({
-        variant: "destructive",
-        title: "请求失败",
+        variant: 'destructive',
+        title: '请求失败',
         description: message,
       });
     } else if (status >= 500) {
       // 服务器错误
       toast({
-        variant: "destructive",
-        title: "服务器错误",
+        variant: 'destructive',
+        title: '服务器错误',
         description: `服务器处理请求失败 (${status})`,
       });
     } else {
       // 其他错误
       toast({
-        variant: "destructive",
-        title: "请求失败",
+        variant: 'destructive',
+        title: '请求失败',
         description: errorData.message
           ? String(errorData.message)
-          : getStatusMessage(status) || "请求处理失败",
+          : getStatusMessage(status) || '请求处理失败',
       });
     }
   }
@@ -450,7 +450,7 @@ export class HttpClient {
    */
   private errorHandler<T>(
     error: unknown,
-    skipErrorHandler = false,
+    skipErrorHandler = false
   ): Promise<T> {
     // 错误类型断言
     const err = error as {
@@ -466,7 +466,7 @@ export class HttpClient {
     }
 
     // 检查是否是取消请求导致的错误
-    if (error instanceof DOMException && error.name === "AbortError") {
+    if (error instanceof DOMException && error.name === 'AbortError') {
       // 请求被取消，通常不需要显示错误提示
 
       return Promise.reject({
@@ -484,8 +484,8 @@ export class HttpClient {
     // 这里只处理其他类型的错误
     if (!err.status) {
       toast({
-        variant: "destructive",
-        description: err.message || "请求处理失败",
+        variant: 'destructive',
+        description: err.message || '请求处理失败',
       });
     }
 
@@ -503,6 +503,6 @@ export class HttpClient {
 
 // 导出默认实例
 export const httpClient = new HttpClient({
-  baseURL: typeof window !== "undefined" ? window.location.origin : "",
+  baseURL: typeof window !== 'undefined' ? window.location.origin : '',
   timeout: 30000,
 });

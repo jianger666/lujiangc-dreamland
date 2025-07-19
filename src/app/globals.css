@@ -79,10 +79,10 @@
   }
 
   /* 修复 Radix UI Checkbox 隐藏 input 在移动端造成双重滚动条的问题 */
-  button[role="checkbox"] + input[type="checkbox"] {
+  button[role='checkbox'] + input[type='checkbox'] {
     display: none !important;
   }
-  button[role="radio"] + input[type="radio"] {
+  button[role='radio'] + input[type='radio'] {
     display: none !important;
   }
 }

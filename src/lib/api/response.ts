@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { HttpStatus, getStatusMessage } from "./httpStatus";
+import { NextResponse } from 'next/server';
+import { HttpStatus, getStatusMessage } from './httpStatus';
 
 /**
  * 标准API响应接口
@@ -33,7 +33,7 @@ export function createSuccessResponse<T>({
       success: true,
       timestamp: Date.now(),
     },
-    { status: statusCode },
+    { status: statusCode }
   );
 }
 
@@ -56,7 +56,7 @@ export function createErrorResponse({
       success: false,
       timestamp: Date.now(),
     },
-    { status: statusCode },
+    { status: statusCode }
   );
 }
 
@@ -67,9 +67,9 @@ export function createErrorResponse({
 export function createStreamResponse(stream: ReadableStream): Response {
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
     },
   });
 }

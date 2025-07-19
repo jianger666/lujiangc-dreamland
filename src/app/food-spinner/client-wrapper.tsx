@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { Suspense } from "react";
-import dynamic from "next/dynamic";
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 
 // 动态导入食品转盘组件，禁用SSR
 const FoodSpinnerContainer = dynamic(
   () =>
-    import("./components/food-spinner-container").then(
-      (mod) => mod.FoodSpinnerContainer,
+    import('./components/food-spinner-container').then(
+      (mod) => mod.FoodSpinnerContainer
     ),
-  { ssr: false },
+  { ssr: false }
 );
 
 export function FoodSpinnerClientWrapper() {

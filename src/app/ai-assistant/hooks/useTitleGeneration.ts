@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
-import { Conversation } from "@/types/ai-assistant";
-import { useTitle } from "./useTitle";
+import { useCallback, useState } from 'react';
+import { Conversation } from '@/types/ai-assistant';
+import { useTitle } from './useTitle';
 
 export const useTitleGeneration = () => {
   // 等待生成标题的对话ID集合
@@ -34,12 +34,12 @@ export const useTitleGeneration = () => {
     async (
       conversationId: string,
       conversations: Conversation[],
-      setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>,
+      setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>
     ) => {
       if (!pendingTitleGeneration.has(conversationId)) return;
 
       const conversation = conversations.find(
-        (conv) => conv.id === conversationId,
+        (conv) => conv.id === conversationId
       );
 
       // 只处理未生成过标题且至少有两条消息的对话
@@ -51,7 +51,7 @@ export const useTitleGeneration = () => {
         try {
           // 调用API生成标题
           const newTitle = await generateConversationTitle(
-            conversation.messages,
+            conversation.messages
           );
 
           // 更新对话标题
@@ -59,14 +59,14 @@ export const useTitleGeneration = () => {
             prev.map((conv) =>
               conv.id === conversationId
                 ? { ...conv, title: newTitle, hasGeneratedTitle: true }
-                : conv,
-            ),
+                : conv
+            )
           );
 
           // 移除已处理的对话ID
           removePendingTitleGeneration(conversationId);
         } catch (error) {
-          console.error("生成标题失败:", error);
+          console.error('生成标题失败:', error);
         }
       }
     },
@@ -74,14 +74,14 @@ export const useTitleGeneration = () => {
       pendingTitleGeneration,
       generateConversationTitle,
       removePendingTitleGeneration,
-    ],
+    ]
   );
 
   // 监听流式响应完成事件的处理函数
   const handleStreamingComplete = useCallback(
     (conversationId: string, conversations: Conversation[]) => {
       const conversation = conversations.find(
-        (conv) => conv.id === conversationId,
+        (conv) => conv.id === conversationId
       );
 
       // 检查是否需要生成标题（未生成过且至少有两条消息）
@@ -93,7 +93,7 @@ export const useTitleGeneration = () => {
         addToPendingTitleGeneration(conversationId);
       }
     },
-    [addToPendingTitleGeneration],
+    [addToPendingTitleGeneration]
   );
 
   return {

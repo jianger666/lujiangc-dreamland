@@ -1,8 +1,8 @@
-import httpClient from "@/lib/api/http";
+import httpClient from '@/lib/api/http';
 import {
   MarathonPlanFormData,
   ScheduleResponse,
-} from "@/app/marathon-planner/types";
+} from '@/app/marathon-planner/types';
 
 /**
  * 生成马拉松训练课表
@@ -10,11 +10,11 @@ import {
  * @returns 生成的课表内容
  */
 export const generateMarathonSchedule = async (
-  formData: MarathonPlanFormData,
+  formData: MarathonPlanFormData
 ): Promise<ScheduleResponse> => {
   return httpClient.post<ScheduleResponse>(
-    "/api/marathon-planner/generate-schedule",
+    '/api/marathon-planner/generate-schedule',
     formData,
-    { skipErrorHandler: true },
+    { skipErrorHandler: true }
   );
 };

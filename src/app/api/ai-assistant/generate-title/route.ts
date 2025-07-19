@@ -1,12 +1,12 @@
-import { NextRequest } from "next/server";
+import { NextRequest } from 'next/server';
 import {
   tryChatCompletionWithFailover,
   TITLE_GENERATION_SYSTEM_PROMPT,
-} from "../_utils";
-import { apiHandler } from "@/lib/api/handler";
-import { createErrorResponse } from "@/lib/api/response";
-import { AIModelEnum, AiRoleEnum } from "@/types/ai-assistant";
-import type { ChatCompletion } from "openai/resources";
+} from '../_utils';
+import { apiHandler } from '@/lib/api/handler';
+import { createErrorResponse } from '@/lib/api/response';
+import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
+import type { ChatCompletion } from 'openai/resources';
 
 // 标题生成使用的模型ID
 const TITLE_GENERATOR_MODEL = AIModelEnum.TitleGenerator;
@@ -20,7 +20,7 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
 
     if (!userMessage) {
       return createErrorResponse({
-        message: "无用户消息",
+        message: '无用户消息',
       });
     }
 
@@ -41,19 +41,19 @@ const handleGenerateTitle = apiHandler(async (req: NextRequest) => {
     // 3. 调用带故障转移的请求函数，传递模型ID
     const response = (await tryChatCompletionWithFailover(
       TITLE_GENERATOR_MODEL,
-      baseRequestOptions,
+      baseRequestOptions
     )) as ChatCompletion; // 明确类型为非流式响应
 
     // 提取生成的标题 (逻辑不变)
-    const title = response.choices[0]?.message?.content?.trim() ?? "";
+    const title = response.choices[0]?.message?.content?.trim() ?? '';
 
     // 直接返回标题字符串，符合原apiHandler期望
     return new Response(title, { status: 200 });
   } catch (error) {
-    console.error("生成标题错误（所有实例均失败）:", error);
+    console.error('生成标题错误（所有实例均失败）:', error);
     // 返回更通用的错误给客户端
     return createErrorResponse({
-      message: "生成标题时出错，请稍后重试。",
+      message: '生成标题时出错，请稍后重试。',
     });
   }
 });

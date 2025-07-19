@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { useDebounceCallback } from "usehooks-ts";
+import { useEffect, useRef } from 'react';
+import { useDebounceCallback } from 'usehooks-ts';
 
 /**
  * useFocusTextarea hook的配置选项
@@ -48,14 +48,14 @@ export const useFocusTextarea = ({
   // 当isLoading从true变为false时自动聚焦
   useEffect(() => {
     if (!isLoading) {
-      console.log("isLoading触发");
+      console.log('isLoading触发');
       focusTextarea();
     }
   }, [isLoading]);
 
   // 当对话切换时自动聚焦输入框
   useEffect(() => {
-    console.log("conversationId触发");
+    console.log('conversationId触发');
 
     focusTextarea();
   }, [conversationId]);
@@ -63,7 +63,7 @@ export const useFocusTextarea = ({
   // 监听消息列表变化，当清空对话后自动聚焦输入框
   useEffect(() => {
     if (messagesLength === 0) {
-      console.log("messagesLength触发");
+      console.log('messagesLength触发');
 
       focusTextarea();
     }

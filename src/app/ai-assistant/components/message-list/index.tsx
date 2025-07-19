@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   useRef,
@@ -6,28 +6,28 @@ import React, {
   useEffect,
   useMemo,
   useCallback,
-} from "react";
-import { ChevronsDown } from "lucide-react";
-import { VariableSizeList } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { useDebouncedCallback } from "use-debounce";
+} from 'react';
+import { ChevronsDown } from 'lucide-react';
+import { VariableSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { useDebouncedCallback } from 'use-debounce';
 
-import { Loading } from "@/components/ui/loading";
-import { Button } from "@/components/ui/button";
-import { AiRoleEnum, Message, StreamingMessage } from "@/types/ai-assistant";
-import { useAIAssistant } from "../../hooks";
+import { Loading } from '@/components/ui/loading';
+import { Button } from '@/components/ui/button';
+import { AiRoleEnum, Message, StreamingMessage } from '@/types/ai-assistant';
+import { useAIAssistant } from '../../hooks';
 
 import {
   DEFAULT_ITEM_HEIGHT,
   OVERSCAN_COUNT,
   AUTO_SCROLL_DISABLE_THRESHOLD,
   BUTTON_SHOW_THRESHOLD,
-} from "@/app/ai-assistant/consts";
+} from '@/app/ai-assistant/consts';
 
-import { HighlightTheme } from "./HighlightTheme";
-import { EmptyState } from "./EmptyState";
-import { Row } from "./Row";
-import { ItemData } from "./types";
+import { HighlightTheme } from './HighlightTheme';
+import { EmptyState } from './EmptyState';
+import { Row } from './Row';
+import { ItemData } from './types';
 
 export function MessageList() {
   const { currentStreamingState, activeConversation, activeConversationId } =
@@ -38,7 +38,7 @@ export function MessageList() {
       content: currentStreamingState.content,
       thinking: currentStreamingState.thinking,
     }),
-    [currentStreamingState],
+    [currentStreamingState]
   );
   const isLoading = currentStreamingState.isLoading;
 
@@ -52,17 +52,17 @@ export function MessageList() {
 
   const debouncedSetShowScrollToBottomButton = useDebouncedCallback(
     setShowScrollToBottomButton,
-    50,
+    50
   );
 
   const isGenerating = useMemo(
     () => !!streamingMessage.content || !!streamingMessage.thinking,
-    [streamingMessage],
+    [streamingMessage]
   );
 
   const isRequesting = useMemo(
     () => isLoading && !isGenerating,
-    [isLoading, isGenerating],
+    [isLoading, isGenerating]
   );
 
   const allMessages = useMemo(() => {
@@ -82,13 +82,13 @@ export function MessageList() {
   const handleScrollToBottom = useCallback(
     (smooth: boolean = false) => {
       if (listRef.current && outerListRef.current) {
-        outerListRef.current.style.scrollBehavior = smooth ? "smooth" : "auto";
-        listRef.current!.scrollToItem(allMessages.length - 1, "end");
+        outerListRef.current.style.scrollBehavior = smooth ? 'smooth' : 'auto';
+        listRef.current!.scrollToItem(allMessages.length - 1, 'end');
         isUserScrolledUpRef.current = false;
         setShowScrollToBottomButton(false);
       }
     },
-    [allMessages.length],
+    [allMessages.length]
   );
 
   // 切换窗口时或者首次加载时，滚动到底部
@@ -110,7 +110,7 @@ export function MessageList() {
         if (!isFirstScrollToBottom) {
           debounceFirstScrollToBottom();
         } else if (isGenerating && !isUserScrolledUpRef.current) {
-          console.log("生成滚动到底部");
+          console.log('生成滚动到底部');
 
           handleScrollToBottom(false);
         }
@@ -121,7 +121,7 @@ export function MessageList() {
       isFirstScrollToBottom,
       isGenerating,
       handleScrollToBottom,
-    ],
+    ]
   );
 
   const getItemHeight = useCallback((index: number) => {
@@ -156,7 +156,7 @@ export function MessageList() {
         isUserScrolledUpRef.current = !isNearBottomForAutoScroll;
       }
     },
-    [debouncedSetShowScrollToBottomButton],
+    [debouncedSetShowScrollToBottomButton]
   );
 
   // 当切换窗口时，重置状态
@@ -197,7 +197,7 @@ export function MessageList() {
       isRequesting,
       isGenerating,
     }),
-    [allMessages, setSize, isRequesting, isGenerating],
+    [allMessages, setSize, isRequesting, isGenerating]
   );
 
   return (

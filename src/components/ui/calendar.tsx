@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-} from "lucide-react";
-import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
+} from 'lucide-react';
+import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker';
 
-import { cn } from "@/lib/utils";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button, buttonVariants } from '@/components/ui/button';
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
-  captionLayout = "label",
-  buttonVariant = "ghost",
+  captionLayout = 'label',
+  buttonVariant = 'ghost',
   formatters,
   components,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+  buttonVariant?: React.ComponentProps<typeof Button>['variant'];
 }) {
   const defaultClassNames = getDefaultClassNames();
 
@@ -29,118 +29,118 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "group/calendar bg-background p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        'group/calendar bg-background p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
         // 移动端优化
-        "sm:p-3 p-2 sm:[--cell-size:2rem] [--cell-size:2.75rem]",
+        'p-2 [--cell-size:2.75rem] sm:p-3 sm:[--cell-size:2rem]',
         // 确保在小屏幕上有足够的空间
-        "sm:min-w-0 min-w-full",
+        'min-w-full sm:min-w-0',
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
-        className,
+        className
       )}
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString("zh-CN", { month: "long" }),
+          date.toLocaleString('zh-CN', { month: 'long' }),
         formatYearDropdown: (date) =>
-          date.toLocaleString("zh-CN", { year: "numeric" }),
+          date.toLocaleString('zh-CN', { year: 'numeric' }),
         formatWeekdayName: (date) =>
-          date.toLocaleDateString("zh-CN", { weekday: "short" }),
+          date.toLocaleDateString('zh-CN', { weekday: 'short' }),
         ...formatters,
       }}
       classNames={{
-        root: cn("w-fit sm:w-fit w-full", defaultClassNames.root),
+        root: cn('w-fit sm:w-fit w-full', defaultClassNames.root),
         months: cn(
-          "relative flex flex-col gap-4 md:flex-row",
+          'relative flex flex-col gap-4 md:flex-row',
           // 移动端间距优化
-          "sm:gap-4 gap-2",
-          defaultClassNames.months,
+          'sm:gap-4 gap-2',
+          defaultClassNames.months
         ),
         month: cn(
-          "flex w-full flex-col gap-4",
-          "sm:gap-4 gap-2",
-          defaultClassNames.month,
+          'flex w-full flex-col gap-4',
+          'sm:gap-4 gap-2',
+          defaultClassNames.month
         ),
         nav: cn(
-          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
-          defaultClassNames.nav,
+          'absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1',
+          defaultClassNames.nav
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_previous,
+          'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50',
+          defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_next,
+          'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50',
+          defaultClassNames.button_next
         ),
         month_caption: cn(
-          "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]",
-          defaultClassNames.month_caption,
+          'flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]',
+          defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          "flex h-[--cell-size] w-full items-center justify-center gap-1.5 text-sm font-medium",
-          defaultClassNames.dropdowns,
+          'flex h-[--cell-size] w-full items-center justify-center gap-1.5 text-sm font-medium',
+          defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
-          defaultClassNames.dropdown_root,
+          'has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border',
+          defaultClassNames.dropdown_root
         ),
         dropdown: cn(
-          "bg-popover absolute inset-0 opacity-0",
-          defaultClassNames.dropdown,
+          'bg-popover absolute inset-0 opacity-0',
+          defaultClassNames.dropdown
         ),
         caption_label: cn(
-          "select-none font-medium",
-          captionLayout === "label"
-            ? "text-sm"
-            : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5",
-          defaultClassNames.caption_label,
+          'select-none font-medium',
+          captionLayout === 'label'
+            ? 'text-sm'
+            : '[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5',
+          defaultClassNames.caption_label
         ),
-        table: "w-full border-collapse",
-        weekdays: cn("flex", defaultClassNames.weekdays),
+        table: 'w-full border-collapse',
+        weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn(
-          "text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal",
+          'text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal',
           // 移动端文字大小优化
-          "sm:text-[0.8rem] text-[0.75rem]",
-          defaultClassNames.weekday,
+          'sm:text-[0.8rem] text-[0.75rem]',
+          defaultClassNames.weekday
         ),
-        week: cn("mt-2 flex w-full", "sm:mt-2 mt-1", defaultClassNames.week),
+        week: cn('mt-2 flex w-full', 'sm:mt-2 mt-1', defaultClassNames.week),
         week_number_header: cn(
-          "w-[--cell-size] select-none",
-          defaultClassNames.week_number_header,
+          'w-[--cell-size] select-none',
+          defaultClassNames.week_number_header
         ),
         week_number: cn(
-          "text-muted-foreground select-none text-[0.8rem]",
-          "sm:text-[0.8rem] text-[0.75rem]",
-          defaultClassNames.week_number,
+          'text-muted-foreground select-none text-[0.8rem]',
+          'sm:text-[0.8rem] text-[0.75rem]',
+          defaultClassNames.week_number
         ),
         day: cn(
-          "group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md",
+          'group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md',
           // 移动端优化触摸目标
-          "sm:p-0 p-0.5",
-          defaultClassNames.day,
+          'sm:p-0 p-0.5',
+          defaultClassNames.day
         ),
         range_start: cn(
-          "bg-accent rounded-l-md",
-          defaultClassNames.range_start,
+          'bg-accent rounded-l-md',
+          defaultClassNames.range_start
         ),
-        range_middle: cn("rounded-none", defaultClassNames.range_middle),
-        range_end: cn("bg-accent rounded-r-md", defaultClassNames.range_end),
+        range_middle: cn('rounded-none', defaultClassNames.range_middle),
+        range_end: cn('bg-accent rounded-r-md', defaultClassNames.range_end),
         today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
-          defaultClassNames.today,
+          'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
+          defaultClassNames.today
         ),
         outside: cn(
-          "text-muted-foreground aria-selected:text-muted-foreground",
-          defaultClassNames.outside,
+          'text-muted-foreground aria-selected:text-muted-foreground',
+          defaultClassNames.outside
         ),
         disabled: cn(
-          "text-muted-foreground opacity-50",
-          defaultClassNames.disabled,
+          'text-muted-foreground opacity-50',
+          defaultClassNames.disabled
         ),
-        hidden: cn("invisible", defaultClassNames.hidden),
+        hidden: cn('invisible', defaultClassNames.hidden),
         ...classNames,
       }}
       components={{
@@ -155,23 +155,23 @@ function Calendar({
           );
         },
         Chevron: ({ className, orientation, ...props }) => {
-          if (orientation === "left") {
+          if (orientation === 'left') {
             return (
-              <ChevronLeftIcon className={cn("size-4", className)} {...props} />
+              <ChevronLeftIcon className={cn('size-4', className)} {...props} />
             );
           }
 
-          if (orientation === "right") {
+          if (orientation === 'right') {
             return (
               <ChevronRightIcon
-                className={cn("size-4", className)}
+                className={cn('size-4', className)}
                 {...props}
               />
             );
           }
 
           return (
-            <ChevronDownIcon className={cn("size-4", className)} {...props} />
+            <ChevronDownIcon className={cn('size-4', className)} {...props} />
           );
         },
         DayButton: CalendarDayButton,
@@ -220,14 +220,14 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-end=true]:bg-primary data-[range-middle=true]:bg-accent data-[range-start=true]:bg-primary data-[selected-single=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:text-accent-foreground data-[range-start=true]:text-primary-foreground data-[selected-single=true]:text-primary-foreground group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70",
+        'group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-end=true]:bg-primary data-[range-middle=true]:bg-accent data-[range-start=true]:bg-primary data-[selected-single=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:text-accent-foreground data-[range-start=true]:text-primary-foreground data-[selected-single=true]:text-primary-foreground group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70',
         // 移动端触摸优化
-        "sm:h-auto h-[--cell-size] sm:min-h-[--cell-size] min-h-[--cell-size]",
-        "sm:text-sm text-base", // 移动端增大字体
+        'h-[--cell-size] min-h-[--cell-size] sm:h-auto sm:min-h-[--cell-size]',
+        'text-base sm:text-sm', // 移动端增大字体
         // 确保触摸目标足够大
-        "touch-manipulation",
+        'touch-manipulation',
         defaultClassNames.day,
-        className,
+        className
       )}
       {...props}
     />

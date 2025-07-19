@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { memo, useMemo, CSSProperties } from "react";
-import { Button } from "@/components/ui/button";
-import { MessageCirclePlus } from "lucide-react";
-import { PanelLeftClose } from "lucide-react";
-import { Conversation } from "@/types/ai-assistant";
-import dayjs from "dayjs";
-import { ConversationItem } from "./conversationItem";
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { cn } from "@/lib";
+import React, { memo, useMemo, CSSProperties } from 'react';
+import { Button } from '@/components/ui/button';
+import { MessageCirclePlus } from 'lucide-react';
+import { PanelLeftClose } from 'lucide-react';
+import { Conversation } from '@/types/ai-assistant';
+import dayjs from 'dayjs';
+import { ConversationItem } from './conversationItem';
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { cn } from '@/lib';
 
 // Define types for itemData
 interface ConversationRowData {
@@ -56,9 +56,9 @@ const ConversationRow = memo(
         />
       </div>
     );
-  },
+  }
 );
-ConversationRow.displayName = "ConversationRow";
+ConversationRow.displayName = 'ConversationRow';
 
 export const ConversationContent = memo(
   ({
@@ -113,7 +113,7 @@ export const ConversationContent = memo(
         activeConversationId,
         onSelect,
         onDelete,
-      ],
+      ]
     );
 
     return (
@@ -130,7 +130,7 @@ export const ConversationContent = memo(
               size="icon"
               onClick={() => changeDesktopSidebarOpen(!desktopSidebarOpen)}
               title="收起侧边栏"
-              className={cn(desktopSidebarOpen ? "flex" : "hidden")}
+              className={cn(desktopSidebarOpen ? 'flex' : 'hidden')}
             >
               <PanelLeftClose />
             </Button>
@@ -165,7 +165,7 @@ export const ConversationContent = memo(
         </div>
       </div>
     );
-  },
+  }
 );
 
-ConversationContent.displayName = "ConversationContent";
+ConversationContent.displayName = 'ConversationContent';

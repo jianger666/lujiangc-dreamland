@@ -1,5 +1,5 @@
-import type { ChatCompletionChunk } from "openai/resources";
-import { AiStreamChunkTypeEnum } from "@/types/ai-assistant";
+import type { ChatCompletionChunk } from 'openai/resources';
+import { AiStreamChunkTypeEnum } from '@/types/ai-assistant';
 
 /**
  * 将数据编码为SSE格式
@@ -15,17 +15,17 @@ export function encodeSSEMessage(type: AiStreamChunkTypeEnum, message: string) {
  */
 async function generateErrorMessage(
   controller: ReadableStreamDefaultController,
-  errorMessage: string,
+  errorMessage: string
 ) {
   controller.enqueue(
     encodeSSEMessage(
       AiStreamChunkTypeEnum.Text,
-      "抱歉，我暂时无法处理你的问题：\n" + errorMessage,
-    ),
+      '抱歉，我暂时无法处理你的问题：\n' + errorMessage
+    )
   );
   // 发送完成标记
   const encoder = new TextEncoder();
-  controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+  controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 }
 
 /**
@@ -34,7 +34,7 @@ async function generateErrorMessage(
  */
 export async function formatStreamError(
   controller: ReadableStreamDefaultController,
-  errorMessage: string,
+  errorMessage: string
 ) {
   // 使用共享函数生成三段式错误消息
   await generateErrorMessage(controller, errorMessage);
@@ -60,9 +60,9 @@ export function createStreamErrorResponse(errorMessage: string): Response {
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
     },
   });
 }
@@ -85,82 +85,82 @@ export async function handleStreamResponse({
   try {
     // 处理流式响应
     for await (const chunk of response) {
-      const content = chunk.choices[0]?.delta?.content || "";
+      const content = chunk.choices[0]?.delta?.content || '';
       // 获取推理内容（如果存在）
       const reasoning =
         ((chunk.choices[0]?.delta as Record<string, unknown>)
-          ?.reasoning as string) || "";
+          ?.reasoning as string) || '';
       const trimmedContent = content.trim();
 
       // 处理reasoning属性（某些模型专有）
       if (reasoning) {
-        let processedReasoning = reasoning.replace(/\\n/g, "\n");
+        let processedReasoning = reasoning.replace(/\\n/g, '\n');
 
         if (isFirstThinkBlock && processedReasoning) {
-          processedReasoning = processedReasoning.replace(/^[\n\r]+/, "");
+          processedReasoning = processedReasoning.replace(/^[\n\r]+/, '');
           isFirstThinkBlock = false;
         }
 
         controller.enqueue(
-          encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedReasoning),
+          encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedReasoning)
         );
         continue;
       }
 
       // 处理<think>标签
-      if (trimmedContent === "<think>") {
+      if (trimmedContent === '<think>') {
         isThinkMode = true;
         continue;
       }
 
-      if (trimmedContent === "</think>") {
+      if (trimmedContent === '</think>') {
         isThinkMode = false;
         continue;
       }
 
       // 有实际内容时进行处理
       if (content) {
-        let processedContent = content.replace(/\\n/g, "\n");
+        let processedContent = content.replace(/\\n/g, '\n');
 
         if (isThinkMode) {
           // 处理思考内容
           if (isFirstThinkBlock && processedContent) {
-            processedContent = processedContent.replace(/^[\n\r]+/, "");
+            processedContent = processedContent.replace(/^[\n\r]+/, '');
             isFirstThinkBlock = false;
           }
 
           controller.enqueue(
-            encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedContent),
+            encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedContent)
           );
         } else {
           if (isFirstTextBlock && processedContent) {
-            processedContent = processedContent.replace(/^[\n\r]+/, "");
+            processedContent = processedContent.replace(/^[\n\r]+/, '');
             isFirstTextBlock = false;
           }
 
           controller.enqueue(
-            encodeSSEMessage(AiStreamChunkTypeEnum.Text, processedContent),
+            encodeSSEMessage(AiStreamChunkTypeEnum.Text, processedContent)
           );
         }
       }
     }
 
     // 发送完成标记
-    controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+    controller.enqueue(encoder.encode('data: [DONE]\n\n'));
     controller.close();
   } catch (error) {
-    console.error("流处理错误:", error);
+    console.error('流处理错误:', error);
 
     // 处理错误，将错误信息以三段式格式发送给前端
     try {
       // 获取错误消息
-      const errorMessage = (error as Error).message ?? "处理AI响应时发生错误。";
+      const errorMessage = (error as Error).message ?? '处理AI响应时发生错误。';
 
       // 使用格式化函数发送三段式错误
       await formatStreamError(controller, errorMessage);
     } catch (formatError) {
       // 如果格式化错误消息时出错，记录并最终调用error
-      console.error("格式化错误消息时出错:", formatError);
+      console.error('格式化错误消息时出错:', formatError);
       controller.error(error);
     }
   }

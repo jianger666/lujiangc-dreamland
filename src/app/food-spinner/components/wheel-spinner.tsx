@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Restaurant } from "../types";
-import { Utensils, Frown, Store } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Wheel } from "react-custom-roulette";
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Restaurant } from '../types';
+import { Utensils, Frown, Store } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Wheel } from 'react-custom-roulette';
 
 // 创建触发confetti效果的函数
 function triggerConfetti() {
   // 仅在客户端环境执行
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     // 动态导入confetti
-    import("react-canvas-confetti").then((confetti) => {
+    import('react-canvas-confetti').then((confetti) => {
       confetti.default({
         particleCount: 100,
         spread: 70,
@@ -33,16 +33,16 @@ interface WheelSpinnerProps {
 // 生成转盘的分段颜色（循环使用）
 const generateSegmentColors = (count: number): string[] => {
   const baseColors = [
-    "#F94144",
-    "#F3722C",
-    "#F8961E",
-    "#F9C74F",
-    "#90BE6D",
-    "#43AA8B",
-    "#577590",
-    "#277DA1",
-    "#9D4EDD",
-    "#C77DFF",
+    '#F94144',
+    '#F3722C',
+    '#F8961E',
+    '#F9C74F',
+    '#90BE6D',
+    '#43AA8B',
+    '#577590',
+    '#277DA1',
+    '#9D4EDD',
+    '#C77DFF',
   ];
 
   if (count <= baseColors.length) {
@@ -60,12 +60,12 @@ const generateSegmentColors = (count: number): string[] => {
 // 截断长餐厅名称
 const truncateText = (text: string, maxLength: number = 8): string => {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + "...";
+  return text.slice(0, maxLength) + '...';
 };
 
 // 检查图片URL是否有效
 const isValidImageUrl = (url?: string) => {
-  return url && (url.startsWith("http://") || url.startsWith("https://"));
+  return url && (url.startsWith('http://') || url.startsWith('https://'));
 };
 
 export function WheelSpinner({
@@ -80,7 +80,7 @@ export function WheelSpinner({
   const [colors, setColors] = useState<string[]>([]);
   const [error, setError] = useState(false);
   const [previousRestaurants, setPreviousRestaurants] = useState<Restaurant[]>(
-    [],
+    []
   );
 
   // 根据餐厅列表生成轮盘数据
@@ -132,7 +132,7 @@ export function WheelSpinner({
   // 图片加载错误处理
   const handleImageError = () => {
     setError(true);
-    console.log("图片加载失败");
+    console.log('图片加载失败');
   };
 
   // 决定显示什么内容
@@ -147,7 +147,7 @@ export function WheelSpinner({
               prizeNumber={prizeNumber}
               data={wheelData}
               backgroundColors={colors}
-              textColors={Array(wheelData.length).fill("#ffffff")}
+              textColors={Array(wheelData.length).fill('#ffffff')}
               outerBorderColor="#f3799e"
               outerBorderWidth={2}
               innerRadius={30}
@@ -171,7 +171,7 @@ export function WheelSpinner({
             className="mt-4"
             size="lg"
           >
-            {mustSpin ? "转盘旋转中..." : "开始转动"}
+            {mustSpin ? '转盘旋转中...' : '开始转动'}
           </Button>
 
           {winner && (
@@ -206,7 +206,7 @@ export function WheelSpinner({
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     距离: {(winner.distance / 1000).toFixed(1)}公里 · 人均: ¥
-                    {winner.price || "未知"}
+                    {winner.price || '未知'}
                   </p>
                   <p className="mt-2 border-t border-muted pt-2 text-sm text-muted-foreground">
                     地址: {winner.address}

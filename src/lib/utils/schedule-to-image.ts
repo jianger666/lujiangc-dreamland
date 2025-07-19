@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import html2canvas from "html2canvas";
-import { saveAs } from "file-saver";
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 
 /**
  * 将HTML元素转换为图片并下载
@@ -11,20 +11,20 @@ import { saveAs } from "file-saver";
  */
 export async function downloadImageFromHTML(
   element: HTMLElement,
-  filename: string = "marathon-schedule.png",
+  filename: string = 'marathon-schedule.png',
   options: {
     scale?: number;
     width?: number;
     height?: number;
     backgroundColor?: string;
-  } = {},
+  } = {}
 ): Promise<void> {
   try {
-    console.log("开始生成图片...");
+    console.log('开始生成图片...');
 
     const canvas = await html2canvas(element, {
       scale: options.scale || 2, // 高分辨率
-      backgroundColor: options.backgroundColor || "#ffffff",
+      backgroundColor: options.backgroundColor || '#ffffff',
       useCORS: true,
       allowTaint: true,
       width: options.width,
@@ -40,19 +40,19 @@ export async function downloadImageFromHTML(
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            console.log("图片生成成功，开始下载");
+            console.log('图片生成成功，开始下载');
             saveAs(blob, filename);
             resolve();
           } else {
-            reject(new Error("无法生成图片blob"));
+            reject(new Error('无法生成图片blob'));
           }
         },
-        "image/png",
-        1.0,
+        'image/png',
+        1.0
       );
     });
   } catch (error) {
-    console.error("下载图片失败:", error);
+    console.error('下载图片失败:', error);
     throw error;
   }
 }
@@ -69,19 +69,19 @@ export async function copyImageFromHTML(
     width?: number;
     height?: number;
     backgroundColor?: string;
-  } = {},
+  } = {}
 ): Promise<void> {
   try {
-    console.log("开始复制图片到剪贴板...");
+    console.log('开始复制图片到剪贴板...');
 
     // 检查浏览器是否支持剪贴板API
     if (!navigator.clipboard) {
-      throw new Error("浏览器不支持剪贴板功能");
+      throw new Error('浏览器不支持剪贴板功能');
     }
 
     const canvas = await html2canvas(element, {
       scale: options.scale || 2,
-      backgroundColor: options.backgroundColor || "#ffffff",
+      backgroundColor: options.backgroundColor || '#ffffff',
       useCORS: true,
       allowTaint: true,
       width: options.width,
@@ -98,25 +98,25 @@ export async function copyImageFromHTML(
           if (blob) {
             try {
               const clipboardItem = new ClipboardItem({
-                "image/png": blob,
+                'image/png': blob,
               });
               await navigator.clipboard.write([clipboardItem]);
-              console.log("图片复制到剪贴板成功");
+              console.log('图片复制到剪贴板成功');
               resolve();
             } catch (clipboardError) {
-              console.error("写入剪贴板失败:", clipboardError);
-              reject(new Error("写入剪贴板失败"));
+              console.error('写入剪贴板失败:', clipboardError);
+              reject(new Error('写入剪贴板失败'));
             }
           } else {
-            reject(new Error("无法生成图片blob"));
+            reject(new Error('无法生成图片blob'));
           }
         },
-        "image/png",
-        1.0,
+        'image/png',
+        1.0
       );
     });
   } catch (error) {
-    console.error("复制图片失败:", error);
+    console.error('复制图片失败:', error);
     throw error;
   }
 }
@@ -135,7 +135,7 @@ export function isClipboardSupported(): boolean {
  */
 export function getOptimalDimensions(
   element: HTMLElement,
-  maxWidth: number = 1200,
+  maxWidth: number = 1200
 ): { width: number; height: number } {
   const rect = element.getBoundingClientRect();
   const scale = Math.min(1, maxWidth / rect.width);

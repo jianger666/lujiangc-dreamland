@@ -1,4 +1,4 @@
-import { FoodSpinnerClientWrapper } from "./client-wrapper";
+import { FoodSpinnerClientWrapper } from './client-wrapper';
 
 export default function FoodSpinnerPage() {
   return (

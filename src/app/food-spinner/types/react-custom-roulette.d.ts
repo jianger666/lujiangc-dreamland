@@ -1,4 +1,4 @@
-declare module "react-custom-roulette" {
+declare module 'react-custom-roulette' {
   export interface RouletteData {
     option: string;
     style?: {

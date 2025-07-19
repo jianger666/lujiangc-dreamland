@@ -1,7 +1,7 @@
 export enum AiRoleEnum {
-  User = "user",
-  Assistant = "assistant",
-  System = "system",
+  User = 'user',
+  Assistant = 'assistant',
+  System = 'system',
 }
 
 export interface Message {
@@ -52,16 +52,16 @@ export interface ChatCompletionRequest {
  * 流式数据块类型
  */
 export enum AiStreamChunkTypeEnum {
-  Text = "text",
-  Think = "think",
+  Text = 'text',
+  Think = 'think',
 }
 
 export enum AIProviderEnum {
-  OPEN_ROUTER = "OPEN_ROUTER",
-  GOOGLE = "GOOGLE",
-  ZHIPU = "ZHIPU",
-  FREE_CHAT_GPT = "FREE_CHAT_GPT",
-  CURSOR_PROXY = "CURSOR_PROXY",
+  OPEN_ROUTER = 'OPEN_ROUTER',
+  GOOGLE = 'GOOGLE',
+  ZHIPU = 'ZHIPU',
+  FREE_CHAT_GPT = 'FREE_CHAT_GPT',
+  CURSOR_PROXY = 'CURSOR_PROXY',
 }
 export interface ProviderConfig {
   baseURL: string;
@@ -69,14 +69,14 @@ export interface ProviderConfig {
 }
 
 export enum AIModelEnum {
-  DeepSeekV30324 = "DeepSeekV30324",
-  DeepSeekR1 = "DeepSeekR1",
-  Default = "Default",
-  Gp4oMini = "Gp4oMini",
+  DeepSeekV30324 = 'DeepSeekV30324',
+  DeepSeekR1 = 'DeepSeekR1',
+  Default = 'Default',
+  Gp4oMini = 'Gp4oMini',
   // 不是模型名称，专门用于对话内容生成标题的模型一类
-  TitleGenerator = "TitleGenerator",
+  TitleGenerator = 'TitleGenerator',
   // 不是模型名称，专门用于图像理解的模型一类
-  ImageReader = "ImageReader",
+  ImageReader = 'ImageReader',
 }
 
 export interface ModelConfig {

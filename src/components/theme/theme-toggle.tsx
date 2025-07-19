@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
@@ -20,14 +20,14 @@ export function ThemeToggle() {
 
   return (
     <Button
-      title={theme === "dark" ? "切换至亮色模式" : "切换至暗色模式"}
+      title={theme === 'dark' ? '切换至亮色模式' : '切换至暗色模式'}
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       className="h-10 w-10 rounded-full"
-      aria-label={theme === "dark" ? "切换至亮色模式" : "切换至暗色模式"}
+      aria-label={theme === 'dark' ? '切换至亮色模式' : '切换至暗色模式'}
     >
-      {theme === "dark" ? (
+      {theme === 'dark' ? (
         <Sun className="h-[1.2rem] w-[1.2rem] text-yellow-300" />
       ) : (
         <Moon className="h-[1.2rem] w-[1.2rem] text-primary" />

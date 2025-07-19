@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const zlib = require("zlib");
-const crypto = require("crypto");
-const { v4: uuidv4 } = require("uuid");
-const $root = require("../proto/message.js");
+const zlib = require('zlib');
+const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
+const $root = require('../proto/message.js');
 
 function generateCursorBody(messages, modelName) {
   const instruction = messages
-    .filter((msg) => msg.role === "system")
+    .filter((msg) => msg.role === 'system')
     .map((msg) => msg.content)
-    .join("\n");
+    .join('\n');
 
   const formattedMessages = messages
-    .filter((msg) => msg.role !== "system")
+    .filter((msg) => msg.role !== 'system')
     .map((msg) => ({
       content: msg.content,
-      role: msg.role === "user" ? 1 : 2,
+      role: msg.role === 'user' ? 1 : 2,
       messageId: uuidv4(),
-      ...(msg.role === "user" ? { chatModeEnum: 1 } : {}),
+      ...(msg.role === 'user' ? { chatModeEnum: 1 } : {}),
       //...(msg.role !== 'user' ? { summaryId: uuidv4() } : {})
     }));
 
@@ -35,16 +35,16 @@ function generateCursorBody(messages, modelName) {
       unknown4: 1,
       model: {
         name: modelName,
-        empty: "",
+        empty: '',
       },
-      webTool: "",
+      webTool: '',
       unknown13: 1,
       cursorSetting: {
-        name: "cursor\\aisettings",
-        unknown3: "",
+        name: 'cursor\\aisettings',
+        unknown3: '',
         unknown6: {
-          unknwon1: "",
-          unknown2: "",
+          unknwon1: '',
+          unknown2: '',
         },
         unknown8: 1,
         unknown9: 1,
@@ -53,10 +53,10 @@ function generateCursorBody(messages, modelName) {
       //unknown22: 1,
       conversationId: uuidv4(),
       metadata: {
-        os: "win32",
-        arch: "x64",
-        version: "10.0.22631",
-        path: "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        os: 'win32',
+        arch: 'x64',
+        version: '10.0.22631',
+        path: 'C:\\Program Files\\PowerShell\\7\\pwsh.exe',
         timestamp: new Date().toISOString(),
       },
       unknown27: 0,
@@ -65,12 +65,12 @@ function generateCursorBody(messages, modelName) {
       largeContext: 0,
       unknown38: 0,
       chatModeEnum: 1,
-      unknown47: "",
+      unknown47: '',
       unknown48: 0,
       unknown49: 0,
       unknown51: 0,
       unknown53: 1,
-      chatMode: "Ask",
+      chatMode: 'Ask',
     },
   };
 
@@ -87,7 +87,7 @@ function generateCursorBody(messages, modelName) {
 
   const finalBody = Buffer.concat([
     Buffer.from([magicNumber]),
-    Buffer.from(buffer.length.toString(16).padStart(8, "0"), "hex"),
+    Buffer.from(buffer.length.toString(16).padStart(8, '0'), 'hex'),
     buffer,
   ]);
 
@@ -97,18 +97,18 @@ function generateCursorBody(messages, modelName) {
 function chunkToUtf8String(chunk) {
   const thinkingOutput = [];
   const textOutput = [];
-  const buffer = Buffer.from(chunk, "hex");
+  const buffer = Buffer.from(chunk, 'hex');
   //console.log("Chunk buffer:", buffer.toString('hex'))
 
   try {
     for (let i = 0; i < buffer.length; i++) {
       const magicNumber = parseInt(
-        buffer.subarray(i, i + 1).toString("hex"),
-        16,
+        buffer.subarray(i, i + 1).toString('hex'),
+        16
       );
       const dataLength = parseInt(
-        buffer.subarray(i + 1, i + 5).toString("hex"),
-        16,
+        buffer.subarray(i + 1, i + 5).toString('hex'),
+        16
       );
       const data = buffer.subarray(i + 5, i + 5 + dataLength);
       //console.log("Parsed buffer:", magicNumber, dataLength, data.toString('hex'))
@@ -132,12 +132,12 @@ function chunkToUtf8String(chunk) {
       } else if (magicNumber == 2 || magicNumber == 3) {
         // Json message
         const gunzipData = magicNumber == 2 ? data : zlib.gunzipSync(data);
-        const utf8 = gunzipData.toString("utf-8");
+        const utf8 = gunzipData.toString('utf-8');
         const message = JSON.parse(utf8);
 
         if (
           message != null &&
-          (typeof message !== "object" ||
+          (typeof message !== 'object' ||
             (Array.isArray(message)
               ? message.length > 0
               : Object.keys(message).length > 0))
@@ -152,19 +152,19 @@ function chunkToUtf8String(chunk) {
       i += 5 + dataLength - 1;
     }
   } catch (err) {
-    console.log("Error parsing chunk response:", err);
+    console.log('Error parsing chunk response:', err);
   }
 
   return {
-    thinking: thinkingOutput.join(""),
-    text: textOutput.join(""),
+    thinking: thinkingOutput.join(''),
+    text: textOutput.join(''),
   };
 }
 
-function generateHashed64Hex(input, salt = "") {
-  const hash = crypto.createHash("sha256");
+function generateHashed64Hex(input, salt = '') {
+  const hash = crypto.createHash('sha256');
   hash.update(input + salt);
-  return hash.digest("hex");
+  return hash.digest('hex');
 }
 
 function obfuscateBytes(byteArray) {
@@ -177,8 +177,8 @@ function obfuscateBytes(byteArray) {
 }
 
 function generateCursorChecksum(token) {
-  const machineId = generateHashed64Hex(token, "machineId");
-  const macMachineId = generateHashed64Hex(token, "macMachineId");
+  const machineId = generateHashed64Hex(token, 'machineId');
+  const macMachineId = generateHashed64Hex(token, 'macMachineId');
 
   const timestamp = Math.floor(Date.now() / 1e6);
   const byteArray = new Uint8Array([
@@ -191,7 +191,7 @@ function generateCursorChecksum(token) {
   ]);
 
   const obfuscatedBytes = obfuscateBytes(byteArray);
-  const encodedChecksum = Buffer.from(obfuscatedBytes).toString("base64");
+  const encodedChecksum = Buffer.from(obfuscatedBytes).toString('base64');
 
   return `${encodedChecksum}${machineId}/${macMachineId}`;
 }

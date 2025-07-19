@@ -1,10 +1,10 @@
-import React, { useRef, useEffect, memo } from "react";
-import { cn } from "@/lib/utils";
-import { AiRoleEnum, Message, StreamingMessage } from "@/types/ai-assistant";
-import { Loading } from "@/components/ui/loading";
-import { ThinkingBlock } from "./ThinkingBlock";
-import { MessageContent } from "./MessageContent";
-import { CopyButton } from "./CopyButton";
+import React, { useRef, useEffect, memo } from 'react';
+import { cn } from '@/lib/utils';
+import { AiRoleEnum, Message, StreamingMessage } from '@/types/ai-assistant';
+import { Loading } from '@/components/ui/loading';
+import { ThinkingBlock } from './ThinkingBlock';
+import { MessageContent } from './MessageContent';
+import { CopyButton } from './CopyButton';
 
 // 单个消息组件 - 用于虚拟列表
 const MessageItemComponent = ({
@@ -51,14 +51,14 @@ const MessageItemComponent = ({
               {thinking && <ThinkingBlock content={thinking} />}
               <div
                 className={cn(
-                  "group flex",
-                  role === AiRoleEnum.User ? "justify-end" : "justify-start",
+                  'group flex',
+                  role === AiRoleEnum.User ? 'justify-end' : 'justify-start'
                 )}
               >
                 <div
                   className={cn(
-                    "relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]",
-                    role === AiRoleEnum.User ? "bg-accent" : "bg-card",
+                    'relative max-w-[85%] rounded-lg px-4 py-2 text-sm md:max-w-[70%] xl:max-w-[800px]',
+                    role === AiRoleEnum.User ? 'bg-accent' : 'bg-card'
                   )}
                 >
                   {/* 显示图片 */}
@@ -98,14 +98,14 @@ const MessageItemComponent = ({
                   {/* 复制按钮 */}
                   <div
                     className={cn(
-                      "absolute top-1 transition-opacity group-hover:opacity-100",
-                      "opacity-0", // 初始隐藏
-                      role === AiRoleEnum.User ? "-left-10" : "-right-10",
-                      "flex items-center",
+                      'absolute top-1 transition-opacity group-hover:opacity-100',
+                      'opacity-0', // 初始隐藏
+                      role === AiRoleEnum.User ? '-left-10' : '-right-10',
+                      'flex items-center'
                     )}
                   >
                     <CopyButton
-                      textToCopy={message?.content || ""}
+                      textToCopy={message?.content || ''}
                       title="复制消息"
                     />
                   </div>

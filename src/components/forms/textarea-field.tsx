@@ -1,5 +1,5 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 import {
   FormField,
   FormItem,
@@ -7,15 +7,15 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 interface TextareaFieldProps {
   name: string;
@@ -41,7 +41,7 @@ export function TextareaField({
   tooltip,
 }: TextareaFieldProps) {
   const { control, watch } = useFormContext();
-  const fieldValue = watch(name) || "";
+  const fieldValue = watch(name) || '';
 
   return (
     <FormField
@@ -75,7 +75,7 @@ export function TextareaField({
                 rows={rows}
                 maxLength={maxLength}
                 disabled={disabled}
-                className={cn(maxLength && "pr-16", className)}
+                className={cn(maxLength && 'pr-16', className)}
               />
               {maxLength && (
                 <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">

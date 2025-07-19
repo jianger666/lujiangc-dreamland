@@ -1,4 +1,4 @@
-declare module "react-canvas-confetti" {
+declare module 'react-canvas-confetti' {
   interface ConfettiOptions {
     particleCount?: number;
     angle?: number;

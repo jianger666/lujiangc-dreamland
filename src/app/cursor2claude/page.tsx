@@ -1,10 +1,10 @@
-import { Metadata } from "next";
-import { MarkdownRenderer } from "./components/MarkdownRenderer";
+import { Metadata } from 'next';
+import { MarkdownRenderer } from './components/MarkdownRenderer';
 
 export const metadata: Metadata = {
-  title: "Cursor to Claude Code 使用指南",
+  title: 'Cursor to Claude Code 使用指南',
   description:
-    "学习如何使用我们的API接口来配置Claude Code，实现免费使用Claude Code的效果",
+    '学习如何使用我们的API接口来配置Claude Code，实现免费使用Claude Code的效果',
 };
 
 const markdownContent = `# Cursor to Claude Code 使用指南

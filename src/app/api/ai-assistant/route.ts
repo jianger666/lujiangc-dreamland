@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
+import { NextRequest } from 'next/server';
 // OpenAI import removed as it's no longer directly used here
 import type {
   ChatCompletionChunk,
   ChatCompletionCreateParams,
-} from "openai/resources";
+} from 'openai/resources';
 
 import {
   handleStreamResponse,
@@ -11,14 +11,14 @@ import {
   createStreamErrorResponse,
   tryChatCompletionWithFailover,
   createSearchResultsPrompt,
-} from "./_utils";
-import { apiHandler } from "@/lib/api/handler";
-import { createStreamResponse } from "@/lib/api/response";
-import { AIModelEnum, AiRoleEnum, Message } from "@/types/ai-assistant";
-import { generateUUID } from "@/lib";
-import { getClientConfigForModel } from "./_config";
+} from './_utils';
+import { apiHandler } from '@/lib/api/handler';
+import { createStreamResponse } from '@/lib/api/response';
+import { AIModelEnum, AiRoleEnum, Message } from '@/types/ai-assistant';
+import { generateUUID } from '@/lib';
+import { getClientConfigForModel } from './_config';
 
-export const runtime = "edge";
+export const runtime = 'edge';
 
 /**
  * 统一处理错误并返回流式错误响应
@@ -31,7 +31,7 @@ function handleStreamError(error: unknown, context: string): Response {
   let errorMessage: string;
 
   if (error instanceof Error) errorMessage = error.message;
-  else if (typeof error === "string") errorMessage = error;
+  else if (typeof error === 'string') errorMessage = error;
   else errorMessage = `${context}时出错`;
 
   return createStreamErrorResponse(errorMessage);
@@ -49,12 +49,12 @@ function doesModelSupportImages(modelEnum: AIModelEnum): boolean {
   // 检查模型实例中是否有支持图片的模型
   const imageReaderInstances = getClientConfigForModel(AIModelEnum.ImageReader);
   const imageReaderModelIds = imageReaderInstances.map(
-    (instance) => instance.modelId,
+    (instance) => instance.modelId
   );
 
   // 检查选定模型的实例是否与ImageReader的实例有重叠
   return modelConfig.some((config) =>
-    imageReaderModelIds.includes(config.modelId),
+    imageReaderModelIds.includes(config.modelId)
   );
 }
 
@@ -67,11 +67,11 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
 
   // 没有selectedModel或者selectedModel不是AIModelEnum的成员
   if (!selectedModel || !Object.values(AIModelEnum).includes(selectedModel)) {
-    return handleStreamError("没有提供有效的模型", "参数验证");
+    return handleStreamError('没有提供有效的模型', '参数验证');
   }
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    return handleStreamError("没有提供有效的消息", "参数验证");
+    return handleStreamError('没有提供有效的消息', '参数验证');
   }
 
   // 准备发送给 AI 的消息数组
@@ -81,14 +81,14 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
   let modelToUse = selectedModel as AIModelEnum;
 
   if (imageDatas && imageDatas.length > 0) {
-    console.log("[API Route] 接收到图片数据，数量:", imageDatas.length);
+    console.log('[API Route] 接收到图片数据，数量:', imageDatas.length);
 
     // 检查当前选择的模型是否支持图片
     const modelSupportsImages = doesModelSupportImages(modelToUse);
 
     // 如果当前模型不支持图片，则切换到ImageReader
     if (!modelSupportsImages) {
-      console.log("[API Route] 当前模型不支持图片，切换到ImageReader");
+      console.log('[API Route] 当前模型不支持图片，切换到ImageReader');
       modelToUse = AIModelEnum.ImageReader;
     }
 
@@ -98,7 +98,7 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
       if (lastMessage && lastMessage.role === AiRoleEnum.User) {
         // 添加系统消息告知AI有图片
         const imageText =
-          imageDatas.length === 1 ? "一张图片" : `${imageDatas.length}张图片`;
+          imageDatas.length === 1 ? '一张图片' : `${imageDatas.length}张图片`;
         messagesForAI.splice(messagesForAI.length - 1, 0, {
           id: generateUUID(),
           role: AiRoleEnum.System,
@@ -111,7 +111,7 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
   // 如果启用了 Web 搜索
   if (isWebSearchEnabled) {
     const userQuery = messages[messages.length - 1]?.content;
-    if (typeof userQuery === "string" && userQuery.trim()) {
+    if (typeof userQuery === 'string' && userQuery.trim()) {
       try {
         const searchResults = await performWebSearch(userQuery);
         if (searchResults && searchResults.length > 0) {
@@ -120,9 +120,9 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
             // .slice(0, 3) // 移除数量限制
             .map(
               (r, i) =>
-                `[RESULT ${i + 1}]\nTitle: ${r.title}\nLink: ${r.link}\nSnippet: ${r.snippet}`,
+                `[RESULT ${i + 1}]\nTitle: ${r.title}\nLink: ${r.link}\nSnippet: ${r.snippet}`
             )
-            .join("\n\n");
+            .join('\n\n');
 
           // 使用导入的函数生成提示词
           const searchResultsText = createSearchResultsPrompt({
@@ -136,17 +136,17 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
             content: searchResultsText,
           });
         } else {
-          console.log("[API Route] Web search returned no usable results.");
+          console.log('[API Route] Web search returned no usable results.');
         }
       } catch (searchError) {
         // 捕获搜索错误但不中断整个请求流程
-        console.error("[API Route] Web search failed:", searchError);
+        console.error('[API Route] Web search failed:', searchError);
 
         // 可选：通知用户搜索失败，但继续处理请求
         const searchErrorMessage =
-          "Web search failed, proceeding with AI response using available context.";
+          'Web search failed, proceeding with AI response using available context.';
         messagesForAI.splice(messagesForAI.length - 1, 0, {
-          id: "system-search-error-" + Date.now(),
+          id: 'system-search-error-' + Date.now(),
           role: AiRoleEnum.System,
           content: searchErrorMessage,
         });
@@ -156,8 +156,8 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
 
   try {
     // 准备基础请求选项
-    const baseRequestOptions: Omit<ChatCompletionCreateParams, "model"> = {
-      messages: messagesForAI as ChatCompletionCreateParams["messages"],
+    const baseRequestOptions: Omit<ChatCompletionCreateParams, 'model'> = {
+      messages: messagesForAI as ChatCompletionCreateParams['messages'],
       stream: true,
     };
 
@@ -176,9 +176,9 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
       ) {
         // 修改传递格式使其符合OpenAI multimodal API的格式，支持多张图片
         const content = [
-          { type: "text", text: messagesForAI[lastMessageIndex].content },
+          { type: 'text', text: messagesForAI[lastMessageIndex].content },
           ...imageDatas.map((imageData: string) => ({
-            type: "image_url",
+            type: 'image_url',
             image_url: { url: imageData },
           })),
         ];
@@ -190,7 +190,7 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     // 调用带故障转移的请求函数，传递 modelToUse
     const response = (await tryChatCompletionWithFailover(
       modelToUse, // 使用可能已切换的模型
-      baseRequestOptions,
+      baseRequestOptions
     )) as AsyncIterable<ChatCompletionChunk>; // 明确类型为流式
 
     // 创建流处理管道
@@ -207,7 +207,7 @@ const handleAiRequest = apiHandler(async (req: NextRequest) => {
     return createStreamResponse(stream);
   } catch (error) {
     // 如果 tryChatCompletionWithFailover 抛出错误（所有尝试均失败）
-    return handleStreamError(error, "调用AI服务（所有实例均失败）");
+    return handleStreamError(error, '调用AI服务（所有实例均失败）');
   }
 });
 

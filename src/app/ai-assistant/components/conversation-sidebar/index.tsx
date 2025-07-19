@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { memo, useCallback } from "react";
-import { useAIAssistant } from "../../hooks";
-import { useBreakpoint } from "@/hooks/use-breakpoint";
+import React, { memo, useCallback } from 'react';
+import { useAIAssistant } from '../../hooks';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { ConversationContent } from "./conversationContent";
+} from '@/components/ui/sheet';
+import { ConversationContent } from './conversationContent';
 
 export const ConversationSidebar = memo(() => {
   const {
@@ -25,21 +25,21 @@ export const ConversationSidebar = memo(() => {
     changeDesktopSidebarOpen,
   } = useAIAssistant();
 
-  const isDesktop = useBreakpoint("md");
+  const isDesktop = useBreakpoint('md');
 
   const handleSelectConversation = useCallback(
     (conversationId: string) => {
       setActiveConversationId(conversationId);
       if (!isDesktop) changeMobileSidebarOpen(false);
     },
-    [isDesktop, setActiveConversationId, changeMobileSidebarOpen],
+    [isDesktop, setActiveConversationId, changeMobileSidebarOpen]
   );
 
   const handleDeleteConversation = useCallback(
     (id: string) => {
       deleteConversation(id);
     },
-    [deleteConversation],
+    [deleteConversation]
   );
 
   const handleAddNewConversation = useCallback(() => {
@@ -65,7 +65,7 @@ export const ConversationSidebar = memo(() => {
       {isDesktop ? (
         <div
           className={`flex h-full flex-shrink-0 flex-col border-r border-border bg-background transition-all duration-300 ease-in-out ${
-            desktopSidebarOpen ? "w-64" : "w-0"
+            desktopSidebarOpen ? 'w-64' : 'w-0'
           }`}
         >
           <div className="flex-1 overflow-hidden">{Content}</div>
@@ -92,4 +92,4 @@ export const ConversationSidebar = memo(() => {
   );
 });
 
-ConversationSidebar.displayName = "ConversationSidebar";
+ConversationSidebar.displayName = 'ConversationSidebar';

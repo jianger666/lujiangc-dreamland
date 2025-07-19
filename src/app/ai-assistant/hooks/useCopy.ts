@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 
 /**
  * 复制文本到剪贴板的自定义Hook
@@ -17,7 +17,7 @@ export function useCopy(timeout = 2000) {
       const timer = setTimeout(() => setCopied(false), timeout);
       return () => clearTimeout(timer);
     },
-    [timeout],
+    [timeout]
   );
 
   return { copied, copyToClipboard };

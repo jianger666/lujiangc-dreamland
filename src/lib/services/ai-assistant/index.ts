@@ -1,4 +1,4 @@
-import httpClient from "@/lib/api/http";
+import httpClient from '@/lib/api/http';
 
 /**
  * 根据对话内容自动生成标题
@@ -7,13 +7,13 @@ import httpClient from "@/lib/api/http";
  */
 export const generateTitle = async (userMessage: string) => {
   return httpClient.post<string>(
-    "/api/ai-assistant/generate-title",
+    '/api/ai-assistant/generate-title',
     {
       userMessage,
     },
-    { skipErrorHandler: true },
+    { skipErrorHandler: true }
   );
 };
 
 // 导出马拉松计划制定相关服务
-export * from "./marathon-planner";
+export * from './marathon-planner';

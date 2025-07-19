@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Edit, Send, X, Menu, Paintbrush, PanelLeftOpen } from "lucide-react";
-import { useAIAssistant } from "../hooks";
-import { useBreakpoint } from "@/hooks/use-breakpoint";
-import { cn } from "@/lib";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Edit, Send, X, Menu, Paintbrush, PanelLeftOpen } from 'lucide-react';
+import { useAIAssistant } from '../hooks';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { cn } from '@/lib';
 
 export function ConversationHeader() {
   const {
@@ -18,9 +18,9 @@ export function ConversationHeader() {
     desktopSidebarOpen,
   } = useAIAssistant();
 
-  const [editingTitle, setEditingTitle] = useState("");
+  const [editingTitle, setEditingTitle] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const isDesktop = useBreakpoint("md");
+  const isDesktop = useBreakpoint('md');
 
   if (!activeConversation) {
     return null;
@@ -55,7 +55,7 @@ export function ConversationHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className={cn(desktopSidebarOpen ? "hidden" : "flex")}
+            className={cn(desktopSidebarOpen ? 'hidden' : 'flex')}
             onClick={() => changeDesktopSidebarOpen(true)}
             title="展开侧边栏"
           >
@@ -72,7 +72,7 @@ export function ConversationHeader() {
               autoFocus
               maxLength={10}
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleSaveEditedTitle();
+                if (e.key === 'Enter') handleSaveEditedTitle();
               }}
             />
             <Button

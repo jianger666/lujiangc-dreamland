@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
+import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 interface MarkdownRendererProps {
   content: string;
@@ -30,7 +30,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
         components={{
           code: (props: any) => {
             const { inline, className, children, ...rest } = props;
-            const match = /language-(\w+)/.exec(className || "");
+            const match = /language-(\w+)/.exec(className || '');
             return !inline && match ? (
               <SyntaxHighlighter
                 style={atomDark as any}
@@ -39,7 +39,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
                 className="rounded-lg"
                 {...rest}
               >
-                {String(children).replace(/\n$/, "")}
+                {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
             ) : (
               <code

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { WeatherInfo } from "../types";
-import { MapPin, CloudRain, Cloud, Sun, CloudSun } from "lucide-react";
-import { getWeatherInfo } from "../utils";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useEffect } from 'react';
+import { Card } from '@/components/ui/card';
+import { WeatherInfo } from '../types';
+import { MapPin, CloudRain, Cloud, Sun, CloudSun } from 'lucide-react';
+import { getWeatherInfo } from '../utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LocationWeatherProps {
   location: [number, number] | null;
@@ -34,10 +34,10 @@ export function LocationWeather({
       if (info) {
         setWeatherInfo(info);
       } else {
-        setError("无法获取天气信息");
+        setError('无法获取天气信息');
       }
     } catch {
-      setError("天气信息获取失败");
+      setError('天气信息获取失败');
     } finally {
       setIsLoading(false);
     }
@@ -49,19 +49,19 @@ export function LocationWeather({
 
   // 获取天气图标
   const getWeatherIcon = (weather: string) => {
-    if (weather.includes("雨")) {
+    if (weather.includes('雨')) {
       return <CloudRain className="h-5 w-5 text-blue-500" />;
     }
 
-    if (weather.includes("云") || weather.includes("阴")) {
+    if (weather.includes('云') || weather.includes('阴')) {
       return <Cloud className="h-5 w-5 text-gray-500" />;
     }
 
-    if (weather.includes("晴") && weather.includes("多云")) {
+    if (weather.includes('晴') && weather.includes('多云')) {
       return <CloudSun className="h-5 w-5 text-yellow-500" />;
     }
 
-    if (weather.includes("晴")) {
+    if (weather.includes('晴')) {
       return <Sun className="h-5 w-5 text-yellow-500" />;
     }
 
@@ -75,14 +75,14 @@ export function LocationWeather({
         <div className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary" />
           <h3 className="font-medium">
-            {address ? address : weatherInfo?.city || "正在获取位置..."}
+            {address ? address : weatherInfo?.city || '正在获取位置...'}
           </h3>
         </div>
 
         {isLoading ? (
           <div className="flex items-center gap-3">
             <Skeleton
-              lines={["24px", "16px", "32px"]}
+              lines={['24px', '16px', '32px']}
               className="h-5"
               lineGap="flex gap-3 items-center"
             />

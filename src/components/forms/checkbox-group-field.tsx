@@ -1,5 +1,5 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 import {
   FormField,
   FormItem,
@@ -7,16 +7,16 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/form';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 type ValueType = string | number;
 
@@ -32,11 +32,11 @@ interface CheckboxGroupFieldProps<T extends ValueType = string> {
   description?: string;
   options: CheckboxOption<T>[];
   className?: string;
-  direction?: "horizontal" | "vertical";
+  direction?: 'horizontal' | 'vertical';
   disabled?: boolean;
   onChange?: (values: T[]) => void;
   tooltip?: string;
-  size?: "small" | "middle" | "large";
+  size?: 'small' | 'middle' | 'large';
 }
 
 export function CheckboxGroupField<T extends ValueType = string>({
@@ -45,25 +45,25 @@ export function CheckboxGroupField<T extends ValueType = string>({
   description,
   options,
   className,
-  direction = "vertical",
+  direction = 'vertical',
   disabled = false,
   onChange,
   tooltip,
-  size = "middle",
+  size = 'middle',
 }: CheckboxGroupFieldProps<T>) {
   const { control } = useFormContext();
 
   // 布局方向样式
   const groupClassName = cn({
-    "space-y-2": direction === "vertical",
-    "flex flex-wrap gap-4": direction === "horizontal",
+    'space-y-2': direction === 'vertical',
+    'flex flex-wrap gap-4': direction === 'horizontal',
   });
 
   // 尺寸样式
-  const labelClassName = cn("font-normal", {
-    "text-sm": size === "small",
-    "text-base": size === "middle",
-    "text-lg": size === "large",
+  const labelClassName = cn('font-normal', {
+    'text-sm': size === 'small',
+    'text-base': size === 'middle',
+    'text-lg': size === 'large',
   });
 
   return (
@@ -139,7 +139,7 @@ export function CheckboxGroupField<T extends ValueType = string>({
                         htmlFor={id}
                         className={cn(
                           labelClassName,
-                          isDisabled ? "opacity-50" : "",
+                          isDisabled ? 'opacity-50' : ''
                         )}
                       >
                         {option.label}

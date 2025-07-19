@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { FilterPanel, FilterFormValues } from "./filter-panel";
-import { WheelSpinner } from "./wheel-spinner";
-import { RestaurantList } from "./restaurant-list";
-import { LocationWeather } from "./location-weather";
-import { Restaurant } from "../types";
+import { useState, useEffect } from 'react';
+import { FilterPanel, FilterFormValues } from './filter-panel';
+import { WheelSpinner } from './wheel-spinner';
+import { RestaurantList } from './restaurant-list';
+import { LocationWeather } from './location-weather';
+import { Restaurant } from '../types';
 import {
   getCurrentLocation,
   searchNearbyRestaurants,
   AMapPoiItem,
-} from "../utils";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Loading } from "@/components/ui/loading";
+} from '../utils';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Loading } from '@/components/ui/loading';
 
 export function FoodSpinnerContainer() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -21,11 +21,11 @@ export function FoodSpinnerContainer() {
   const [isMapInitializing, setIsMapInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
-    null,
+    null
   );
   const [locationAddress, setLocationAddress] =
-    useState<string>("正在获取位置...");
-  const [cityCode, setCityCode] = useState<string>("");
+    useState<string>('正在获取位置...');
+  const [cityCode, setCityCode] = useState<string>('');
   const [hasSearched, setHasSearched] = useState(false);
   const [hasInitializedWheelData, setHasInitializedWheelData] = useState(false);
 
@@ -38,8 +38,8 @@ export function FoodSpinnerContainer() {
       setLocationAddress(locationInfo.address);
       setCityCode(locationInfo.cityCode);
     } catch (err) {
-      console.error("获取位置失败:", err);
-      setLocationAddress("位置获取失败");
+      console.error('获取位置失败:', err);
+      setLocationAddress('位置获取失败');
     } finally {
       setIsMapInitializing(false);
     }
@@ -47,7 +47,7 @@ export function FoodSpinnerContainer() {
 
   // 初始化位置信息
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     let isMounted = true;
     fetchLocation().then(() => {
@@ -67,14 +67,14 @@ export function FoodSpinnerContainer() {
   const searchRestaurants = async (formValues: FilterFormValues) => {
     try {
       if (!userLocation) {
-        return setError("请先允许获取位置信息");
+        return setError('请先允许获取位置信息');
       }
 
       // 优化：直接使用表单值，不再进行冗余的数据转换
       // 构建搜索关键词：类别 + 用户输入的关键词
       const searchKeywords = [formValues.category, formValues.keywords]
         .filter(Boolean)
-        .join(" ");
+        .join(' ');
 
       // 设置搜索距离
       const searchDistance = formValues.distance
@@ -85,11 +85,11 @@ export function FoodSpinnerContainer() {
       const poisResults: AMapPoiItem[] = await searchNearbyRestaurants(
         userLocation,
         searchKeywords,
-        searchDistance,
+        searchDistance
       );
 
       if (poisResults.length === 0) {
-        setError("没有找到符合条件的餐厅，请尝试调整搜索条件或扩大搜索范围");
+        setError('没有找到符合条件的餐厅，请尝试调整搜索条件或扩大搜索范围');
         setRestaurants([]);
         return;
       }
@@ -98,9 +98,9 @@ export function FoodSpinnerContainer() {
       let minPrice = 0,
         maxPrice = 0;
       if (formValues.priceRange) {
-        const [min, max] = formValues.priceRange.split("_");
+        const [min, max] = formValues.priceRange.split('_');
         minPrice = parseInt(min, 10);
-        maxPrice = max === "1000" ? 99999 : parseInt(max, 10);
+        maxPrice = max === '1000' ? 99999 : parseInt(max, 10);
       }
 
       // 解析最低评分
@@ -111,7 +111,7 @@ export function FoodSpinnerContainer() {
         .map((poi) => ({
           id: poi.id,
           name: poi.name,
-          address: poi.address || "地址未知",
+          address: poi.address || '地址未知',
           distance: poi.distance,
           rating: poi.rating ? parseFloat(poi.rating) : 3.5,
           price: poi.cost ? parseFloat(poi.cost) : 0,
@@ -120,7 +120,7 @@ export function FoodSpinnerContainer() {
           tel: poi.tel,
           website: poi.website,
           photos:
-            typeof poi.photos === "string"
+            typeof poi.photos === 'string'
               ? []
               : poi.photos?.map((photo) => photo.url) || [],
         }))
@@ -140,12 +140,12 @@ export function FoodSpinnerContainer() {
           return meetsPrice && meetsRating;
         });
 
-      console.log("筛选条件:", formValues);
+      console.log('筛选条件:', formValues);
       console.log(
-        "已筛选餐厅数:",
+        '已筛选餐厅数:',
         filteredResults.length,
-        "总POI数:",
-        poisResults.length,
+        '总POI数:',
+        poisResults.length
       );
 
       console.log(poisResults);
@@ -154,20 +154,20 @@ export function FoodSpinnerContainer() {
 
       // 设置适当的提示信息
       if (filteredResults.length === 0 && poisResults.length > 0) {
-        setError("没有找到符合价格和评分筛选条件的餐厅，请尝试调整筛选条件");
+        setError('没有找到符合价格和评分筛选条件的餐厅，请尝试调整筛选条件');
       } else {
         setError(null);
       }
     } catch (error) {
-      console.error("搜索餐厅时出错:", error);
-      setError("搜索美食时出错，请稍后再试");
+      console.error('搜索餐厅时出错:', error);
+      setError('搜索美食时出错，请稍后再试');
       setRestaurants([]);
     }
   };
 
   // 处理筛选器提交
   const handleFilterSubmit = async (
-    formValues: FilterFormValues,
+    formValues: FilterFormValues
   ): Promise<void> => {
     setHasSearched(true);
     setError(null);
@@ -190,7 +190,7 @@ export function FoodSpinnerContainer() {
             <Skeleton className="h-12 w-12 rounded-full" />
             <div className="space-y-2">
               <Skeleton
-                lines={["24px", "16px", "32px"]}
+                lines={['24px', '16px', '32px']}
                 className="h-5"
                 lineGap="flex gap-3 items-center"
               />

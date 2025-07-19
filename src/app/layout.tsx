@@ -1,29 +1,29 @@
-import "./globals.css";
-import "katex/dist/katex.min.css";
-import { ThemeProvider } from "@/components/theme/theme-provider";
-import { Header } from "@/components/layout/header";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Noto_Sans_SC } from "next/font/google";
-import { Metadata, Viewport } from "next";
+import './globals.css';
+import 'katex/dist/katex.min.css';
+import { ThemeProvider } from '@/components/theme/theme-provider';
+import { Header } from '@/components/layout/header';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Noto_Sans_SC } from 'next/font/google';
+import { Metadata, Viewport } from 'next';
 // import { AIAssistant } from '@/components/ui/jiangerAI/ai-assistant';
-import { Suspense } from "react";
-import { cn } from "@/lib";
-import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from 'react';
+import { cn } from '@/lib';
+import { Toaster } from '@/components/ui/toaster';
 
 // Noto Sans SC 支持中文和拉丁字符，是一个全面的字体选择
 const notoSansSC = Noto_Sans_SC({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
-  title: "江耳的梦境",
-  description: "江耳的梦境 - 一些江耳的奇思妙想",
+  title: '江耳的梦境',
+  description: '江耳的梦境 - 一些江耳的奇思妙想',
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1.0,
   maximumScale: 1.0,
   userScalable: false,
@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh" suppressHydrationWarning className="h-full">
-      <body className={cn(notoSansSC.className, "flex h-full flex-col")}>
+      <body className={cn(notoSansSC.className, 'flex h-full flex-col')}>
         <NuqsAdapter>
           <ThemeProvider
             attribute="class"

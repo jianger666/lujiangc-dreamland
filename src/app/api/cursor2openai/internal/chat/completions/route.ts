@@ -1,54 +1,54 @@
-import { NextRequest, NextResponse } from "next/server";
-import { apiHandler } from "@/lib/api/handler";
-import { v4 as uuidv4, v5 as uuidv5 } from "uuid";
+import { NextRequest, NextResponse } from 'next/server';
+import { apiHandler } from '@/lib/api/handler';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-const { fetch, ProxyAgent, Agent } = require("undici");
-const config = require("../../../config/config");
-const $root = require("../../../proto/message.js");
+const { fetch, ProxyAgent, Agent } = require('undici');
+const config = require('../../../config/config');
+const $root = require('../../../proto/message.js');
 const {
   generateCursorBody,
   chunkToUtf8String,
   generateHashed64Hex,
   generateCursorChecksum,
-} = require("../../../utils/utils.js");
+} = require('../../../utils/utils.js');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 export const GET = apiHandler(async (request: NextRequest) => {
   try {
     const bearerToken = request.headers
-      .get("authorization")
-      ?.replace("Bearer ", "");
-    let authToken = bearerToken?.split(",").map((key) => key.trim())[0];
-    if (authToken && authToken.includes("%3A%3A")) {
-      authToken = authToken.split("%3A%3A")[1];
-    } else if (authToken && authToken.includes("::")) {
-      authToken = authToken.split("::")[1];
+      .get('authorization')
+      ?.replace('Bearer ', '');
+    let authToken = bearerToken?.split(',').map((key) => key.trim())[0];
+    if (authToken && authToken.includes('%3A%3A')) {
+      authToken = authToken.split('%3A%3A')[1];
+    } else if (authToken && authToken.includes('::')) {
+      authToken = authToken.split('::')[1];
     }
 
     const cursorChecksum =
-      request.headers.get("x-cursor-checksum") ??
-      generateCursorChecksum(authToken?.trim() || "");
-    const cursorClientVersion = "0.48.7";
+      request.headers.get('x-cursor-checksum') ??
+      generateCursorChecksum(authToken?.trim() || '');
+    const cursorClientVersion = '0.48.7';
 
     const availableModelsResponse = await fetch(
-      "https://api2.cursor.sh/aiserver.v1.AiService/AvailableModels",
+      'https://api2.cursor.sh/aiserver.v1.AiService/AvailableModels',
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "accept-encoding": "gzip",
+          'accept-encoding': 'gzip',
           authorization: `Bearer ${authToken}`,
-          "connect-protocol-version": "1",
-          "content-type": "application/proto",
-          "user-agent": "connect-es/1.6.1",
-          "x-cursor-checksum": cursorChecksum,
-          "x-cursor-client-version": cursorClientVersion,
-          "x-cursor-config-version": uuidv4(),
-          "x-cursor-timezone": "Asia/Shanghai",
-          "x-ghost-mode": "true",
-          Host: "api2.cursor.sh",
+          'connect-protocol-version': '1',
+          'content-type': 'application/proto',
+          'user-agent': 'connect-es/1.6.1',
+          'x-cursor-checksum': cursorChecksum,
+          'x-cursor-client-version': cursorClientVersion,
+          'x-cursor-config-version': uuidv4(),
+          'x-cursor-timezone': 'Asia/Shanghai',
+          'x-ghost-mode': 'true',
+          Host: 'api2.cursor.sh',
         },
-      },
+      }
     );
     const data = await availableModelsResponse.arrayBuffer();
     const buffer = Buffer.from(data);
@@ -56,25 +56,25 @@ export const GET = apiHandler(async (request: NextRequest) => {
       const models = $root.AvailableModelsResponse.decode(buffer).models;
 
       return NextResponse.json({
-        object: "list",
+        object: 'list',
         data: models.map((model: any) => ({
           id: model.name,
           created: Date.now(),
-          object: "model",
-          owned_by: "cursor",
+          object: 'model',
+          owned_by: 'cursor',
         })),
       });
     } catch {
-      const text = buffer.toString("utf-8");
+      const text = buffer.toString('utf-8');
       throw new Error(text);
     }
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       {
-        error: "Internal server error",
+        error: 'Internal server error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 });
@@ -84,9 +84,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
     const body = await request.json();
     const { model, messages, stream = false } = body;
     const bearerToken = request.headers
-      .get("authorization")
-      ?.replace("Bearer ", "");
-    const keys = bearerToken?.split(",").map((key) => key.trim()) || [];
+      .get('authorization')
+      ?.replace('Bearer ', '');
+    const keys = bearerToken?.split(',').map((key) => key.trim()) || [];
     let authToken = keys[Math.floor(Math.random() * keys.length)];
 
     if (
@@ -98,25 +98,25 @@ export const POST = apiHandler(async (request: NextRequest) => {
       return NextResponse.json(
         {
           error:
-            "Invalid request. Messages should be a non-empty array and authorization is required",
+            'Invalid request. Messages should be a non-empty array and authorization is required',
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    if (authToken && authToken.includes("%3A%3A")) {
-      authToken = authToken.split("%3A%3A")[1];
-    } else if (authToken && authToken.includes("::")) {
-      authToken = authToken.split("::")[1];
+    if (authToken && authToken.includes('%3A%3A')) {
+      authToken = authToken.split('%3A%3A')[1];
+    } else if (authToken && authToken.includes('::')) {
+      authToken = authToken.split('::')[1];
     }
 
     const cursorChecksum =
-      request.headers.get("x-cursor-checksum") ??
+      request.headers.get('x-cursor-checksum') ??
       generateCursorChecksum(authToken.trim());
 
     const sessionid = uuidv5(authToken, uuidv5.DNS);
     const clientKey = generateHashed64Hex(authToken);
-    const cursorClientVersion = "0.48.7";
+    const cursorClientVersion = '0.48.7';
     const cursorConfigVersion = uuidv4();
 
     const cursorBody = generateCursorBody(messages, model);
@@ -125,26 +125,26 @@ export const POST = apiHandler(async (request: NextRequest) => {
       : new Agent({ allowH2: true });
 
     const response = await fetch(
-      "https://api2.cursor.sh/aiserver.v1.ChatService/StreamUnifiedChatWithTools",
+      'https://api2.cursor.sh/aiserver.v1.ChatService/StreamUnifiedChatWithTools',
       {
-        method: "POST",
+        method: 'POST',
         headers: {
           authorization: `Bearer ${authToken}`,
-          "connect-accept-encoding": "gzip",
-          "connect-content-encoding": "gzip",
-          "connect-protocol-version": "1",
-          "content-type": "application/connect+proto",
-          "user-agent": "connect-es/1.6.1",
-          "x-amzn-trace-id": `Root=${uuidv4()}`,
-          "x-client-key": clientKey,
-          "x-cursor-checksum": cursorChecksum,
-          "x-cursor-client-version": cursorClientVersion,
-          "x-cursor-config-version": cursorConfigVersion,
-          "x-cursor-timezone": "Asia/Shanghai",
-          "x-ghost-mode": "true",
-          "x-request-id": uuidv4(),
-          "x-session-id": sessionid,
-          Host: "api2.cursor.sh",
+          'connect-accept-encoding': 'gzip',
+          'connect-content-encoding': 'gzip',
+          'connect-protocol-version': '1',
+          'content-type': 'application/connect+proto',
+          'user-agent': 'connect-es/1.6.1',
+          'x-amzn-trace-id': `Root=${uuidv4()}`,
+          'x-client-key': clientKey,
+          'x-cursor-checksum': cursorChecksum,
+          'x-cursor-client-version': cursorClientVersion,
+          'x-cursor-config-version': cursorConfigVersion,
+          'x-cursor-timezone': 'Asia/Shanghai',
+          'x-ghost-mode': 'true',
+          'x-request-id': uuidv4(),
+          'x-session-id': sessionid,
+          Host: 'api2.cursor.sh',
         },
         body: cursorBody,
         dispatcher: dispatcher,
@@ -152,7 +152,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
           connect: 5000,
           read: 30000,
         },
-      },
+      }
     );
 
     if (response.status !== 200) {
@@ -160,7 +160,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
         {
           error: response.statusText,
         },
-        { status: response.status },
+        { status: response.status }
       );
     }
 
@@ -171,25 +171,25 @@ export const POST = apiHandler(async (request: NextRequest) => {
       const readableStream = new ReadableStream({
         async start(controller) {
           try {
-            let thinkingStart = "<thinking>";
-            let thinkingEnd = "</thinking>";
+            let thinkingStart = '<thinking>';
+            let thinkingEnd = '</thinking>';
             for await (const chunk of response.body as any) {
               const { thinking, text } = chunkToUtf8String(chunk);
-              let content = "";
+              let content = '';
 
-              if (thinkingStart !== "" && thinking.length > 0) {
-                content += thinkingStart + "\n";
-                thinkingStart = "";
+              if (thinkingStart !== '' && thinking.length > 0) {
+                content += thinkingStart + '\n';
+                thinkingStart = '';
               }
               content += thinking;
               if (
-                thinkingEnd !== "" &&
+                thinkingEnd !== '' &&
                 thinking.length === 0 &&
                 text.length !== 0 &&
-                thinkingStart === ""
+                thinkingStart === ''
               ) {
-                content += "\n" + thinkingEnd + "\n";
-                thinkingEnd = "";
+                content += '\n' + thinkingEnd + '\n';
+                thinkingEnd = '';
               }
 
               content += text;
@@ -199,7 +199,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
                   encoder.encode(
                     `data: ${JSON.stringify({
                       id: responseId,
-                      object: "chat.completion.chunk",
+                      object: 'chat.completion.chunk',
                       created: Math.floor(Date.now() / 1000),
                       model: model,
                       choices: [
@@ -210,28 +210,28 @@ export const POST = apiHandler(async (request: NextRequest) => {
                           },
                         },
                       ],
-                    })}\n\n`,
-                  ),
+                    })}\n\n`
+                  )
                 );
               }
             }
           } catch (streamError: any) {
-            console.error("Stream error:", streamError);
-            if (streamError.name === "TimeoutError") {
+            console.error('Stream error:', streamError);
+            if (streamError.name === 'TimeoutError') {
               controller.enqueue(
                 encoder.encode(
-                  `data: ${JSON.stringify({ error: "Server response timeout" })}\n\n`,
-                ),
+                  `data: ${JSON.stringify({ error: 'Server response timeout' })}\n\n`
+                )
               );
             } else {
               controller.enqueue(
                 encoder.encode(
-                  `data: ${JSON.stringify({ error: "Stream processing error" })}\n\n`,
-                ),
+                  `data: ${JSON.stringify({ error: 'Stream processing error' })}\n\n`
+                )
               );
             }
           } finally {
-            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             controller.close();
           }
         },
@@ -239,32 +239,32 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
       return new Response(readableStream, {
         headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
         },
       });
     } else {
       try {
-        let thinkingStart = "<thinking>";
-        let thinkingEnd = "</thinking>";
-        let content = "";
+        let thinkingStart = '<thinking>';
+        let thinkingEnd = '</thinking>';
+        let content = '';
         for await (const chunk of response.body as any) {
           const { thinking, text } = chunkToUtf8String(chunk);
 
-          if (thinkingStart !== "" && thinking.length > 0) {
-            content += thinkingStart + "\n";
-            thinkingStart = "";
+          if (thinkingStart !== '' && thinking.length > 0) {
+            content += thinkingStart + '\n';
+            thinkingStart = '';
           }
           content += thinking;
           if (
-            thinkingEnd !== "" &&
+            thinkingEnd !== '' &&
             thinking.length === 0 &&
             text.length !== 0 &&
-            thinkingStart === ""
+            thinkingStart === ''
           ) {
-            content += "\n" + thinkingEnd + "\n";
-            thinkingEnd = "";
+            content += '\n' + thinkingEnd + '\n';
+            thinkingEnd = '';
           }
 
           content += text;
@@ -272,17 +272,17 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
         return NextResponse.json({
           id: `chatcmpl-${uuidv4()}`,
-          object: "chat.completion",
+          object: 'chat.completion',
           created: Math.floor(Date.now() / 1000),
           model: model,
           choices: [
             {
               index: 0,
               message: {
-                role: "assistant",
+                role: 'assistant',
                 content: content,
               },
-              finish_reason: "stop",
+              finish_reason: 'stop',
             },
           ],
           usage: {
@@ -292,27 +292,27 @@ export const POST = apiHandler(async (request: NextRequest) => {
           },
         });
       } catch (error: any) {
-        console.error("Non-stream error:", error);
-        if (error.name === "TimeoutError") {
+        console.error('Non-stream error:', error);
+        if (error.name === 'TimeoutError') {
           return NextResponse.json(
-            { error: "Server response timeout" },
-            { status: 408 },
+            { error: 'Server response timeout' },
+            { status: 408 }
           );
         }
         throw error;
       }
     }
   } catch (error: any) {
-    console.error("Error:", error);
+    console.error('Error:', error);
     const errorMessage = {
       error:
-        error.name === "TimeoutError"
-          ? "Request timeout"
-          : "Internal server error",
+        error.name === 'TimeoutError'
+          ? 'Request timeout'
+          : 'Internal server error',
     };
 
     return NextResponse.json(errorMessage, {
-      status: error.name === "TimeoutError" ? 408 : 500,
+      status: error.name === 'TimeoutError' ? 408 : 500,
     });
   }
 });

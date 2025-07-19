@@ -1,10 +1,10 @@
-import { useCallback, useRef, useState } from "react";
-import { Conversation, Message, StreamingState } from "@/types/ai-assistant";
+import { useCallback, useRef, useState } from 'react';
+import { Conversation, Message, StreamingState } from '@/types/ai-assistant';
 import {
   resetStreamingState as resetStreamingStateUtil,
   startStreamResponse as startStreamResponseUtil,
   stopStreamResponse as stopStreamResponseUtil,
-} from "../utils/streamService";
+} from '../utils/streamService';
 
 export const useStreamResponse = () => {
   // 各对话的流式响应状态
@@ -12,7 +12,7 @@ export const useStreamResponse = () => {
 
   // 存储每个对话的AbortController实例
   const abortControllersRef = useRef<Record<string, AbortController | null>>(
-    {},
+    {}
   );
 
   // 处理流式响应完成后的回调
@@ -52,7 +52,7 @@ export const useStreamResponse = () => {
         imageDatas,
       });
     },
-    [],
+    []
   );
 
   // 停止流式响应
@@ -74,18 +74,18 @@ export const useStreamResponse = () => {
         streamingState,
       });
     },
-    [streamingState],
+    [streamingState]
   );
 
   // 重置流式响应状态
   const resetStreamingState = useCallback(
     (
       setStreamingStateFn: React.Dispatch<React.SetStateAction<StreamingState>>,
-      conversationId: string,
+      conversationId: string
     ) => {
       resetStreamingStateUtil(setStreamingStateFn, conversationId);
     },
-    [],
+    []
   );
 
   return {

@@ -1,4 +1,4 @@
-import { openDB, DBSchema, IDBPDatabase } from "idb";
+import { openDB, DBSchema, IDBPDatabase } from 'idb';
 
 /**
  * 通用 IndexedDB 辅助函数
@@ -15,7 +15,7 @@ import { openDB, DBSchema, IDBPDatabase } from "idb";
 export async function openDatabase<T extends DBSchema>(
   name: string,
   version: number,
-  upgradeCallback: (db: IDBPDatabase<T>) => void,
+  upgradeCallback: (db: IDBPDatabase<T>) => void
 ): Promise<IDBPDatabase<T>> {
   return openDB<T>(name, version, {
     upgrade(db) {
@@ -34,7 +34,7 @@ export async function openDatabase<T extends DBSchema>(
 export function createDBInstance<T extends DBSchema>(
   name: string,
   version: number,
-  upgradeCallback: (db: IDBPDatabase<T>) => void,
+  upgradeCallback: (db: IDBPDatabase<T>) => void
 ) {
   let dbPromise: Promise<IDBPDatabase<T>> | null = null;
 

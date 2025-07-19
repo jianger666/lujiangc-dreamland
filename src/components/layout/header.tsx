@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { Menu, MoreHorizontal, Layout } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import Image, { ImageProps } from "next/image";
+import * as React from 'react';
+import { Menu, MoreHorizontal, Layout } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import Image, { ImageProps } from 'next/image';
 
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,29 +14,29 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/navigation-menu';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 export interface NavItem {
   title: string;
   href: string;
   description?: string;
   isExternal?: boolean;
-  items?: Omit<NavItem, "items">[];
+  items?: Omit<NavItem, 'items'>[];
 }
 
 interface HeaderProps {
@@ -51,7 +51,7 @@ const NavSubItem = ({
   pathname,
   onClick,
 }: {
-  subItem: Omit<NavItem, "items">;
+  subItem: Omit<NavItem, 'items'>;
   pathname: string;
   onClick?: () => void;
 }) => (
@@ -59,8 +59,8 @@ const NavSubItem = ({
     key={subItem.title}
     href={subItem.href}
     className={cn(
-      "flex cursor-pointer items-center justify-between py-2 text-muted-foreground transition-colors duration-200 hover:text-primary",
-      pathname === subItem.href && "font-medium text-primary",
+      'flex cursor-pointer items-center justify-between py-2 text-muted-foreground transition-colors duration-200 hover:text-primary',
+      pathname === subItem.href && 'font-medium text-primary'
     )}
     onClick={onClick}
   >
@@ -71,16 +71,16 @@ const NavSubItem = ({
 export function Header({
   navigationItems = [
     {
-      title: "吃啥转转",
-      href: "/food-spinner",
+      title: '吃啥转转',
+      href: '/food-spinner',
     },
     {
-      title: "江耳助手",
-      href: "/ai-assistant",
+      title: '江耳助手',
+      href: '/ai-assistant',
     },
     {
-      title: "马拉松计划",
-      href: "/marathon-planner",
+      title: '马拉松计划',
+      href: '/marathon-planner',
     },
     // 有子菜单的导航项
     // {
@@ -109,7 +109,7 @@ export function Header({
   const searchParams = useSearchParams();
 
   // 检查URL中是否有控制导航栏显示的参数
-  const hideNav = searchParams.get("hideNav") === "true";
+  const hideNav = searchParams.get('hideNav') === 'true';
 
   // 如果URL参数指定隐藏导航栏，则不渲染整个组件
   if (hideNav) {
@@ -120,12 +120,12 @@ export function Header({
   const hiddenItems = navigationItems.slice(maxVisibleItems);
 
   // 渲染Logo组件
-  const LogoComponent = (props?: Omit<ImageProps, "src" | "alt">) => (
+  const LogoComponent = (props?: Omit<ImageProps, 'src' | 'alt'>) => (
     <Link href="/" className="flex items-center">
       <Image
         src="/logo/logo_primary.png"
         alt="Logo"
-        style={{ objectFit: "contain" }}
+        style={{ objectFit: 'contain' }}
         priority
         {...(props ?? {})}
       />
@@ -149,11 +149,11 @@ export function Header({
                     <Link href={item.href} legacyBehavior passHref>
                       <NavigationMenuLink
                         className={cn(
-                          "group relative inline-flex h-9 w-max cursor-pointer items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-primary focus:bg-accent focus:text-primary focus:outline-none",
+                          'group relative inline-flex h-9 w-max cursor-pointer items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-primary focus:bg-accent focus:text-primary focus:outline-none',
                           {
-                            "font-semibold text-primary":
+                            'font-semibold text-primary':
                               pathname === item.href,
-                          },
+                          }
                         )}
                       >
                         {item.title}
@@ -231,11 +231,11 @@ export function Header({
                           className="focus:bg-accent focus:text-primary"
                         >
                           <Link
-                            href={item.href || "#"}
+                            href={item.href || '#'}
                             className={cn(
-                              "flex w-full cursor-pointer items-center transition-colors hover:text-primary",
+                              'flex w-full cursor-pointer items-center transition-colors hover:text-primary',
                               pathname === item.href &&
-                                "font-medium text-primary",
+                                'font-medium text-primary'
                             )}
                           >
                             {item.title}
@@ -253,7 +253,7 @@ export function Header({
         <div className="flex items-center gap-2">
           {showUIShowcaseIcon && (
             <>
-              {" "}
+              {' '}
               <Button
                 title="UI 展示页"
                 variant="ghost"
@@ -300,9 +300,8 @@ export function Header({
                         <Link
                           href={item.href}
                           className={cn(
-                            "flex cursor-pointer items-center justify-between py-2 text-foreground transition-colors duration-200 hover:text-primary",
-                            pathname === item.href &&
-                              "font-medium text-primary",
+                            'flex cursor-pointer items-center justify-between py-2 text-foreground transition-colors duration-200 hover:text-primary',
+                            pathname === item.href && 'font-medium text-primary'
                           )}
                           onClick={() => setOpen(false)}
                         >
@@ -313,8 +312,8 @@ export function Header({
                           <Link
                             href={item.href}
                             className={cn(
-                              "flex cursor-pointer items-center justify-between py-2 font-medium text-foreground transition-colors duration-200 hover:text-primary",
-                              pathname === item.href && "text-primary",
+                              'flex cursor-pointer items-center justify-between py-2 font-medium text-foreground transition-colors duration-200 hover:text-primary',
+                              pathname === item.href && 'text-primary'
                             )}
                             onClick={() => setOpen(false)}
                           >
