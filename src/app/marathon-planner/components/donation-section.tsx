@@ -68,4 +68,4 @@ export function DonationSection({ className = '' }: DonationSectionProps) {
       </CardContent>
     </Card>
   );
-} 
+}
