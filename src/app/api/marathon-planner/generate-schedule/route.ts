@@ -12,10 +12,7 @@ import {
   formatTargetTime,
   formatDateString,
 } from '@/lib/utils/prompt-loader';
-import {
-  MarathonPlanFormData,
-  WEEKDAYS,
-} from '@/app/marathon-planner/types';
+import { MarathonPlanFormData, WEEKDAYS } from '@/app/marathon-planner/types';
 import type { ChatCompletionChunk } from 'openai/resources';
 
 /**
@@ -114,9 +111,7 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
 
     // 返回流式错误响应，保持与前端的一致性
     const errorMessage =
-      error instanceof Error
-        ? error.message
-        : '生成训练计划时出错，请稍后重试';
+      error instanceof Error ? error.message : '生成训练计划时出错，请稍后重试';
 
     // 使用统一的流式错误响应函数
     return createStreamErrorResponse(
