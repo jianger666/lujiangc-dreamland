@@ -1,13 +1,20 @@
 export interface MarathonPlanFormData {
-  raceName: string; // 比赛名称
-  raceDate: Date; // 比赛日期
-  trainingStartDate?: Date; // 训练开始日期（可选，默认今天）
-  marathonType: 'half' | 'full'; // 马拉松类型
-  currentPB?: number; // 当前PB(分钟)
-  targetTime: number; // 目标成绩(分钟)
-  trainingDays: string[]; // 训练日期(周一到周日)
-  dailyTrainingTime: Record<string, number>; // 每日训练时长
-  additionalNotes?: string; // 额外备注
+  raceName: string;
+  raceDate: Date;
+  trainingStartDate: Date;
+  marathonType: 'half' | 'full';
+  currentPB?: number;
+  targetTime: number;
+  currentWeeklyMileage: number;
+  experienceLevel: 'newbie' | 'intermediate' | 'advanced';
+  maxHeartRate?: number;
+  trainingSchedule: {
+    day: string;
+    label: string;
+    enabled: boolean;
+    duration: number;
+  }[];
+  additionalNotes?: string;
 }
 
 export interface ScheduleResponse {

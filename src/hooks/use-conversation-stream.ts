@@ -6,7 +6,7 @@ import {
   stopStreamResponse as stopStreamResponseUtil,
 } from '@/app/ai-assistant/utils/streamService';
 
-export const useConversationStream = () => {
+export const useStreamResponse = () => {
   // 各对话的流式响应状态
   const [streamingState, setStreamingState] = useState<StreamingState>({});
 
