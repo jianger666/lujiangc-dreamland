@@ -32,7 +32,7 @@ import {
 } from '@/types/ai-assistant';
 import {
   useConversations,
-  useStreamResponse,
+  useConversationStream,
   useTitleGeneration,
 } from '../hooks';
 import { useLocalStorage } from 'usehooks-ts';
@@ -185,7 +185,7 @@ export function AIAssistantProvider({
     startStreamResponse,
     resetStreamingState,
     stopStreamResponse,
-  } = useStreamResponse();
+  } = useConversationStream();
 
   // 使用自定义hooks管理标题生成
   const {

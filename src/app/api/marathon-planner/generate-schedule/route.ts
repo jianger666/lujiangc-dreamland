@@ -1,16 +1,13 @@
 import { NextRequest } from 'next/server';
 import { apiHandler } from '@/lib/api/handler';
-import { createErrorResponse, createStreamResponse } from '@/lib/api/response';
+import { createStreamResponse } from '@/lib/api/response';
 import { AIModelEnum, AiRoleEnum } from '@/types/ai-assistant';
 import {
   tryChatCompletionWithFailover,
   handleStreamResponse,
   createStreamErrorResponse,
 } from '@/app/api/ai-assistant/_utils';
-import {
-  formatTargetTime,
-  formatDateString,
-} from '@/lib/utils';
+import { formatTargetTime, formatDateString } from '@/lib/utils';
 import { readPromptMarkdown } from '@/lib/utils/prompt-loader';
 import { MarathonPlanFormData } from '@/app/marathon-planner/types';
 import { EXPERIENCE_LEVEL_MAP } from '@/app/marathon-planner/consts';

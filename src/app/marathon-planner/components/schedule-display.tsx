@@ -67,7 +67,7 @@ export function ScheduleDisplay({
     <div className="flex flex-col items-center space-y-6">
       {/* 课表内容区域 */}
       <div
-        className="w-full max-w-4xl overflow-hidden rounded-lg bg-card flex justify-center"
+        className="flex w-full max-w-4xl justify-center overflow-hidden rounded-lg bg-card"
         id="marathon-schedule-content"
       >
         <SchedulePoster
@@ -118,7 +118,7 @@ export const ScheduleDisplayWithRef = React.forwardRef<
   return (
     <div className="flex flex-col items-center space-y-6">
       <div
-        className="w-full max-w-4xl overflow-hidden rounded-lg bg-card flex justify-center"
+        className="flex w-full max-w-4xl justify-center overflow-hidden rounded-lg bg-card"
         id="marathon-schedule-content"
       >
         <SchedulePoster

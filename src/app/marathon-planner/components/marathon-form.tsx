@@ -4,12 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormLabel } from '@/components/ui/form';
 import {
   InputField,
   DateField,
@@ -266,7 +261,7 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
           type="submit"
           disabled={isLoading}
           className="w-full"
-          onClick={async (e) => {
+          onClick={async () => {
             // 总是触发验证以确保错误显示
             await form.trigger();
           }}

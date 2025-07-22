@@ -33,7 +33,7 @@ export const SchedulePoster = forwardRef<HTMLDivElement, SchedulePosterProps>(
       <div
         ref={ref}
         className={cn(
-          'schedule-poster-container relative overflow-hidden rounded-xl shadow-2xl mx-auto',
+          'schedule-poster-container relative mx-auto overflow-hidden rounded-xl shadow-2xl',
           isDesktop ? 'max-w-4xl' : 'max-w-full',
           'min-h-[600px]',
           className
@@ -112,7 +112,7 @@ export const SchedulePoster = forwardRef<HTMLDivElement, SchedulePosterProps>(
                 !isDesktop && 'prose-sm text-sm'
               )}
             >
-              <ReactMarkdown 
+              <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkBreaks]}
                 rehypePlugins={[rehypeRaw]}
               >

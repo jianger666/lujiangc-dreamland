@@ -445,7 +445,7 @@ export async function copyScheduleImage({
             });
             await navigator.clipboard.write([clipboardItem]);
             resolve();
-          } catch (clipboardError) {
+          } catch {
             reject(new Error('写入剪贴板失败'));
           }
         } else {
