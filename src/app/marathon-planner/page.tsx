@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { MarathonForm } from './components/marathon-form';
 import { ScheduleDisplay } from './components/schedule-display';
@@ -13,6 +13,22 @@ export default function MarathonPlannerPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [formData, setFormData] = useState<MarathonPlanFormData | null>(null);
+  const scheduleDisplayRef = useRef<HTMLDivElement>(null);
+
+  // 当开始生成计划时，自动滚动到显示区域
+  useEffect(() => {
+    if (isLoading && formData && scheduleDisplayRef.current) {
+      const timer = setTimeout(() => {
+        scheduleDisplayRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest',
+        });
+      }, 300); // 稍微延迟一下，确保DOM已更新
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, formData]);
 
   const handleGenerateSchedule = async (data: MarathonPlanFormData) => {
     setError('');
@@ -55,7 +71,10 @@ export default function MarathonPlannerPage() {
       <div className="space-y-8">
         <MarathonForm onSubmit={handleGenerateSchedule} isLoading={isLoading} />
         {(schedule || isLoading) && formData && (
-          <div className="flex flex-col items-center space-y-6">
+          <div
+            ref={scheduleDisplayRef}
+            className="flex flex-col items-center space-y-6"
+          >
             <ScheduleDisplay
               schedule={schedule}
               isLoading={isLoading}

@@ -31,7 +31,7 @@ export function ScheduleDisplay({
 
   if (isLoading && !schedule) {
     return (
-      <div className="w-full max-w-4xl rounded-lg border bg-card p-6">
+      <div className="w-full max-w-6xl rounded-lg border bg-card p-6">
         <div className="mb-4 flex items-center gap-2">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-r-transparent" />
           <h3 className="text-lg font-semibold">正在生成马拉松训练计划...</h3>
@@ -67,7 +67,7 @@ export function ScheduleDisplay({
     <div className="flex flex-col items-center space-y-6">
       {/* 课表内容区域 */}
       <div
-        className="flex w-full max-w-4xl justify-center overflow-hidden rounded-lg bg-card"
+        className="flex w-full max-w-6xl justify-center overflow-hidden rounded-lg bg-card"
         id="marathon-schedule-content"
       >
         <SchedulePoster
@@ -98,7 +98,7 @@ export function ScheduleDisplay({
 
       {/* 收款码区域 - 仅在课表生成完成时显示 */}
       {!isLoading && schedule && (
-        <DonationSection className="w-full max-w-4xl" />
+        <DonationSection className="w-full max-w-6xl" />
       )}
     </div>
   );
@@ -118,7 +118,7 @@ export const ScheduleDisplayWithRef = React.forwardRef<
   return (
     <div className="flex flex-col items-center space-y-6">
       <div
-        className="flex w-full max-w-4xl justify-center overflow-hidden rounded-lg bg-card"
+        className="flex w-full max-w-6xl justify-center overflow-hidden rounded-lg bg-card"
         id="marathon-schedule-content"
       >
         <SchedulePoster
