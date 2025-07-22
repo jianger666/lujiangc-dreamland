@@ -84,6 +84,13 @@ export function ScheduleDisplay({
         </div>
       )}
       
+      {/* 图片生成优化提示 */}
+      {!isLoading && schedule && (
+        <div className="text-center text-sm text-muted-foreground max-w-2xl">
+          <p>💡 课表图片将采用优化后的独立生成技术，确保在不同设备上都能获得高质量、一致性的输出效果。</p>
+        </div>
+      )}
+      
       {/* 操作按钮 - 仅在加载完成且有内容时显示 */}
       {showActions && formData && onRegenerate && (
         <ScheduleActions
@@ -91,6 +98,7 @@ export function ScheduleDisplay({
           getContentElement={() => contentRef.current}
           formData={formData}
           isRegenerating={isRegenerating}
+          schedule={schedule}
         />
       )}
     </div>
