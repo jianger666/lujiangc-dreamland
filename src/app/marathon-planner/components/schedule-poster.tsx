@@ -4,6 +4,7 @@ import React, { forwardRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
 import { cn } from '@/lib/utils';
 
@@ -111,7 +112,10 @@ export const SchedulePoster = forwardRef<HTMLDivElement, SchedulePosterProps>(
                 !isDesktop && 'prose-sm text-sm'
               )}
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                rehypePlugins={[rehypeRaw]}
+              >
                 {schedule}
               </ReactMarkdown>
             </div>
