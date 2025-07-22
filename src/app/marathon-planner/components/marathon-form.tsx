@@ -34,33 +34,46 @@ const formSchema = z.object({
   marathonType: z.enum(['half', 'full'], {
     required_error: '必须选择一个马拉松类型',
   }),
-  currentPB: z.coerce.number({
-    invalid_type_error: '当前PB必须是有效数字',
-    required_error: '当前PB不能为空'
-  }).positive('当前PB必须大于0').optional(),
-  targetTime: z.coerce.number({
-    invalid_type_error: '目标成绩必须是有效数字',
-    required_error: '目标成绩不能为空'
-  }).positive('目标成绩必须大于0'),
-  currentWeeklyMileage: z.coerce.number({
-    invalid_type_error: '当前周跑量必须是有效数字',
-    required_error: '当前周跑量不能为空'
-  }).positive('周跑量必须大于0'),
+  currentPB: z.coerce
+    .number({
+      invalid_type_error: '当前PB必须是有效数字',
+      required_error: '当前PB不能为空',
+    })
+    .positive('当前PB必须大于0')
+    .optional(),
+  targetTime: z.coerce
+    .number({
+      invalid_type_error: '目标成绩必须是有效数字',
+      required_error: '目标成绩不能为空',
+    })
+    .positive('目标成绩必须大于0'),
+  currentWeeklyMileage: z.coerce
+    .number({
+      invalid_type_error: '当前周跑量必须是有效数字',
+      required_error: '当前周跑量不能为空',
+    })
+    .positive('周跑量必须大于0'),
   experienceLevel: z.enum(['newbie', 'intermediate', 'advanced'], {
     required_error: '必须选择一个经验水平',
   }),
-  maxHeartRate: z.coerce.number({
-    invalid_type_error: '最大心率必须是有效数字',
-  }).positive('最大心率必须大于0').optional(),
+  maxHeartRate: z.coerce
+    .number({
+      invalid_type_error: '最大心率必须是有效数字',
+    })
+    .positive('最大心率必须大于0')
+    .optional(),
   trainingSchedule: z
     .array(
       z.object({
         day: z.string(),
         label: z.string(),
         enabled: z.boolean(),
-        duration: z.coerce.number({
-          invalid_type_error: '训练时长必须是有效数字',
-        }).min(0, '时长不能为负').max(300, '时长不能超过300分钟'),
+        duration: z.coerce
+          .number({
+            invalid_type_error: '训练时长必须是有效数字',
+          })
+          .min(0, '时长不能为负')
+          .max(300, '时长不能超过300分钟'),
       })
     )
     .refine(
@@ -98,7 +111,7 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
         day: weekday.day,
         label: weekday.label,
         enabled: false,
-        duration: 60
+        duration: 60,
       })),
       experienceLevel: 'newbie',
       additionalNotes: '',
@@ -117,7 +130,7 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
   const handleFormError = (errors: any) => {
     // 当表单验证失败时，确保错误状态被正确触发
     console.log('表单验证失败:', errors);
-    
+
     // 手动触发表单验证以确保错误状态更新
     form.trigger('trainingSchedule');
   };
@@ -127,7 +140,10 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit, handleFormError)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit, handleFormError)}
+        className="space-y-8"
+      >
         <div className="space-y-4">
           <InputField
             name="raceName"
@@ -141,7 +157,7 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
           <RadioGroupField
             name="marathonType"
             label="马拉松类型"
-            options={MARATHON_TYPES.map(mt => ({...mt}))}
+            options={MARATHON_TYPES.map((mt) => ({ ...mt }))}
           />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <InputField
@@ -149,14 +165,22 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
               label="当前PB (分钟)"
               type="number"
               placeholder="例如: 210 (3小时30分), 选填"
-              description={currentPB ? `格式化后: ${formatTime(currentPB)}` : '输入分钟数，如210'}
+              description={
+                currentPB
+                  ? `格式化后: ${formatTime(currentPB)}`
+                  : '输入分钟数，如210'
+              }
             />
             <InputField
               name="targetTime"
               label="目标成绩 (分钟)"
               type="number"
               placeholder="例如: 180 (3小时)"
-              description={targetTime ? `格式化后: ${formatTime(targetTime)}` : '输入分钟数，如180'}
+              description={
+                targetTime
+                  ? `格式化后: ${formatTime(targetTime)}`
+                  : '输入分钟数，如180'
+              }
             />
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -176,7 +200,7 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
           <RadioGroupField
             name="experienceLevel"
             label="跑步经验"
-            options={EXPERIENCE_LEVELS.map(el => ({...el}))}
+            options={EXPERIENCE_LEVELS.map((el) => ({ ...el }))}
           />
           <div className="space-y-2">
             <FormLabel>选择你的每周训练日及可用时长</FormLabel>
@@ -187,8 +211,16 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
                     <Checkbox
                       checked={field.enabled}
                       onCheckedChange={(checked) => {
-                        const newDuration = checked ? (field.duration < 30 ? 60 : field.duration) : 0;
-                        update(index, { ...field, enabled: !!checked, duration: newDuration });
+                        const newDuration = checked
+                          ? field.duration < 30
+                            ? 60
+                            : field.duration
+                          : 0;
+                        update(index, {
+                          ...field,
+                          enabled: !!checked,
+                          duration: newDuration,
+                        });
                       }}
                     />
                     <FormLabel>{field.label}</FormLabel>
@@ -204,21 +236,25 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
                       valueAsNumber: true,
                     })}
                   />
-                  {form.formState.errors.trainingSchedule?.[index]?.duration?.message && (
+                  {form.formState.errors.trainingSchedule?.[index]?.duration
+                    ?.message && (
                     <p className="text-[0.8rem] font-medium text-destructive">
-                      {form.formState.errors.trainingSchedule[index]?.duration?.message}
+                      {
+                        form.formState.errors.trainingSchedule[index]?.duration
+                          ?.message
+                      }
                     </p>
                   )}
                 </div>
               ))}
             </div>
-            {(form.formState.errors.trainingSchedule?.message || 
-              (form.formState.isSubmitted && fields.filter(f => f.enabled).length === 0)) && (
+            {(form.formState.errors.trainingSchedule?.message ||
+              (form.formState.isSubmitted &&
+                fields.filter((f) => f.enabled).length === 0)) && (
               <p className="text-[0.8rem] font-medium text-destructive">
-                {form.formState.errors.trainingSchedule?.message }
+                {form.formState.errors.trainingSchedule?.message}
               </p>
             )}
- 
           </div>
           <TextareaField
             name="additionalNotes"
@@ -226,9 +262,9 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
             placeholder="例如: 我想把强度安排到周三。我想把lsd安排到周天"
           />
         </div>
-        <Button 
-          type="submit" 
-          disabled={isLoading} 
+        <Button
+          type="submit"
+          disabled={isLoading}
           className="w-full"
           onClick={async (e) => {
             // 总是触发验证以确保错误显示

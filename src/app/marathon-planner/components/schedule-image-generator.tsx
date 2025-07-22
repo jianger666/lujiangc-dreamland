@@ -14,11 +14,17 @@ interface ScheduleImageGeneratorProps {
   height?: number;
 }
 
-export const ScheduleImageGenerator = forwardRef<HTMLDivElement, ScheduleImageGeneratorProps>(
-  ({ schedule, raceName = '马拉松训练计划', className, width = 1024, height }, ref) => {
+export const ScheduleImageGenerator = forwardRef<
+  HTMLDivElement,
+  ScheduleImageGeneratorProps
+>(
+  (
+    { schedule, raceName = '马拉松训练计划', className: _className, width = 1024, height },
+    ref
+  ) => {
     // 根据内容长度动态计算高度
     const estimatedHeight = height || Math.max(1280, schedule.length * 2 + 600);
-    
+
     if (!schedule) {
       return (
         <div
@@ -32,7 +38,8 @@ export const ScheduleImageGenerator = forwardRef<HTMLDivElement, ScheduleImageGe
             justifyContent: 'center',
             padding: '32px',
             background: '#ffffff',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             fontSize: '16px',
             color: '#6b7280',
           }}
@@ -53,11 +60,13 @@ export const ScheduleImageGenerator = forwardRef<HTMLDivElement, ScheduleImageGe
           position: 'relative',
           borderRadius: '12px',
           margin: '0 auto',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           fontSize: '14px',
           lineHeight: '1.5',
           // 使用简化的渐变背景，提高html2canvas兼容性
-          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
+          background:
+            'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
           boxSizing: 'border-box',
         }}
       >
@@ -370,4 +379,4 @@ export const ScheduleImageGenerator = forwardRef<HTMLDivElement, ScheduleImageGe
   }
 );
 
-ScheduleImageGenerator.displayName = 'ScheduleImageGenerator'; 
+ScheduleImageGenerator.displayName = 'ScheduleImageGenerator';

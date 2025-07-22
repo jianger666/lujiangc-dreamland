@@ -23,4 +23,4 @@ export const WEEKDAYS = [
   { day: 'Friday', label: '周五' },
   { day: 'Saturday', label: '周六' },
   { day: 'Sunday', label: '周日' },
-] as const; 
+] as const;

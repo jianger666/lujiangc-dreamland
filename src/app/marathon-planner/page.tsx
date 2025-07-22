@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -33,7 +32,7 @@ export default function MarathonPlannerPage() {
           return;
         }
         const parsedData = JSON.parse(event.data);
-        setSchedule(prev => prev + (parsedData.message || ''));
+        setSchedule((prev) => prev + (parsedData.message || ''));
       },
       onerror(err) {
         setIsLoading(false);
@@ -54,21 +53,18 @@ export default function MarathonPlannerPage() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="space-y-8">
-        <MarathonForm
-          onSubmit={handleGenerateSchedule}
-          isLoading={isLoading}
-        />
+        <MarathonForm onSubmit={handleGenerateSchedule} isLoading={isLoading} />
         {(schedule || isLoading) && formData && (
           <div className="flex flex-col items-center space-y-6">
-                          <ScheduleDisplay
-                schedule={schedule}
-                isLoading={isLoading}
-                raceName={formData.raceName}
-                showActions={!isLoading && !!schedule}
-                formData={formData}
-                onRegenerate={() => handleGenerateSchedule(formData)}
-                isRegenerating={isLoading}
-              />
+            <ScheduleDisplay
+              schedule={schedule}
+              isLoading={isLoading}
+              raceName={formData.raceName}
+              showActions={!isLoading && !!schedule}
+              formData={formData}
+              onRegenerate={() => handleGenerateSchedule(formData)}
+              isRegenerating={isLoading}
+            />
           </div>
         )}
         {error && (
@@ -81,4 +77,3 @@ export default function MarathonPlannerPage() {
     </main>
   );
 }
-

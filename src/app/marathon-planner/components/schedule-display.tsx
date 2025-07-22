@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { SchedulePoster } from './schedule-poster';
 import { ScheduleActions } from './schedule-actions';
+import { DonationSection } from './donation-section';
 import type { MarathonPlanFormData } from '../types';
 
 interface ScheduleDisplayProps {
@@ -75,7 +76,7 @@ export function ScheduleDisplay({
           raceName={raceName}
         />
       </div>
-      
+
       {/* 流式加载状态指示 */}
       {isLoading && schedule && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -83,14 +84,7 @@ export function ScheduleDisplay({
           <span>正在生成中...</span>
         </div>
       )}
-      
-      {/* 图片生成优化提示 */}
-      {!isLoading && schedule && (
-        <div className="text-center text-sm text-muted-foreground max-w-2xl">
-          <p>💡 课表图片将采用优化后的独立生成技术，确保在不同设备上都能获得高质量、一致性的输出效果。</p>
-        </div>
-      )}
-      
+
       {/* 操作按钮 - 仅在加载完成且有内容时显示 */}
       {showActions && formData && onRegenerate && (
         <ScheduleActions
@@ -100,6 +94,11 @@ export function ScheduleDisplay({
           isRegenerating={isRegenerating}
           schedule={schedule}
         />
+      )}
+
+      {/* 收款码区域 - 仅在课表生成完成时显示 */}
+      {!isLoading && schedule && (
+        <DonationSection className="w-full max-w-4xl" />
       )}
     </div>
   );

@@ -55,7 +55,7 @@ export function ScheduleActions({
 
       try {
         const filename = `${formData.raceName || '马拉松训练计划'}-${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.png`;
-        
+
         await downloadScheduleImage({
           schedule,
           raceName: formData.raceName,
@@ -228,8 +228,6 @@ export function ScheduleActions({
     setDownloadSuccess(false);
     onRegenerate();
   };
-
-
 
   // 下载按钮的内容和图标
   const getDownloadButtonContent = () => {
