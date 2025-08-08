@@ -90,7 +90,7 @@ export async function handleStreamResponse({
       const reasoning =
         ((chunk.choices[0]?.delta as Record<string, unknown>)
           ?.reasoning as string) || '';
-      const trimmedContent = content.trim();
+      
 
       // 处理reasoning属性（某些模型专有）
       if (reasoning) {
@@ -112,7 +112,7 @@ export async function handleStreamResponse({
         const START_TAGS = ['<think>', '<thinking>'];
         const END_TAGS = ['</think>', '</thinking>'];
 
-        let processedContent = content.replace(/\\n/g, '\n');
+        const processedContent = content.replace(/\\n/g, '\n');
 
         // 如果整个分片只包含某个单独的标签（常见于部分模型逐token输出）
         const onlyTag = processedContent.trim();
