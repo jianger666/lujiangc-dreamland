@@ -107,40 +107,77 @@ export async function handleStreamResponse({
         continue;
       }
 
-      // 处理<think>标签
-      if (trimmedContent === '<think>') {
-        isThinkMode = true;
-        continue;
-      }
-
-      if (trimmedContent === '</think>') {
-        isThinkMode = false;
-        continue;
-      }
-
-      // 有实际内容时进行处理
+      // 有实际内容时进行处理（兼容 <think> / </think> 以及 <thinking> / </thinking>）
       if (content) {
+        const START_TAGS = ['<think>', '<thinking>'];
+        const END_TAGS = ['</think>', '</thinking>'];
+
         let processedContent = content.replace(/\\n/g, '\n');
 
-        if (isThinkMode) {
-          // 处理思考内容
-          if (isFirstThinkBlock && processedContent) {
-            processedContent = processedContent.replace(/^[\n\r]+/, '');
-            isFirstThinkBlock = false;
+        // 如果整个分片只包含某个单独的标签（常见于部分模型逐token输出）
+        const onlyTag = processedContent.trim();
+        if (START_TAGS.includes(onlyTag)) {
+          isThinkMode = true;
+          continue;
+        }
+        if (END_TAGS.includes(onlyTag)) {
+          isThinkMode = false;
+          continue;
+        }
+
+        // 在同一分片中可能同时包含文本与标签；进行按标签拆分并路由
+        const allTags = [...START_TAGS, ...END_TAGS];
+
+        const emitSegment = (segment: string) => {
+          if (!segment) return;
+          if (isThinkMode) {
+            if (isFirstThinkBlock) {
+              segment = segment.replace(/^[\n\r]+/, '');
+              isFirstThinkBlock = false;
+            }
+            controller.enqueue(
+              encodeSSEMessage(AiStreamChunkTypeEnum.Think, segment)
+            );
+          } else {
+            if (isFirstTextBlock) {
+              segment = segment.replace(/^[\n\r]+/, '');
+              isFirstTextBlock = false;
+            }
+            controller.enqueue(
+              encodeSSEMessage(AiStreamChunkTypeEnum.Text, segment)
+            );
+          }
+        };
+
+        let cursor = 0;
+        while (cursor < processedContent.length) {
+          // 查找下一个标签
+          let nextIndex = -1;
+          let nextTag: string | null = null;
+          for (const tag of allTags) {
+            const idx = processedContent.indexOf(tag, cursor);
+            if (idx !== -1 && (nextIndex === -1 || idx < nextIndex)) {
+              nextIndex = idx;
+              nextTag = tag;
+            }
           }
 
-          controller.enqueue(
-            encodeSSEMessage(AiStreamChunkTypeEnum.Think, processedContent)
-          );
-        } else {
-          if (isFirstTextBlock && processedContent) {
-            processedContent = processedContent.replace(/^[\n\r]+/, '');
-            isFirstTextBlock = false;
+          if (nextIndex === -1 || nextTag === null) {
+            // 无后续标签，直接输出剩余内容
+            emitSegment(processedContent.slice(cursor));
+            break;
           }
 
-          controller.enqueue(
-            encodeSSEMessage(AiStreamChunkTypeEnum.Text, processedContent)
-          );
+          // 输出标签前的段落
+          emitSegment(processedContent.slice(cursor, nextIndex));
+
+          // 根据标签切换模式，并跳过标签本身
+          if (START_TAGS.includes(nextTag)) {
+            isThinkMode = true;
+          } else if (END_TAGS.includes(nextTag)) {
+            isThinkMode = false;
+          }
+          cursor = nextIndex + nextTag.length;
         }
       }
     }
