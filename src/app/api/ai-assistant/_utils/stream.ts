@@ -90,7 +90,6 @@ export async function handleStreamResponse({
       const reasoning =
         ((chunk.choices[0]?.delta as Record<string, unknown>)
           ?.reasoning as string) || '';
-      
 
       // 处理reasoning属性（某些模型专有）
       if (reasoning) {
