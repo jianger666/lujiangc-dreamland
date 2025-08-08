@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack --port 3939",
     "build": "next build",
     "start": "next start",
-    "prepare": "husky install",
+    "prepare": "husky",
     "lint": "next lint",
     "lint:fix": "next lint --fix"
   },

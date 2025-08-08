@@ -51,6 +51,15 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       },
     ],
   },
+  [AIModelEnum.GPT5]: {
+    displayName: 'gpt-5',
+    instances: [
+      {
+        provider: AIProviderEnum.CURSOR_PROXY,
+        modelId: 'gpt-5',
+      },
+    ],
+  },
   [AIModelEnum.Gp4oMini]: {
     displayName: 'gpt-4o-mini',
     instances: [

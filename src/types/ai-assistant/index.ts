@@ -73,6 +73,7 @@ export enum AIModelEnum {
   DeepSeekR1 = 'DeepSeekR1',
   Default = 'Default',
   Gp4oMini = 'Gp4oMini',
+  GPT5 = 'gpt-5',
   // 不是模型名称，专门用于对话内容生成标题的模型一类
   TitleGenerator = 'TitleGenerator',
   // 不是模型名称，专门用于图像理解的模型一类
