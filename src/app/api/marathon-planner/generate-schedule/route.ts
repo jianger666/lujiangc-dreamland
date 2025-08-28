@@ -59,7 +59,7 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
     };
 
     const response = (await tryChatCompletionWithFailover(
-      AIModelEnum.Default,
+      AIModelEnum.DeepSeekV30324,
       requestOptions
     )) as AsyncIterable<ChatCompletionChunk>;
 
