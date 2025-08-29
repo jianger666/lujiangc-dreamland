@@ -70,6 +70,7 @@ export interface ProviderConfig {
 
 export enum AIModelEnum {
   DeepSeekV30324 = 'DeepSeekV30324',
+  DeepSeekV31 = 'DeepSeekV31',
   DeepSeekR1 = 'DeepSeekR1',
   Default = 'Default',
   Gp4oMini = 'Gp4oMini',

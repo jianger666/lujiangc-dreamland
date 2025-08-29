@@ -75,6 +75,15 @@ export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
       },
     ],
   },
+  [AIModelEnum.DeepSeekV31]: {
+    displayName: 'DeepSeek-V3.1',
+    instances: [
+      {
+        provider: AIProviderEnum.OPEN_ROUTER,
+        modelId: 'deepseek/deepseek-chat-v3.1:free',
+      },
+    ],
+  },
   [AIModelEnum.DeepSeekR1]: {
     displayName: 'DeepSeek-R1',
     instances: [
