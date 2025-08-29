@@ -54,9 +54,19 @@ const formSchema = z.object({
   maxHeartRate: z.coerce
     .number({
       invalid_type_error: '最大心率必须是有效数字',
+      required_error: '最大心率不能为空',
     })
-    .positive('最大心率必须大于0')
-    .optional(),
+    .positive('最大心率必须大于0'),
+  lactateThresholdHeartRate: z
+    .union([
+      z.string().min(1).pipe(z.coerce.number().positive('乳酸阈心率必须大于0')),
+      z.literal(''),
+    ])
+    .optional()
+    .transform((val) => {
+      if (val === '' || val === undefined) return undefined;
+      return typeof val === 'number' ? val : Number(val);
+    }),
   trainingSchedule: z
     .array(
       z.object({
@@ -189,7 +199,16 @@ export const MarathonForm: React.FC<MarathonFormProps> = ({
               name="maxHeartRate"
               label="最大心率 (BPM)"
               type="number"
-              placeholder="选填, 不清楚可按 220-年龄 估算"
+              placeholder="不清楚可按 220-年龄 估算"
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+            <InputField
+              name="lactateThresholdHeartRate"
+              label="乳酸阈心率 (BPM)"
+              type="number"
+              placeholder="选填，如果提供将优先用于心率区间计算"
+              description="乳酸阈心率是训练中的重要指标，通常通过专业测试获得"
             />
           </div>
           <RadioGroupField

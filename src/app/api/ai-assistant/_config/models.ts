@@ -34,32 +34,9 @@ export const PROVIDERS_CONFIG: Record<AIProviderEnum, ProviderConfig> = {
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
     apiKeys: [process.env.ZHIPU_API_KEY!],
   },
-  [AIProviderEnum.CURSOR_PROXY]: {
-    // 当前域名
-    baseURL: process.env.NEXT_PUBLIC_APP_URL + '/api/cursor2openai/v1',
-    apiKeys: [process.env.CURSOR_PROXY_API_KEY!],
-  },
 };
 
 export const MODELS_CONFIG: Record<AIModelEnum, ModelConfig> = {
-  [AIModelEnum.Default]: {
-    displayName: 'default',
-    instances: [
-      {
-        provider: AIProviderEnum.CURSOR_PROXY,
-        modelId: 'default',
-      },
-    ],
-  },
-  [AIModelEnum.GPT5]: {
-    displayName: 'gpt-5',
-    instances: [
-      {
-        provider: AIProviderEnum.CURSOR_PROXY,
-        modelId: 'gpt-5',
-      },
-    ],
-  },
   [AIModelEnum.Gp4oMini]: {
     displayName: 'gpt-4o-mini',
     instances: [

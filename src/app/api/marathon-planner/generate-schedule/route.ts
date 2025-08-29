@@ -42,7 +42,9 @@ const handleGenerateSchedule = apiHandler(async (req: NextRequest) => {
       currentPB: currentPB ? formatTargetTime(currentPB) : '无',
       targetTime: formatTargetTime(targetTime),
       currentWeeklyMileage: formData.currentWeeklyMileage.toString(),
-      maxHeartRate: formData.maxHeartRate?.toString() || '未提供',
+      maxHeartRate: formData.maxHeartRate.toString(),
+      lactateThresholdHeartRate:
+        formData.lactateThresholdHeartRate?.toString() || '未提供',
       trainingSchedule,
       additionalNotes: formData.additionalNotes || '无特殊要求',
     };

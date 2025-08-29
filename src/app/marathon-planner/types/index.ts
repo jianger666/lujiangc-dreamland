@@ -7,7 +7,8 @@ export interface MarathonPlanFormData {
   targetTime: number;
   currentWeeklyMileage: number;
   experienceLevel: 'newbie' | 'intermediate' | 'advanced';
-  maxHeartRate?: number;
+  maxHeartRate: number;
+  lactateThresholdHeartRate?: number;
   trainingSchedule: {
     day: string;
     label: string;
