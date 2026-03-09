@@ -200,29 +200,6 @@ export async function getChatIdByUserId(userId: string): Promise<string> {
   return data.data.chat_id;
 }
 
-export async function createP2PChat(_userId: string): Promise<string> {
-  const token = await getTenantAccessToken();
-
-  const res = await fetch(`${FEISHU_BASE_URL}/im/v1/chats`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      chat_mode: 'p2p',
-      user_id_type: 'open_id',
-    }),
-  });
-
-  const data = await res.json();
-  if (data.code !== 0) {
-    throw new Error(`Failed to create P2P chat: ${data.msg}`);
-  }
-
-  return data.data.chat_id;
-}
-
 export async function sendMessageByOpenId(
   openId: string,
   markdown: string

@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server';
 import { getPairByCode, savePendingRequest } from '@/lib/services/feishu/store';
 import { sendMessageByOpenId } from '@/lib/services/feishu/client';
+import { apiHandler } from '@/lib/api/handler';
 
 const API_SECRET = process.env.FEEDBACK_API_SECRET;
 
-export async function POST(request: NextRequest) {
+export const POST = apiHandler(async (request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
   if (API_SECRET && authHeader !== `Bearer ${API_SECRET}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -48,4 +49,4 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   }
-}
+});

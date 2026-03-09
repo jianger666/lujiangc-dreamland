@@ -6,20 +6,19 @@ import {
   saveReply,
 } from '@/lib/services/feishu/store';
 import { sendTextMessage } from '@/lib/services/feishu/client';
+import { apiHandler } from '@/lib/api/handler';
 
 const VERIFICATION_TOKEN = process.env.FEISHU_VERIFICATION_TOKEN;
 
 const processedEvents = new Set<string>();
 
-export async function POST(request: NextRequest) {
+export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json();
 
-  // URL verification challenge
   if (body.type === 'url_verification') {
     return Response.json({ challenge: body.challenge });
   }
 
-  // Verify token if configured
   if (VERIFICATION_TOKEN && body.header?.token !== VERIFICATION_TOKEN) {
     return Response.json({ error: 'Invalid token' }, { status: 403 });
   }
@@ -40,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   return Response.json({ ok: true });
-}
+});
 
 async function handleMessageReceive(event: any) {
   const sender = event.sender?.sender_id?.open_id;
@@ -60,7 +59,6 @@ async function handleMessageReceive(event: any) {
     return;
   }
 
-  // Handle pair command
   const pairMatch =
     textContent.match(/^\/pair\s+(\S+)/i) || textContent.match(/^CF-(\S+)/i);
   if (pairMatch) {
@@ -79,7 +77,6 @@ async function handleMessageReceive(event: any) {
     return;
   }
 
-  // Handle reply to pending request
   const userInfo = await getPairByUser(sender);
   if (!userInfo) {
     await sendTextMessage(
