@@ -80,7 +80,7 @@ function markdownToRichText(
     }
 
     const elements: FeishuRichTextElement[] = [];
-    let remaining = line;
+    const remaining = line;
 
     // **bold** and `code` and [link](url)
     const inlineRegex = /\*\*(.+?)\*\*|`(.+?)`|\[(.+?)\]\((.+?)\)/g;
@@ -178,16 +178,19 @@ export async function sendTextMessage(
 export async function getChatIdByUserId(userId: string): Promise<string> {
   const token = await getTenantAccessToken();
 
-  const res = await fetch(`${FEISHU_BASE_URL}/im/v1/chats?user_id_type=open_id`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      user_id: userId,
-    }),
-  });
+  const res = await fetch(
+    `${FEISHU_BASE_URL}/im/v1/chats?user_id_type=open_id`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user_id: userId,
+      }),
+    }
+  );
 
   const data = await res.json();
   if (data.code !== 0) {
@@ -197,7 +200,7 @@ export async function getChatIdByUserId(userId: string): Promise<string> {
   return data.data.chat_id;
 }
 
-export async function createP2PChat(userId: string): Promise<string> {
+export async function createP2PChat(_userId: string): Promise<string> {
   const token = await getTenantAccessToken();
 
   const res = await fetch(`${FEISHU_BASE_URL}/im/v1/chats`, {

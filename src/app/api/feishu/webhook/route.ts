@@ -61,15 +61,21 @@ async function handleMessageReceive(event: any) {
   }
 
   // Handle pair command
-  const pairMatch = textContent.match(/^\/pair\s+(\S+)/i) || textContent.match(/^CF-(\S+)/i);
+  const pairMatch =
+    textContent.match(/^\/pair\s+(\S+)/i) || textContent.match(/^CF-(\S+)/i);
   if (pairMatch) {
-    const code = textContent.startsWith('/pair') ? pairMatch[1] : `CF-${pairMatch[1]}`;
+    const code = textContent.startsWith('/pair')
+      ? pairMatch[1]
+      : `CF-${pairMatch[1]}`;
     await savePair(code, {
       feishuOpenId: sender,
       chatId,
       createdAt: Date.now(),
     });
-    await sendTextMessage(chatId, `✅ 绑定成功！配对码: ${code}\n\n之后 Cursor AI 的反馈消息会发送到这里，你可以直接回复。`);
+    await sendTextMessage(
+      chatId,
+      `✅ 绑定成功！配对码: ${code}\n\n之后 Cursor AI 的反馈消息会发送到这里，你可以直接回复。`
+    );
     return;
   }
 
@@ -85,7 +91,10 @@ async function handleMessageReceive(event: any) {
 
   const pending = await getPendingRequest(sender);
   if (!pending) {
-    await sendTextMessage(chatId, '当前没有待回复的反馈请求。AI 下次提问时会发送到这里。');
+    await sendTextMessage(
+      chatId,
+      '当前没有待回复的反馈请求。AI 下次提问时会发送到这里。'
+    );
     return;
   }
 

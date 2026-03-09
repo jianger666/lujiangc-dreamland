@@ -15,7 +15,9 @@ async function getKV() {
     kv = mod.kv;
     return kv;
   } catch {
-    console.warn('[FeishuStore] @vercel/kv not available, using in-memory store');
+    console.warn(
+      '[FeishuStore] @vercel/kv not available, using in-memory store'
+    );
     return null;
   }
 }
@@ -105,7 +107,11 @@ export async function savePendingRequest(
   request: PendingRequest
 ) {
   await kvSet(`pending:${feishuOpenId}`, request, 600);
-  await kvSet(`req:${request.requestId}`, { feishuOpenId, status: 'pending' }, 600);
+  await kvSet(
+    `req:${request.requestId}`,
+    { feishuOpenId, status: 'pending' },
+    600
+  );
 }
 
 export async function getPendingRequest(
