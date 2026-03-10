@@ -281,14 +281,10 @@ export const POST = apiHandler(async (request: NextRequest) => {
               if (remainingText) sendSSE(remainingText);
 
               if (toolCallBlocks.length > 0) {
-                const parsed = parseToolCalls(
-                  toolCallBlocks
-                    .map(
-                      (b: string) => `<tool_call>\n${b}\n</tool_call>`
-                    )
-                    .join('\n'),
-                  tools
-                );
+                const tcXml = toolCallBlocks
+                  .map((b: string) => `<tool_call>\n${b}\n</tool_call>`)
+                  .join('\n');
+                const parsed = parseToolCalls(tcXml, tools);
                 if (parsed.length > 0) {
                   sendToolCallSSE(
                     parsed.map((tc: any, i: number) => ({
