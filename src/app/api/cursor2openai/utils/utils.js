@@ -46,7 +46,7 @@ function generateCursorBody(messages, modelName, tools, toolChoice) {
       content: normalizeContent(msg.content),
       role: msg.role === 'user' ? 1 : 2,
       messageId: uuidv4(),
-      ...(msg.role === 'user' ? { chatModeEnum: 2 } : {})
+      ...(msg.role === 'user' && (tools && tools.length > 0) ? { chatModeEnum: 2 } : {})
     }));
 
   const messageIds = formattedMessages.map(msg => {
@@ -87,45 +87,22 @@ function generateCursorBody(messages, modelName, tools, toolChoice) {
         path: "/bin/bash",
         timestamp: new Date().toISOString(),
       },
-      unknown27: 1, // is_agentic = true (field 27) — REQUIRED for Agent mode
-      // supported_tools (field 29): ClientSideToolV2 enum values.
-      // REQUIRED for Agent mode system prompt. Without these, Cursor's backend
-      // generates an "Ask mode" system prompt regardless of other fields.
-      // The proxy intercepts native tool calls from the response (see
-      // findNativeToolCalls) and converts them to OpenClaw format so the
-      // existing OpenAI-compatible pipeline handles them.
-      //
-      // EDIT_FILE (7) and EDIT_FILE_V2 (38) are now INCLUDED.
-      // Cursor streams large tool calls across multiple frames using
-      // is_streaming (field 14) and is_last_message (field 15). The
-      // StreamingToolCallAccumulator concatenates rawArgs deltas across
-      // frames, so full file content is captured before JSON.parse.
-      // If accumulation fails, the truncation fallback (heredoc hint)
-      // remains as a safety net.
-      supportedTools: [
-        5,  // READ_FILE
-        6,  // LIST_DIR
-        7,  // EDIT_FILE — now enabled: streaming rawArgs accumulation handles large payloads
-        8,  // FILE_SEARCH
-        11, // DELETE_FILE — maps to exec rm, common file operation
-        15, // RUN_TERMINAL_COMMAND_V2
-        18, // WEB_SEARCH
-        38, // EDIT_FILE_V2 — now enabled: streaming rawArgs accumulation handles large payloads
-        39, // LIST_DIR_V2
-        40, // READ_FILE_V2
-        41, // RIPGREP_RAW_SEARCH
-        42, // GLOB_FILE_SEARCH
-      ],
+      ...(tools && tools.length > 0 ? {
+        unknown27: 1,
+        supportedTools: [
+          5, 6, 7, 8, 11, 15, 18, 38, 39, 40, 41, 42,
+        ],
+        chatModeEnum: 2,
+        chatMode: "Agent"
+      } : {}),
       messageIds: messageIds,
       largeContext: 0,
       unknown38: 0,
-      chatModeEnum: 2,
       unknown47: "",
-      unknown48: 1, // field 48 — purpose unconfirmed, kept at 1 (matching known working state)
+      unknown48: 1,
       unknown49: 0,
       unknown51: 0,
-      unknown53: 1,
-      chatMode: "Agent"
+      unknown53: 1
     }
   };
 
