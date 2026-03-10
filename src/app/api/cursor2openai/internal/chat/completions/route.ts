@@ -277,7 +277,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
             let finishReason = 'stop';
 
             if (toolDetector) {
-              const { remainingText, toolCallBlocks } = toolDetector.flush();
+              const { remainingText, toolCallBlocks } = toolDetector.finish();
               if (remainingText) sendSSE(remainingText);
 
               if (toolCallBlocks.length > 0) {
