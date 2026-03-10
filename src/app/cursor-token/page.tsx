@@ -222,6 +222,33 @@ export default function CursorTokenPage() {
                 </div>
 
                 <div className="rounded-xl border border-gray-700 bg-gray-900/50 p-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-gray-300">
+                      示例调用
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const baseUrl =
+                          typeof window !== 'undefined'
+                            ? window.location.origin
+                            : '';
+                        const cmd = `curl ${baseUrl}/api/cursor2openai/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer ${token}" \\\n  -d '{"model":"claude-4.5-sonnet","messages":[{"role":"user","content":"你好"}],"stream":true}'`;
+                        navigator.clipboard.writeText(cmd);
+                      }}
+                      className="rounded-lg bg-gray-700 px-3 py-1 text-xs text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
+                    >
+                      复制 curl
+                    </button>
+                  </div>
+                  <pre className="overflow-x-auto rounded-lg bg-gray-950 p-3 font-mono text-xs leading-relaxed text-green-400">
+                    {`curl ${typeof window !== 'undefined' ? window.location.origin : ''}/api/cursor2openai/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer ${token.substring(0, 20)}..." \\
+  -d '{"model":"claude-4.5-sonnet","messages":[{"role":"user","content":"你好"}],"stream":true}'`}
+                  </pre>
+                </div>
+
+                <div className="rounded-xl border border-gray-700 bg-gray-900/50 p-5">
                   <h3 className="mb-3 text-sm font-medium text-gray-300">
                     可用模型（{models.length}）
                   </h3>
