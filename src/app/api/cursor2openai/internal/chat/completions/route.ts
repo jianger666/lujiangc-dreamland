@@ -11,8 +11,12 @@ const {
   chunkToUtf8String,
   generateHashed64Hex,
   generateCursorChecksum,
+  IncrementalFrameParser,
+  processSingleFrame,
 } = require('../../../utils/utils.js');
 /* eslint-enable @typescript-eslint/no-require-imports */
+
+export const maxDuration = 60;
 
 export const GET = apiHandler(async (request: NextRequest) => {
   try {
@@ -29,7 +33,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
     const cursorChecksum =
       request.headers.get('x-cursor-checksum') ??
       generateCursorChecksum(authToken?.trim() || '');
-    const cursorClientVersion = '0.48.7';
+    const cursorClientVersion = '2.4.28';
 
     const availableModelsResponse = await fetch(
       'https://api2.cursor.sh/aiserver.v1.AiService/AvailableModels',
@@ -116,13 +120,20 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
     const sessionid = uuidv5(authToken, uuidv5.DNS);
     const clientKey = generateHashed64Hex(authToken);
-    const cursorClientVersion = '0.48.7';
+    const cursorClientVersion = '2.4.28';
     const cursorConfigVersion = uuidv4();
 
-    const cursorBody = generateCursorBody(messages, model);
+    const cursorBody = generateCursorBody(messages, model, null, null);
+    const dispatcherOpts = {
+      allowH2: true,
+      bodyTimeout: 0,
+      headersTimeout: 0,
+      keepAliveTimeout: 600000,
+      keepAliveMaxTimeout: 600000,
+    };
     const dispatcher = config.proxy.enabled
-      ? new ProxyAgent(config.proxy.url, { allowH2: true })
-      : new Agent({ allowH2: true });
+      ? new ProxyAgent(config.proxy.url, dispatcherOpts)
+      : new Agent(dispatcherOpts);
 
     const response = await fetch(
       'https://api2.cursor.sh/aiserver.v1.ChatService/StreamUnifiedChatWithTools',
@@ -148,10 +159,6 @@ export const POST = apiHandler(async (request: NextRequest) => {
         },
         body: cursorBody,
         dispatcher: dispatcher,
-        timeout: {
-          connect: 5000,
-          read: 30000,
-        },
       }
     );
 
@@ -170,66 +177,81 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
       const readableStream = new ReadableStream({
         async start(controller) {
+          const frameParser = new IncrementalFrameParser();
+          const seenToolCallIds = new Set();
+          let firstChunkSent = false;
+          let thinkingBuffer = '';
+
+          function sendSSE(content: string) {
+            if (!content) return;
+            const delta: Record<string, string> = { content };
+            if (!firstChunkSent) {
+              (delta as any).role = 'assistant';
+              firstChunkSent = true;
+            }
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  id: responseId,
+                  object: 'chat.completion.chunk',
+                  created: Math.floor(Date.now() / 1000),
+                  model: model,
+                  choices: [{ index: 0, delta, finish_reason: null }],
+                })}\n\n`
+              )
+            );
+          }
+
           try {
-            let thinkingStart = '<thinking>';
-            let thinkingEnd = '</thinking>';
             for await (const chunk of response.body as any) {
-              const { thinking, text } = chunkToUtf8String(chunk);
-              let content = '';
-
-              if (thinkingStart !== '' && thinking.length > 0) {
-                content += thinkingStart + '\n';
-                thinkingStart = '';
-              }
-              content += thinking;
-              if (
-                thinkingEnd !== '' &&
-                thinking.length === 0 &&
-                text.length !== 0 &&
-                thinkingStart === ''
-              ) {
-                content += '\n' + thinkingEnd + '\n';
-                thinkingEnd = '';
-              }
-
-              content += text;
-
-              if (content.length > 0) {
-                controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({
-                      id: responseId,
-                      object: 'chat.completion.chunk',
-                      created: Math.floor(Date.now() / 1000),
-                      model: model,
-                      choices: [
-                        {
-                          index: 0,
-                          delta: {
-                            content: content,
-                          },
-                        },
-                      ],
-                    })}\n\n`
-                  )
+              const frames = frameParser.addChunk(Buffer.from(chunk));
+              for (const frame of frames) {
+                const { text, thinking } = processSingleFrame(
+                  frame.magic,
+                  frame.data,
+                  seenToolCallIds
                 );
+
+                if (thinking) {
+                  if (!thinkingBuffer) {
+                    sendSSE('<thinking>\n');
+                  }
+                  thinkingBuffer += thinking;
+                  sendSSE(thinking);
+                }
+
+                if (text) {
+                  if (thinkingBuffer) {
+                    sendSSE('\n</thinking>\n');
+                    thinkingBuffer = '';
+                  }
+                  sendSSE(text);
+                }
               }
             }
+
+            if (thinkingBuffer) {
+              sendSSE('\n</thinking>\n');
+            }
+
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  id: responseId,
+                  object: 'chat.completion.chunk',
+                  created: Math.floor(Date.now() / 1000),
+                  model: model,
+                  choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
+                })}\n\n`
+              )
+            );
           } catch (streamError: any) {
             console.error('Stream error:', streamError);
-            if (streamError.name === 'TimeoutError') {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ error: 'Server response timeout' })}\n\n`
-                )
-              );
-            } else {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ error: 'Stream processing error' })}\n\n`
-                )
-              );
-            }
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ error: streamError.message || 'Stream processing error' })}\n\n`
+              )
+            );
           } finally {
             controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             controller.close();
@@ -246,29 +268,21 @@ export const POST = apiHandler(async (request: NextRequest) => {
       });
     } else {
       try {
-        let thinkingStart = '<thinking>';
-        let thinkingEnd = '</thinking>';
-        let content = '';
+        const rawChunksNS: Buffer[] = [];
         for await (const chunk of response.body as any) {
-          const { thinking, text } = chunkToUtf8String(chunk);
-
-          if (thinkingStart !== '' && thinking.length > 0) {
-            content += thinkingStart + '\n';
-            thinkingStart = '';
-          }
-          content += thinking;
-          if (
-            thinkingEnd !== '' &&
-            thinking.length === 0 &&
-            text.length !== 0 &&
-            thinkingStart === ''
-          ) {
-            content += '\n' + thinkingEnd + '\n';
-            thinkingEnd = '';
-          }
-
-          content += text;
+          rawChunksNS.push(Buffer.from(chunk));
         }
+        const fullBufferNS = Buffer.concat(rawChunksNS);
+        const {
+          thinking: thinkNS,
+          text: textNS,
+        } = chunkToUtf8String(fullBufferNS);
+
+        let content = '';
+        if (thinkNS && thinkNS.length > 0) {
+          content += '<thinking>\n' + thinkNS + '\n</thinking>\n';
+        }
+        content += textNS;
 
         return NextResponse.json({
           id: `chatcmpl-${uuidv4()}`,

@@ -5,7 +5,7 @@ export const runtime = 'edge';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
@@ -24,32 +24,6 @@ export const GET = apiHandler(async (request: NextRequest) => {
   const response = await fetch(internalUrl, {
     method: 'GET',
     headers,
-  });
-
-  const newHeaders = new Headers(response.headers);
-  Object.entries(corsHeaders).forEach(([k, v]) => newHeaders.set(k, v));
-
-  return new Response(response.body, {
-    status: response.status,
-    headers: newHeaders,
-  });
-});
-
-export const POST = apiHandler(async (request: NextRequest) => {
-  const baseUrl = new URL(request.url).origin;
-  const internalUrl = `${baseUrl}/api/cursor2openai/internal/chat/completions`;
-
-  const headers: Record<string, string> = {};
-  request.headers.forEach((value, key) => {
-    headers[key] = value;
-  });
-
-  const body = await request.text();
-
-  const response = await fetch(internalUrl, {
-    method: 'POST',
-    headers,
-    body,
   });
 
   const newHeaders = new Headers(response.headers);
