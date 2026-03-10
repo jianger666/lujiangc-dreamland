@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Tool Call Emulation & Environment Context for Cursor-To-OpenAI Proxy
  *

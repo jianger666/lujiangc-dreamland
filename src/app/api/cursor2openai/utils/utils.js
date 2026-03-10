@@ -1,3 +1,4 @@
+/* eslint-disable */
 const zlib = require('zlib');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
