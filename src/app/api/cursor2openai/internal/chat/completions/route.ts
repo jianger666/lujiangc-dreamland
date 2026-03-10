@@ -13,7 +13,12 @@ const {
   generateCursorChecksum,
   IncrementalFrameParser,
   processSingleFrame,
+  StreamingToolCallDetector,
 } = require('../../../utils/utils.js');
+const {
+  parseToolCalls,
+  hasToolCallTags,
+} = require('../../../utils/toolEmulation.js');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 export const maxDuration = 60;
@@ -86,7 +91,13 @@ export const GET = apiHandler(async (request: NextRequest) => {
 export const POST = apiHandler(async (request: NextRequest) => {
   try {
     const body = await request.json();
-    const { model, messages, stream = false } = body;
+    const {
+      model,
+      messages,
+      stream = false,
+      tools = null,
+      tool_choice: toolChoice = null,
+    } = body;
     const bearerToken = request.headers
       .get('authorization')
       ?.replace('Bearer ', '');
@@ -123,7 +134,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     const cursorClientVersion = '2.4.28';
     const cursorConfigVersion = uuidv4();
 
-    const cursorBody = generateCursorBody(messages, model, null, null);
+    const cursorBody = generateCursorBody(messages, model, tools, toolChoice);
     const dispatcherOpts = {
       allowH2: true,
       bodyTimeout: 0,
@@ -174,11 +185,15 @@ export const POST = apiHandler(async (request: NextRequest) => {
     if (stream) {
       const encoder = new TextEncoder();
       const responseId = `chatcmpl-${uuidv4()}`;
+      const hasTools = tools && tools.length > 0;
 
       const readableStream = new ReadableStream({
         async start(controller) {
           const frameParser = new IncrementalFrameParser();
           const seenToolCallIds = new Set();
+          const toolDetector = hasTools
+            ? new StreamingToolCallDetector()
+            : null;
           let firstChunkSent = false;
           let thinkingBuffer = '';
 
@@ -189,6 +204,26 @@ export const POST = apiHandler(async (request: NextRequest) => {
               (delta as any).role = 'assistant';
               firstChunkSent = true;
             }
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  id: responseId,
+                  object: 'chat.completion.chunk',
+                  created: Math.floor(Date.now() / 1000),
+                  model: model,
+                  choices: [{ index: 0, delta, finish_reason: null }],
+                })}\n\n`
+              )
+            );
+          }
+
+          function sendToolCallSSE(toolCallArr: any[]) {
+            const delta: any = {};
+            if (!firstChunkSent) {
+              delta.role = 'assistant';
+              firstChunkSent = true;
+            }
+            delta.tool_calls = toolCallArr;
             controller.enqueue(
               encoder.encode(
                 `data: ${JSON.stringify({
@@ -225,13 +260,50 @@ export const POST = apiHandler(async (request: NextRequest) => {
                     sendSSE('\n</thinking>\n');
                     thinkingBuffer = '';
                   }
-                  sendSSE(text);
+                  if (toolDetector) {
+                    const safeText = toolDetector.addText(text);
+                    if (safeText) sendSSE(safeText);
+                  } else {
+                    sendSSE(text);
+                  }
                 }
               }
             }
 
             if (thinkingBuffer) {
               sendSSE('\n</thinking>\n');
+            }
+
+            let finishReason = 'stop';
+
+            if (toolDetector) {
+              const { remainingText, toolCallBlocks } = toolDetector.flush();
+              if (remainingText) sendSSE(remainingText);
+
+              if (toolCallBlocks.length > 0) {
+                const parsed = parseToolCalls(
+                  toolCallBlocks
+                    .map(
+                      (b: string) => `<tool_call>\n${b}\n</tool_call>`
+                    )
+                    .join('\n'),
+                  tools
+                );
+                if (parsed.length > 0) {
+                  sendToolCallSSE(
+                    parsed.map((tc: any, i: number) => ({
+                      index: i,
+                      id: tc.id,
+                      type: 'function',
+                      function: {
+                        name: tc.function.name,
+                        arguments: tc.function.arguments,
+                      },
+                    }))
+                  );
+                  finishReason = 'tool_calls';
+                }
+              }
             }
 
             controller.enqueue(
@@ -241,7 +313,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
                   object: 'chat.completion.chunk',
                   created: Math.floor(Date.now() / 1000),
                   model: model,
-                  choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
+                  choices: [
+                    { index: 0, delta: {}, finish_reason: finishReason },
+                  ],
                 })}\n\n`
               )
             );
@@ -281,6 +355,47 @@ export const POST = apiHandler(async (request: NextRequest) => {
           content += '<thinking>\n' + thinkNS + '\n</thinking>\n';
         }
         content += textNS;
+
+        const hasToolTags =
+          tools && tools.length > 0 && hasToolCallTags(content);
+        if (hasToolTags) {
+          const parsed = parseToolCalls(content, tools);
+          if (parsed.length > 0) {
+            const cleanContent = content
+              .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, '')
+              .trim();
+            return NextResponse.json({
+              id: `chatcmpl-${uuidv4()}`,
+              object: 'chat.completion',
+              created: Math.floor(Date.now() / 1000),
+              model: model,
+              choices: [
+                {
+                  index: 0,
+                  message: {
+                    role: 'assistant',
+                    content: cleanContent || null,
+                    tool_calls: parsed.map((tc: any, i: number) => ({
+                      index: i,
+                      id: tc.id,
+                      type: 'function',
+                      function: {
+                        name: tc.function.name,
+                        arguments: tc.function.arguments,
+                      },
+                    })),
+                  },
+                  finish_reason: 'tool_calls',
+                },
+              ],
+              usage: {
+                prompt_tokens: 0,
+                completion_tokens: 0,
+                total_tokens: 0,
+              },
+            });
+          }
+        }
 
         return NextResponse.json({
           id: `chatcmpl-${uuidv4()}`,
