@@ -273,10 +273,8 @@ export const POST = apiHandler(async (request: NextRequest) => {
           rawChunksNS.push(Buffer.from(chunk));
         }
         const fullBufferNS = Buffer.concat(rawChunksNS);
-        const {
-          thinking: thinkNS,
-          text: textNS,
-        } = chunkToUtf8String(fullBufferNS);
+        const { thinking: thinkNS, text: textNS } =
+          chunkToUtf8String(fullBufferNS);
 
         let content = '';
         if (thinkNS && thinkNS.length > 0) {
