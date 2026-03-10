@@ -141,9 +141,7 @@ export default function CursorTokenPage() {
           {state === 'success' && (
             <div className="space-y-6">
               <div className="rounded-xl border border-green-800 bg-green-900/30 p-4 text-center">
-                <p className="text-lg font-medium text-green-300">
-                  登录成功！
-                </p>
+                <p className="text-lg font-medium text-green-300">登录成功！</p>
               </div>
 
               <div>
