@@ -46,7 +46,7 @@ function generateCursorBody(messages, modelName, tools, toolChoice) {
       content: normalizeContent(msg.content),
       role: msg.role === 'user' ? 1 : 2,
       messageId: uuidv4(),
-      ...(msg.role === 'user' && (tools && tools.length > 0) ? { chatModeEnum: 2 } : {})
+      ...(msg.role === 'user' ? { chatModeEnum: 2 } : {})
     }));
 
   const messageIds = formattedMessages.map(msg => {
@@ -87,22 +87,20 @@ function generateCursorBody(messages, modelName, tools, toolChoice) {
         path: "/bin/bash",
         timestamp: new Date().toISOString(),
       },
-      ...(tools && tools.length > 0 ? {
-        unknown27: 1,
-        supportedTools: [
-          5, 6, 7, 8, 11, 15, 18, 38, 39, 40, 41, 42,
-        ],
-        chatModeEnum: 2,
-        chatMode: "Agent"
-      } : {}),
+      unknown27: 1,
+      supportedTools: [
+        5, 6, 7, 8, 11, 15, 18, 38, 39, 40, 41, 42,
+      ],
       messageIds: messageIds,
       largeContext: 0,
       unknown38: 0,
+      chatModeEnum: 2,
       unknown47: "",
       unknown48: 1,
       unknown49: 0,
       unknown51: 0,
-      unknown53: 1
+      unknown53: 1,
+      chatMode: "Agent"
     }
   };
 
