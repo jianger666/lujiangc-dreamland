@@ -201,6 +201,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
           let allTextAccumulated = '';
           let allThinking = '';
           let firstChunkSent = false;
+          let cursorApiError: any = null;
 
           function sendTextChunk(text: string) {
             if (!text) return;
@@ -231,12 +232,17 @@ export const POST = apiHandler(async (request: NextRequest) => {
                     text,
                     thinking,
                     nativeToolCalls: frameTCs,
+                    error: frameError,
                     parallelToolCallsComplete,
                   } = processSingleFrame(
                     frame.magic,
                     frame.data,
                     seenToolCallIds
                   );
+
+                  if (frameError && !cursorApiError) {
+                    cursorApiError = frameError;
+                  }
 
                   if (
                     parallelToolCallsComplete &&
@@ -400,6 +406,21 @@ export const POST = apiHandler(async (request: NextRequest) => {
                   })}\n\n`
                 )
               );
+            } else if (
+              cursorApiError &&
+              cursorApiError.type === 'context_overflow'
+            ) {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    error: {
+                      message: cursorApiError.message,
+                      type: 'invalid_request_error',
+                      code: cursorApiError.code,
+                    },
+                  })}\n\n`
+                )
+              );
             } else {
               controller.enqueue(
                 encoder.encode(
@@ -452,8 +473,24 @@ export const POST = apiHandler(async (request: NextRequest) => {
           throw new Error('No data received from Cursor API');
         }
         const fullBufferNS = Buffer.concat(rawChunksNS);
-        const { thinking: thinkNS, text: textNS } =
-          chunkToUtf8String(fullBufferNS);
+        const {
+          thinking: thinkNS,
+          text: textNS,
+          error: nsError,
+        } = chunkToUtf8String(fullBufferNS);
+
+        if (nsError && nsError.type === 'context_overflow') {
+          return NextResponse.json(
+            {
+              error: {
+                message: nsError.message,
+                type: 'invalid_request_error',
+                code: nsError.code,
+              },
+            },
+            { status: 400 }
+          );
+        }
 
         let content = '';
         if (thinkNS && thinkNS.length > 0) {
