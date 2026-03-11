@@ -16,7 +16,6 @@ const {
   StreamingToolCallDetector,
   StreamingToolCallAccumulator,
   convertNativeToolCall,
-  CURSOR_TOOL_NAMES,
   expandOcExecCalls,
 } = require('../../../utils/utils.js');
 const {
@@ -131,7 +130,6 @@ export const POST = apiHandler(async (request: NextRequest) => {
       authToken = authToken.split('::')[1];
     }
 
-    const hasTools = tools && Array.isArray(tools) && tools.length > 0;
     const cursorChecksum =
       request.headers.get('x-cursor-checksum') ??
       generateCursorChecksum(authToken.trim());
@@ -244,10 +242,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
                     cursorApiError = frameError;
                   }
 
-                  if (
-                    parallelToolCallsComplete &&
-                    nativeToolCalls.length > 0
-                  ) {
+                  if (parallelToolCallsComplete && nativeToolCalls.length > 0) {
                     signalFinalize = true;
                     break;
                   }
@@ -293,8 +288,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
               );
             }
 
-            const { remainingText, toolCallBlocks } =
-              toolCallDetector.finish();
+            const { remainingText, toolCallBlocks } = toolCallDetector.finish();
 
             const flushedTCs = toolCallAccumulator.flush();
             for (const tc of flushedTCs) {
@@ -303,9 +297,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
             }
 
             if (allThinking && !firstChunkSent) {
-              sendTextChunk(
-                '<thinking> ' + allThinking + ' </thinking> '
-              );
+              sendTextChunk('<thinking> ' + allThinking + ' </thinking> ');
             }
             if (remainingText) sendTextChunk(remainingText);
 
@@ -346,8 +338,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
             }
 
             if (allToolCalls.length === 0 && allTextAccumulated.length > 0) {
-              const normalized =
-                normalizeNearMissToolCalls(allTextAccumulated);
+              const normalized = normalizeNearMissToolCalls(allTextAccumulated);
               if (hasToolCallTags(normalized)) {
                 const { toolCalls: fallbackCalls } = parseToolCalls(
                   normalized,
@@ -429,9 +420,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
                     object: 'chat.completion.chunk',
                     created: Math.floor(Date.now() / 1000),
                     model,
-                    choices: [
-                      { index: 0, delta: {}, finish_reason: 'stop' },
-                    ],
+                    choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
                   })}\n\n`
                 )
               );
