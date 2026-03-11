@@ -14,10 +14,16 @@ const {
   IncrementalFrameParser,
   processSingleFrame,
   StreamingToolCallDetector,
+  StreamingToolCallAccumulator,
+  convertNativeToolCall,
+  CURSOR_TOOL_NAMES,
+  expandOcExecCalls,
 } = require('../../../utils/utils.js');
 const {
   parseToolCalls,
   hasToolCallTags,
+  normalizeNearMissToolCalls,
+  tryParseToolCallContent,
 } = require('../../../utils/toolEmulation.js');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
@@ -101,7 +107,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     const bearerToken = request.headers
       .get('authorization')
       ?.replace('Bearer ', '');
-    const keys = bearerToken?.split(',').map((key) => key.trim()) || [];
+    const keys = bearerToken?.split(',').map((key: string) => key.trim()) || [];
     let authToken = keys[Math.floor(Math.random() * keys.length)];
 
     if (
@@ -125,6 +131,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       authToken = authToken.split('::')[1];
     }
 
+    const hasTools = tools && Array.isArray(tools) && tools.length > 0;
     const cursorChecksum =
       request.headers.get('x-cursor-checksum') ??
       generateCursorChecksum(authToken.trim());
@@ -175,9 +182,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
     if (response.status !== 200) {
       return NextResponse.json(
-        {
-          error: response.statusText,
-        },
+        { error: response.statusText },
         { status: response.status }
       );
     }
@@ -185,52 +190,31 @@ export const POST = apiHandler(async (request: NextRequest) => {
     if (stream) {
       const encoder = new TextEncoder();
       const responseId = `chatcmpl-${uuidv4()}`;
-      const hasTools = tools && tools.length > 0;
 
       const readableStream = new ReadableStream({
         async start(controller) {
           const frameParser = new IncrementalFrameParser();
+          const toolCallDetector = new StreamingToolCallDetector();
+          const toolCallAccumulator = new StreamingToolCallAccumulator();
+          const nativeToolCalls: any[] = [];
           const seenToolCallIds = new Set();
-          const toolDetector = hasTools
-            ? new StreamingToolCallDetector()
-            : null;
+          let allTextAccumulated = '';
+          let allThinking = '';
           let firstChunkSent = false;
-          let thinkingBuffer = '';
 
-          function sendSSE(content: string) {
-            if (!content) return;
-            const delta: Record<string, string> = { content };
-            if (!firstChunkSent) {
-              (delta as any).role = 'assistant';
-              firstChunkSent = true;
-            }
+          function sendTextChunk(text: string) {
+            if (!text) return;
+            const delta: any = !firstChunkSent
+              ? { role: 'assistant', content: text }
+              : { content: text };
+            firstChunkSent = true;
             controller.enqueue(
               encoder.encode(
                 `data: ${JSON.stringify({
                   id: responseId,
                   object: 'chat.completion.chunk',
                   created: Math.floor(Date.now() / 1000),
-                  model: model,
-                  choices: [{ index: 0, delta, finish_reason: null }],
-                })}\n\n`
-              )
-            );
-          }
-
-          function sendToolCallSSE(toolCallArr: any[]) {
-            const delta: any = {};
-            if (!firstChunkSent) {
-              delta.role = 'assistant';
-              firstChunkSent = true;
-            }
-            delta.tool_calls = toolCallArr;
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({
-                  id: responseId,
-                  object: 'chat.completion.chunk',
-                  created: Math.floor(Date.now() / 1000),
-                  model: model,
+                  model,
                   choices: [{ index: 0, delta, finish_reason: null }],
                 })}\n\n`
               )
@@ -238,83 +222,199 @@ export const POST = apiHandler(async (request: NextRequest) => {
           }
 
           try {
-            for await (const chunk of response.body as any) {
-              const frames = frameParser.addChunk(Buffer.from(chunk));
-              for (const frame of frames) {
-                const { text, thinking } = processSingleFrame(
-                  frame.magic,
-                  frame.data,
-                  seenToolCallIds
-                );
-
-                if (thinking) {
-                  if (!thinkingBuffer) {
-                    sendSSE('<thinking>\n');
-                  }
-                  thinkingBuffer += thinking;
-                  sendSSE(thinking);
-                }
-
-                if (text) {
-                  if (thinkingBuffer) {
-                    sendSSE('\n</thinking>\n');
-                    thinkingBuffer = '';
-                  }
-                  if (toolDetector) {
-                    const safeText = toolDetector.addText(text);
-                    if (safeText) sendSSE(safeText);
-                  } else {
-                    sendSSE(text);
-                  }
-                }
-              }
-            }
-
-            if (thinkingBuffer) {
-              sendSSE('\n</thinking>\n');
-            }
-
-            let finishReason = 'stop';
-
-            if (toolDetector) {
-              const { remainingText, toolCallBlocks } = toolDetector.finish();
-              if (remainingText) sendSSE(remainingText);
-
-              if (toolCallBlocks.length > 0) {
-                const tcXml = toolCallBlocks
-                  .map((b: string) => `<tool_call>\n${b}\n</tool_call>`)
-                  .join('\n');
-                const parsed = parseToolCalls(tcXml, tools);
-                if (parsed.length > 0) {
-                  sendToolCallSSE(
-                    parsed.map((tc: any, i: number) => ({
-                      index: i,
-                      id: tc.id,
-                      type: 'function',
-                      function: {
-                        name: tc.function.name,
-                        arguments: tc.function.arguments,
-                      },
-                    }))
+            let signalFinalize = false;
+            try {
+              for await (const chunk of response.body as any) {
+                const frames = frameParser.addChunk(Buffer.from(chunk));
+                for (const frame of frames) {
+                  const {
+                    text,
+                    thinking,
+                    nativeToolCalls: frameTCs,
+                    parallelToolCallsComplete,
+                  } = processSingleFrame(
+                    frame.magic,
+                    frame.data,
+                    seenToolCallIds
                   );
-                  finishReason = 'tool_calls';
+
+                  if (
+                    parallelToolCallsComplete &&
+                    nativeToolCalls.length > 0
+                  ) {
+                    signalFinalize = true;
+                    break;
+                  }
+
+                  for (const tc of frameTCs) {
+                    let completed;
+                    if (tc.isStreaming || tc.isLastMessage) {
+                      completed = toolCallAccumulator.feed(tc);
+                    } else {
+                      completed = tc;
+                    }
+                    if (completed) {
+                      const mapped = convertNativeToolCall(completed);
+                      if (mapped) nativeToolCalls.push(mapped);
+                    }
+                  }
+
+                  if (thinking) allThinking += thinking;
+
+                  if (text) {
+                    allTextAccumulated += text;
+                    const safeText = toolCallDetector.addText(text);
+                    if (safeText) {
+                      if (allThinking && !firstChunkSent) {
+                        sendTextChunk(
+                          '<thinking> ' +
+                            allThinking +
+                            ' </thinking> ' +
+                            safeText
+                        );
+                        allThinking = '';
+                      } else {
+                        sendTextChunk(safeText);
+                      }
+                    }
+                  }
                 }
+                if (signalFinalize) break;
+              }
+            } catch (streamReadErr: any) {
+              console.warn(
+                `[streaming] Stream terminated early: ${streamReadErr.message || streamReadErr}`
+              );
+            }
+
+            const { remainingText, toolCallBlocks } =
+              toolCallDetector.finish();
+
+            const flushedTCs = toolCallAccumulator.flush();
+            for (const tc of flushedTCs) {
+              const mapped = convertNativeToolCall(tc);
+              if (mapped) nativeToolCalls.push(mapped);
+            }
+
+            if (allThinking && !firstChunkSent) {
+              sendTextChunk(
+                '<thinking> ' + allThinking + ' </thinking> '
+              );
+            }
+            if (remainingText) sendTextChunk(remainingText);
+
+            const allToolCalls: any[] = [];
+
+            for (const mapped of nativeToolCalls) {
+              if (mapped.truncated) {
+                sendTextChunk(`\n${mapped.hint}\n`);
+                const safeFilePath = (mapped.filePath || 'file').replace(
+                  /'/g,
+                  "'\\''"
+                );
+                allToolCalls.push({
+                  id: `call_${uuidv4()}`,
+                  type: 'function',
+                  function: {
+                    name: 'exec',
+                    arguments: JSON.stringify({
+                      command: `echo "Ready for chunked heredoc write to: ${safeFilePath}"`,
+                    }),
+                  },
+                });
+              } else {
+                allToolCalls.push({
+                  id: `call_${uuidv4()}`,
+                  type: 'function',
+                  function: {
+                    name: mapped.name,
+                    arguments: JSON.stringify(mapped.arguments),
+                  },
+                });
               }
             }
 
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({
-                  id: responseId,
-                  object: 'chat.completion.chunk',
-                  created: Math.floor(Date.now() / 1000),
-                  model: model,
-                  choices: [
-                    { index: 0, delta: {}, finish_reason: finishReason },
-                  ],
-                })}\n\n`
-              )
-            );
+            for (const block of toolCallBlocks) {
+              const parsed = tryParseToolCallContent(block, tools);
+              if (parsed) allToolCalls.push(parsed);
+            }
+
+            if (allToolCalls.length === 0 && allTextAccumulated.length > 0) {
+              const normalized =
+                normalizeNearMissToolCalls(allTextAccumulated);
+              if (hasToolCallTags(normalized)) {
+                const { toolCalls: fallbackCalls } = parseToolCalls(
+                  normalized,
+                  tools
+                );
+                for (const tc of fallbackCalls) allToolCalls.push(tc);
+              }
+            }
+
+            const finalToolCalls = expandOcExecCalls(allToolCalls);
+
+            if (finalToolCalls.length > 0) {
+              for (let i = 0; i < finalToolCalls.length; i++) {
+                const tc = finalToolCalls[i];
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({
+                      id: responseId,
+                      object: 'chat.completion.chunk',
+                      created: Math.floor(Date.now() / 1000),
+                      model,
+                      choices: [
+                        {
+                          index: 0,
+                          delta: {
+                            tool_calls: [
+                              {
+                                index: i,
+                                id: tc.id,
+                                type: 'function',
+                                function: {
+                                  name: tc.function.name,
+                                  arguments: tc.function.arguments,
+                                },
+                              },
+                            ],
+                          },
+                          finish_reason: null,
+                        },
+                      ],
+                    })}\n\n`
+                  )
+                );
+              }
+
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    id: responseId,
+                    object: 'chat.completion.chunk',
+                    created: Math.floor(Date.now() / 1000),
+                    model,
+                    choices: [
+                      { index: 0, delta: {}, finish_reason: 'tool_calls' },
+                    ],
+                  })}\n\n`
+                )
+              );
+            } else {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    id: responseId,
+                    object: 'chat.completion.chunk',
+                    created: Math.floor(Date.now() / 1000),
+                    model,
+                    choices: [
+                      { index: 0, delta: {}, finish_reason: 'stop' },
+                    ],
+                  })}\n\n`
+                )
+              );
+            }
           } catch (streamError: any) {
             console.error('Stream error:', streamError);
             controller.enqueue(
@@ -339,8 +439,17 @@ export const POST = apiHandler(async (request: NextRequest) => {
     } else {
       try {
         const rawChunksNS: Buffer[] = [];
-        for await (const chunk of response.body as any) {
-          rawChunksNS.push(Buffer.from(chunk));
+        try {
+          for await (const chunk of response.body as any) {
+            rawChunksNS.push(Buffer.from(chunk));
+          }
+        } catch (nsStreamErr: any) {
+          console.warn(
+            `[non-stream] Stream terminated early: ${nsStreamErr.message || nsStreamErr}`
+          );
+        }
+        if (rawChunksNS.length === 0) {
+          throw new Error('No data received from Cursor API');
         }
         const fullBufferNS = Buffer.concat(rawChunksNS);
         const { thinking: thinkNS, text: textNS } =
@@ -348,63 +457,55 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
         let content = '';
         if (thinkNS && thinkNS.length > 0) {
-          content += '<thinking>\n' + thinkNS + '\n</thinking>\n';
+          content += '<thinking> ' + thinkNS + ' </thinking> ';
         }
         content += textNS;
 
-        const hasToolTags =
-          tools && tools.length > 0 && hasToolCallTags(content);
-        if (hasToolTags) {
-          const parsed = parseToolCalls(content, tools);
-          if (parsed.length > 0) {
-            const cleanContent = content
-              .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, '')
-              .trim();
-            return NextResponse.json({
-              id: `chatcmpl-${uuidv4()}`,
-              object: 'chat.completion',
-              created: Math.floor(Date.now() / 1000),
-              model: model,
-              choices: [
-                {
-                  index: 0,
-                  message: {
-                    role: 'assistant',
-                    content: cleanContent || null,
-                    tool_calls: parsed.map((tc: any, i: number) => ({
-                      index: i,
-                      id: tc.id,
-                      type: 'function',
-                      function: {
-                        name: tc.function.name,
-                        arguments: tc.function.arguments,
-                      },
-                    })),
-                  },
-                  finish_reason: 'tool_calls',
-                },
-              ],
-              usage: {
-                prompt_tokens: 0,
-                completion_tokens: 0,
-                total_tokens: 0,
-              },
-            });
+        content = normalizeNearMissToolCalls(content);
+
+        if (hasToolCallTags(content)) {
+          const { textContent, toolCalls } = parseToolCalls(content, tools);
+          const expandedToolCalls = expandOcExecCalls(toolCalls);
+
+          const message: any = {
+            role: 'assistant',
+            content: textContent || null,
+          };
+
+          if (expandedToolCalls.length > 0) {
+            message.tool_calls = expandedToolCalls;
           }
+
+          return NextResponse.json({
+            id: `chatcmpl-${uuidv4()}`,
+            object: 'chat.completion',
+            created: Math.floor(Date.now() / 1000),
+            model,
+            choices: [
+              {
+                index: 0,
+                message,
+                finish_reason:
+                  expandedToolCalls.length > 0 ? 'tool_calls' : 'stop',
+              },
+            ],
+            usage: {
+              prompt_tokens: 0,
+              completion_tokens: 0,
+              total_tokens: 0,
+            },
+          });
         }
 
         return NextResponse.json({
           id: `chatcmpl-${uuidv4()}`,
           object: 'chat.completion',
           created: Math.floor(Date.now() / 1000),
-          model: model,
+          model,
           choices: [
             {
               index: 0,
-              message: {
-                role: 'assistant',
-                content: content,
-              },
+              message: { role: 'assistant', content },
               finish_reason: 'stop',
             },
           ],
@@ -427,15 +528,14 @@ export const POST = apiHandler(async (request: NextRequest) => {
     }
   } catch (error: any) {
     console.error('Error:', error);
-    const errorMessage = {
-      error:
-        error.name === 'TimeoutError'
-          ? 'Request timeout'
-          : 'Internal server error',
-    };
-
-    return NextResponse.json(errorMessage, {
-      status: error.name === 'TimeoutError' ? 408 : 500,
-    });
+    return NextResponse.json(
+      {
+        error:
+          error.name === 'TimeoutError'
+            ? 'Request timeout'
+            : 'Internal server error',
+      },
+      { status: error.name === 'TimeoutError' ? 408 : 500 }
+    );
   }
 });
